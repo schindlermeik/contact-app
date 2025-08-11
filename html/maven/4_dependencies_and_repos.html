@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Abh&auml;ngigkeiten und das Repository-Konzept in Maven</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-abhängigkeiten-und-das-repository-konzept-in-maven">Handout: Abhängigkeiten und das Repository-Konzept in Maven</h1>
+<hr>
+<h2 id="41-woher-bekommt-maven-die-bibliotheken">4.1 <strong>Woher bekommt Maven die Bibliotheken?</strong></h2>
+<p>Maven verwaltet für dich alle externen Bibliotheken, die du als Abhängigkeiten (<code>&lt;dependency&gt;</code>) in deiner <code>pom.xml</code> einträgst. Doch woher kommen diese Bibliotheken eigentlich?</p>
+<h3 id="1-lokales-repository-m2repository"><strong>1. Lokales Repository (<code>~/.m2/repository</code>):</strong></h3>
+<ul>
+<li>Dein <strong>lokales Repository</strong> ist ein Ordner auf deinem Rechner (standardmäßig unter <code>C:\Users\&lt;deinname&gt;\.m2\repository</code> oder <code>~/.m2/repository</code>).</li>
+<li>Hier speichert Maven <strong>alle Bibliotheken</strong>, die dein Projekt (oder andere Maven-Projekte auf deinem Rechner) bereits verwendet hat.</li>
+<li>Vorteil: <strong>Schneller Zugriff</strong> und keine erneuten Downloads, solange die richtige Version schon lokal liegt.</li>
+</ul>
+<h3 id="2-firmeninterne-repositories-zb-nexus-artifactory"><strong>2. Firmeninterne Repositories (z. B. Nexus, Artifactory):</strong></h3>
+<ul>
+<li>
+<p>In größeren Unternehmen gibt es oft ein <strong>internes Maven-Repository</strong> (z. B. mit <a href="https://www.sonatype.com/products/repository-oss">Sonatype Nexus</a> oder <a href="https://jfrog.com/artifactory/">JFrog Artifactory</a>).</p>
+</li>
+<li>
+<p>Vorteil:</p>
+<ul>
+<li><strong>Sicherer</strong> Zugriff (Bibliotheken werden geprüft/freigegeben).</li>
+<li>Proprietäre Bibliotheken (z. B. Eigenentwicklungen) werden dort verteilt.</li>
+<li>Netzwerkintern meist <strong>schneller</strong> als das Internet.</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-zentrales-maven-repository-maven-central-internet"><strong>3. Zentrales Maven-Repository (Maven Central, Internet):</strong></h3>
+<ul>
+<li>Maven Central (<code>https://repo.maven.apache.org/maven2</code>) ist das größte öffentliche Repository für Java-Bibliotheken.</li>
+<li>Wenn Maven eine Dependency <strong>weder lokal noch intern</strong> findet, lädt es sie <strong>direkt aus dem Internet</strong>.</li>
+<li>Vorteil: <strong>Immer aktuelle und viele Open-Source-Bibliotheken</strong> verfügbar.</li>
+</ul>
+<hr>
+<h2 id="42-wie-funktioniert-das-auflösen-von-abhängigkeiten">4.2 <strong>Wie funktioniert das Auflösen von Abhängigkeiten?</strong></h2>
+<p>Maven löst Abhängigkeiten <strong>in einer festen Reihenfolge</strong> auf:</p>
+<ol>
+<li>
+<p><strong>Zuerst schaut Maven im lokalen Repository nach.</strong></p>
+<ul>
+<li>Ist die passende JAR-Version schon da? → Sofort verwenden!</li>
+</ul>
+</li>
+<li>
+<p><strong>Falls nicht, fragt Maven das interne Firmen-Repository ab.</strong></p>
+<ul>
+<li>Das ist meist in der <code>settings.xml</code> hinterlegt.</li>
+</ul>
+</li>
+<li>
+<p><strong>Falls dort auch nicht gefunden, wird Maven Central (Internet) genutzt.</strong></p>
+<ul>
+<li>Maven lädt die gewünschte Bibliothek samt aller nötigen Zusatzdateien herunter und legt sie im lokalen Repository ab.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Was passiert beim ersten Hinzufügen einer Dependency?</strong></p>
+<ul>
+<li>
+<p>Beim ersten Build (z. B. mit <code>mvn clean compile</code>), wenn du eine neue Dependency in die <code>pom.xml</code> schreibst:</p>
+<ul>
+<li>Maven sucht sie <strong>lokal</strong> → nicht da.</li>
+<li>Fragt intern (sofern konfiguriert) → vielleicht nicht da.</li>
+<li>Holt sie dann <strong>aus dem Internet</strong> (Maven Central).</li>
+<li>Speichert sie im lokalen Repository.</li>
+<li><strong>Ab jetzt</strong> werden alle weiteren Builds diese Bibliothek lokal nutzen – kein weiterer Download nötig!</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="43-transitive-abhängigkeiten">4.3 <strong>Transitive Abhängigkeiten</strong></h2>
+<h3 id="was-bedeutet-das"><strong>Was bedeutet das?</strong></h3>
+<ul>
+<li>Viele Bibliotheken <strong>nutzen selbst wieder andere Bibliotheken</strong>.</li>
+<li>Wenn du z. B. <code>spring-boot-starter-web</code> einbindest, bringt dieses Paket weitere Bibliotheken mit (Spring Core, Jackson, Tomcat, usw.).</li>
+<li>Maven löst <strong>alle Abhängigkeiten rekursiv</strong> auf und lädt auch die „Abhängigkeiten der Abhängigkeiten“ automatisch nach.</li>
+</ul>
+<h3 id="beispiel"><strong>Beispiel:</strong></h3>
+<p>Du fügst in der <code>pom.xml</code> ein:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.2.5<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<ul>
+<li>Maven lädt nicht nur <code>spring-boot-starter-web</code>, sondern <strong>alle Module, die dieses Paket benötigt</strong> (z. B. <code>spring-core</code>, <code>spring-web</code>, <code>jackson-databind</code>, …).</li>
+</ul>
+<h3 id="demo-transitive-abhängigkeiten-mit-mvn-dependencytree-anzeigen"><strong>Demo: Transitive Abhängigkeiten mit <code>mvn dependency:tree</code> anzeigen</strong></h3>
+<p>Mit diesem Befehl kannst du alle (auch indirekten) Abhängigkeiten deines Projekts in einer Baumstruktur anzeigen:</p>
+<pre><code class="language-sh">mvn dependency:tree
+</code></pre>
+<p>So erkennst du z. B.:</p>
+<ul>
+<li>Wo kommt eine bestimmte Bibliothek eigentlich her?</li>
+<li>Warum ist Bibliothek X im Classpath?</li>
+</ul>
+<hr>
+<h2 id="44-typische-probleme-beim-dependency-management">4.4 <strong>Typische Probleme beim Dependency-Management</strong></h2>
+<h3 id="1-versionskonflikte-dependency-hell"><strong>1. Versionskonflikte („Dependency Hell“):</strong></h3>
+<ul>
+<li>
+<p>Zwei Bibliotheken benötigen <strong>unterschiedliche Versionen</strong> der gleichen Abhängigkeit.</p>
+</li>
+<li>
+<p>Beispiel:</p>
+<ul>
+<li>Bibliothek A braucht <code>guava:27.0</code>,</li>
+<li>Bibliothek B braucht <code>guava:30.1</code>.</li>
+</ul>
+</li>
+<li>
+<p>Maven entscheidet (nach dem „nearest-wins“-Prinzip), aber das führt manchmal zu Fehlern („NoSuchMethodError“).</p>
+</li>
+</ul>
+<p><strong>Tipp:</strong>
+Mit <code>&lt;dependencyManagement&gt;</code> kannst du die Versionen gezielt zentral vorgeben.</p>
+<hr>
+<h3 id="2-fehlende-oder-falsche-abhängigkeiten"><strong>2. Fehlende oder falsche Abhängigkeiten</strong></h3>
+<ul>
+<li>
+<p>Manchmal verschreibt man sich bei <code>&lt;groupId&gt;</code> oder <code>&lt;artifactId&gt;</code> – dann findet Maven die Bibliothek nicht (Fehlermeldung im Build-Log).</p>
+</li>
+<li>
+<p>Manche Bibliotheken sind <strong>nicht öffentlich</strong> verfügbar (z. B. kostenpflichtig oder nur im internen Firmen-Repo).</p>
+</li>
+<li>
+<p><strong>Lösung:</strong></p>
+<ul>
+<li>
+<p>Prüfe die Schreibweise oder ob du das richtige Repository nutzt.</p>
+</li>
+<li>
+<p>Falls die Bibliothek nicht gefunden wird:</p>
+<ul>
+<li>Nach Tippfehler suchen</li>
+<li>Version gegen <a href="https://search.maven.org">search.maven.org</a> prüfen</li>
+<li>Ggf. internes Repository in <code>settings.xml</code> ergänzen</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li>Maven verwaltet Abhängigkeiten zentral, lädt sie bei Bedarf aus verschiedenen Quellen und speichert sie lokal.</li>
+<li>Transitive Abhängigkeiten werden automatisch mitgezogen.</li>
+<li>Mit <code>mvn dependency:tree</code> kannst du den Abhängigkeitsbaum inspizieren.</li>
+<li>Typische Probleme sind Versionskonflikte und fehlende Artefakte – diese lassen sich mit gezieltem Management und Kontrolle der Repositories meist gut lösen.</li>
+</ul>
+<hr>
+
+            
+            
+        </body>
+        </html>

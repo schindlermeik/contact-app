@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>&ast;&ast;Handout&colon; Einf&uuml;hrung und Grundlagen in IntelliJ IDEA&ast;&ast;</title>
+    <style>
+        /* From extension vscode.github */
+        /*---------------------------------------------------------------------------------------------
+         *  Copyright (c) Microsoft Corporation. All rights reserved.
+         *  Licensed under the MIT License. See License.txt in the project root for license information.
+         *--------------------------------------------------------------------------------------------*/
+
+        .vscode-dark img[src$=\#gh-light-mode-only],
+        .vscode-light img[src$=\#gh-dark-mode-only],
+        .vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+        .vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+            display: none;
+        }
+
+    </style>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+    <style>
+        .task-list-item {
+            list-style-type: none;
+        }
+
+        .task-list-item-checkbox {
+            margin-left: -20px;
+            vertical-align: middle;
+            pointer-events: none;
+        }
+    </style>
+    <style>
+        :root {
+          --color-note: #0969da;
+          --color-tip: #1a7f37;
+          --color-warning: #9a6700;
+          --color-severe: #bc4c00;
+          --color-caution: #d1242f;
+          --color-important: #8250df;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --color-note: #2f81f7;
+            --color-tip: #3fb950;
+            --color-warning: #d29922;
+            --color-severe: #db6d28;
+            --color-caution: #f85149;
+            --color-important: #a371f7;
+          }
+        }
+
+    </style>
+    <style>
+        .markdown-alert {
+          padding: 0.5rem 1rem;
+          margin-bottom: 16px;
+          color: inherit;
+          border-left: .25em solid #888;
+        }
+
+        .markdown-alert>:first-child {
+          margin-top: 0
+        }
+
+        .markdown-alert>:last-child {
+          margin-bottom: 0
+        }
+
+        .markdown-alert .markdown-alert-title {
+          display: flex;
+          font-weight: 500;
+          align-items: center;
+          line-height: 1
+        }
+
+        .markdown-alert .markdown-alert-title .octicon {
+          margin-right: 0.5rem;
+          display: inline-block;
+          overflow: visible !important;
+          vertical-align: text-bottom;
+          fill: currentColor;
+        }
+
+        .markdown-alert.markdown-alert-note {
+          border-left-color: var(--color-note);
+        }
+
+        .markdown-alert.markdown-alert-note .markdown-alert-title {
+          color: var(--color-note);
+        }
+
+        .markdown-alert.markdown-alert-important {
+          border-left-color: var(--color-important);
+        }
+
+        .markdown-alert.markdown-alert-important .markdown-alert-title {
+          color: var(--color-important);
+        }
+
+        .markdown-alert.markdown-alert-warning {
+          border-left-color: var(--color-warning);
+        }
+
+        .markdown-alert.markdown-alert-warning .markdown-alert-title {
+          color: var(--color-warning);
+        }
+
+        .markdown-alert.markdown-alert-tip {
+          border-left-color: var(--color-tip);
+        }
+
+        .markdown-alert.markdown-alert-tip .markdown-alert-title {
+          color: var(--color-tip);
+        }
+
+        .markdown-alert.markdown-alert-caution {
+          border-left-color: var(--color-caution);
+        }
+
+        .markdown-alert.markdown-alert-caution .markdown-alert-title {
+          color: var(--color-caution);
+        }
+
+    </style>
+
+</head>
+<body class="vscode-body vscode-light">
+<h1 id="handout-einführung-und-grundlagen-in-intellij-idea"><strong>Handout: Einführung und Grundlagen in IntelliJ
+    IDEA</strong></h1>
+<hr>
+<h2 id="1-installation-und-erster-start"><strong>1. Installation und erster Start</strong></h2>
+<h3 id="11-intellij-idea--versionen--download"><strong>1.1. IntelliJ IDEA – Versionen &amp; Download</strong></h3>
+<p><strong>IntelliJ IDEA</strong> gibt es in zwei Hauptvarianten:</p>
+<ul>
+    <li><strong>Community Edition</strong> (kostenlos, für Java, Kotlin, Groovy etc.)</li>
+    <li><strong>Ultimate Edition</strong> (kostenpflichtig, für Web, Datenbanken, erweiterte Frameworks)</li>
+</ul>
+<p><strong>Download:</strong>
+    <a href="https://www.jetbrains.com/idea/download/">https://www.jetbrains.com/idea/download/</a></p>
+<p><strong>Installation:</strong></p>
+<ul>
+    <li>Lade das Installationspaket für dein Betriebssystem herunter (Windows, macOS, Linux).</li>
+    <li>Starte den Installer und folge den Schritten.</li>
+    <li>Unter Windows kannst du bei der Installation zusätzliche Optionen wie das Anlegen einer Desktopverknüpfung oder
+        das Hinzufügen zur PATH-Variable auswählen.
+    </li>
+</ul>
+<p><strong>Tipp:</strong> Beim ersten Start prüft IntelliJ, ob du Einstellungen aus einer früheren Version übernehmen
+    möchtest. Falls nicht vorhanden, starte „mit Standardeinstellungen“.</p>
+<hr>
+<h3 id="12-überblick-über-die-benutzeroberfläche"><strong>1.2. Überblick über die Benutzeroberfläche</strong></h3>
+<p>Beim ersten Start erscheint ein Startbildschirm.
+    Nach dem Öffnen oder Anlegen eines Projekts siehst du die Hauptoberfläche, die sich in folgende Bereiche
+    gliedert:</p>
+<ul>
+    <li><strong>Menüleiste</strong>: Zugriff auf alle Funktionen (Datei, Bearbeiten, Ansicht, Navigieren etc.).</li>
+    <li><strong>Toolbar</strong>: Schneller Zugriff auf wichtige Aktionen (Projekt starten, Debuggen, VCS usw.).</li>
+    <li><strong>Projektfenster</strong> (links): Zeigt die Projektstruktur, alle Dateien und Ordner deines Projekts.
+    </li>
+    <li><strong>Editorfenster</strong> (zentral): Hier bearbeitest du deinen Code. Mehrere Tabs sind möglich.</li>
+    <li><strong>Toolfenster</strong> (unten/rechts): Z. B. Terminal, Problems, TODO, Version Control, Debug, Run,
+        Services etc.
+    </li>
+    <li><strong>Statusleiste</strong> (unten): Zeigt Infos wie Codierungsformat, Zeilenumbruch, Git-Branch etc.</li>
+</ul>
+<p><strong>Tipp:</strong>
+    Alle Fenster kannst du ein- und ausblenden (z. B. „Project“ mit Alt+1).</p>
+<hr>
+<h2 id="2-projektverwaltung"><strong>2. Projektverwaltung</strong></h2>
+<h3 id="21-neues-projekt-anlegen"><strong>2.1. Neues Projekt anlegen</strong></h3>
+<p><strong>Vorgehen:</strong></p>
+<ol>
+    <li>Starte IntelliJ IDEA.</li>
+    <li>Klicke auf „New Project“.</li>
+    <li>Wähle den Projekttyp (z. B. „Java“, „Maven“, „Gradle“ etc.).</li>
+    <li>Gib den Projektstandort und den Namen an.</li>
+    <li>Wähle ggf. das JDK aus (falls keines vorhanden, kannst du ein JDK direkt herunterladen).</li>
+    <li>Klicke auf „Create“.</li>
+</ol>
+<p><strong>Projekttypen:</strong></p>
+<ul>
+    <li><strong>Einfaches Java-Projekt:</strong> Für kleine Übungen oder Einsteiger.</li>
+    <li><strong>Maven-/Gradle-Projekt:</strong> Für größere Projekte, bei denen du externe Bibliotheken nutzen willst.
+    </li>
+</ul>
+<hr>
+<h3 id="22-projektstruktur-und-konfigurationsdateien"><strong>2.2. Projektstruktur und Konfigurationsdateien</strong>
+</h3>
+<p>Nach dem Anlegen findest du im Projektfenster:</p>
+<ul>
+    <li>
+        <p><strong>src/</strong>: Quellcodeverzeichnis (meist mit Unterordnern wie <code>main/java</code> und <code>test/java</code>
+            bei Maven/Gradle)</p>
+    </li>
+    <li>
+        <p><strong>.idea/</strong>: Projekteinstellungen (nur relevant für IDE)</p>
+    </li>
+    <li>
+        <p><strong>Projektdateien</strong> (<code>.iml</code>, <code>pom.xml</code>, <code>build.gradle</code> etc.):
+        </p>
+        <ul>
+            <li><strong>pom.xml</strong> (Maven): Definiert Abhängigkeiten und Build-Konfiguration.</li>
+            <li><strong>build.gradle</strong> (Gradle): Dasselbe für Gradle-Projekte.</li>
+        </ul>
+    </li>
+</ul>
+<p><strong>Tipp:</strong>
+    Bearbeite Konfigurationsdateien lieber in IntelliJ – die IDE unterstützt mit Syntax-Highlighting,
+    Autovervollständigung und Fehleranzeige.</p>
+<hr>
+<h3 id="23-projekte-öffnen-und-schließen"><strong>2.3. Projekte öffnen und schließen</strong></h3>
+<ul>
+    <li>
+        <p><strong>Projekt öffnen:</strong></p>
+        <ul>
+            <li>„File“ → „Open“ und dann den Projektordner auswählen.</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>Projekt schließen:</strong></p>
+        <ul>
+            <li>„File“ → „Close Project“.</li>
+            <li>Alternativ: Mit Strg+Shift+F4 den aktuellen Tab/Projekt schließen.</li>
+        </ul>
+    </li>
+</ul>
+<p><strong>Mehrere Projekte:</strong>
+    Du kannst mehrere Projekte gleichzeitig öffnen (als separates Fenster oder als Module im selben Fenster).</p>
+<hr>
+<h2 id="3-grundlegende-navigation"><strong>3. Grundlegende Navigation</strong></h2>
+<p>Effiziente Navigation spart viel Zeit! IntelliJ bietet viele Hilfen:</p>
+<h3 id="31-schnelle-suche-nach-klassen-und-dateien"><strong>3.1. Schnelle Suche nach Klassen und Dateien</strong></h3>
+<ul>
+    <li>
+        <p><strong>Klassen suchen:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux:</strong> Strg + N</li>
+            <li><strong>macOS:</strong> ⌘ + O</li>
+            <li>Tipp: Einfach den Klassennamen (auch Teile) eintippen.</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>Dateien suchen:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux:</strong> Strg + Shift + N</li>
+            <li><strong>macOS:</strong> ⌘ + Shift + O</li>
+            <li>Hier kannst du beliebige Dateien finden (nicht nur Code, auch Ressourcen).</li>
+        </ul>
+    </li>
+</ul>
+<hr>
+<h3 id="32-search-everywhere--überall-suchen"><strong>3.2. „Search Everywhere“ – überall suchen</strong></h3>
+<ul>
+    <li>
+        <p><strong>Shortcut:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux/macOS:</strong> Doppelt Shift drücken</li>
+            <li>Suchfeld erscheint, hier kannst du alles durchsuchen: Klassen, Dateien, Symbole, Aktionen, Einstellungen
+                usw.
+            </li>
+        </ul>
+    </li>
+</ul>
+<hr>
+<h3 id="33-wechsel-zwischen-zuletzt-geöffneten-dateien"><strong>3.3. Wechsel zwischen zuletzt geöffneten
+    Dateien</strong></h3>
+<ul>
+    <li>
+        <p><strong>Shortcut:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux:</strong> Strg + E</li>
+            <li><strong>macOS:</strong> ⌘ + E</li>
+            <li>Es öffnet sich eine Liste der zuletzt verwendeten Dateien. Pfeiltasten und Enter zum Auswählen.</li>
+        </ul>
+    </li>
+</ul>
+<hr>
+<h3 id="34-navigation-zwischen-methoden-und-implementierungen"><strong>3.4. Navigation zwischen Methoden und
+    Implementierungen</strong></h3>
+<ul>
+    <li>
+        <p><strong>Springe zur Implementierung:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux:</strong> Strg + Alt + B</li>
+            <li><strong>macOS:</strong> ⌘ + Alt + B</li>
+            <li>Nützlich bei Interfaces oder abstrakten Methoden.</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>Springe zur Deklaration:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux:</strong> Strg + B oder Strg + Klick</li>
+            <li><strong>macOS:</strong> ⌘ + B</li>
+            <li>Direkt zur Deklaration einer Variablen, Methode oder Klasse springen.</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>Zurück und Vor:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux:</strong> Alt + Links/Rechts</li>
+            <li><strong>macOS:</strong> ⌘ + [ oder ⌘ + ]</li>
+            <li>Springe zu deiner vorherigen oder nächsten Position im Code.</li>
+        </ul>
+    </li>
+</ul>
+<hr>
+<h3 id="35-bookmark-funktion"><strong>3.5. Bookmark-Funktion</strong></h3>
+<p>Markiere wichtige Codezeilen, um sie später schnell wiederzufinden.</p>
+<ul>
+    <li>
+        <p><strong>Bookmark setzen/entfernen:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux:</strong> F11</li>
+            <li><strong>macOS:</strong> F3</li>
+            <li>Ein kleines Lesezeichen erscheint neben der Zeile.</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>Mit Nummer versehenes Bookmark setzen:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux:</strong> Strg + F11</li>
+            <li><strong>macOS:</strong> ⌘ + F3</li>
+            <li>Praktisch, um mehrere Bookmarks zu verwalten (z. B. Bookmark 1, 2, 3…)</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>Zu einem Bookmark springen:</strong></p>
+        <ul>
+            <li><strong>Windows/Linux:</strong> Shift + F11 (Bookmark-Übersicht öffnen)</li>
+            <li><strong>macOS:</strong> Shift + F3</li>
+        </ul>
+    </li>
+</ul>
+<hr>
+<h2 id="tipps--hinweise"><strong>Tipps &amp; Hinweise</strong></h2>
+<ul>
+    <li><strong>Shortcuts üben:</strong> Viele Funktionen kannst du schneller per Tastenkürzel erreichen. Nutze ggf. die
+        integrierte Shortcut-Hilfe (<code>Help</code> → <code>Keymap Reference</code>).
+    </li>
+    <li><strong>Fensteransicht individuell anpassen:</strong> Mit Doppelklick auf einen Editor-Tab wird dieser
+        maximiert.
+    </li>
+    <li><strong>IDE-Einstellungen durchsuchen:</strong> Strg + Alt + S öffnet die Einstellungen – hier kannst du alles
+        individuell anpassen.
+    </li>
+    <li><strong>Projekte regelmäßig speichern:</strong> IntelliJ speichert zwar automatisch, aber ein manuelles
+        Speichern schadet nie (Strg + S).
+    </li>
+</ul>
+<hr>
+<hr>
+<p><strong>Tipp:</strong>
+    Mache dir beim Erkunden Notizen zu Fragen oder Unklarheiten – diese kannst du im Kurs oder mit Hilfe der
+    JetBrains-Dokumentation klären.</p>
+
+
+</body>
+</html>

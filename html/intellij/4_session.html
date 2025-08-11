@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&ast;&ast;Handout&colon; Arbeiten mit Ressourcen&comma; Tools und Konfigurationen in IntelliJ IDEA&ast;&ast;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-arbeiten-mit-ressourcen-tools-und-konfigurationen-in-intellij-idea"><strong>Handout: Arbeiten mit Ressourcen, Tools und Konfigurationen in IntelliJ IDEA</strong></h1>
+<hr>
+<h2 id="1-arbeiten-mit-ressourcen-dateien"><strong>1. Arbeiten mit Ressourcen-Dateien</strong></h2>
+<p>Ressourcendateien sind Konfigurationsdateien, die dein Projekt steuern – etwa <code>.properties</code>, <code>.yml</code> (YAML) oder <code>.xml</code>-Dateien. Besonders in Java- und Spring-Projekten sind sie sehr wichtig.</p>
+<h3 id="11-properties-dateien"><strong>1.1. Properties-Dateien</strong></h3>
+<p><strong>Beispiel:</strong>
+<code>application.properties</code> für Spring Boot-Projekte.</p>
+<p><strong>Typische Inhalte:</strong></p>
+<pre><code class="language-properties"><span class="hljs-attr">server.port</span>=<span class="hljs-string">8081</span>
+<span class="hljs-attr">spring.datasource.url</span>=<span class="hljs-string">jdbc:mysql://localhost:3306/meinedatenbank</span>
+</code></pre>
+<p><strong>Funktionen in IntelliJ:</strong></p>
+<ul>
+<li>Syntax-Highlighting: IntelliJ erkennt Properties-Dateien und hebt Schlüssel/Werte farbig hervor.</li>
+<li>Autovervollständigung: Viele bekannte Properties werden vorgeschlagen.</li>
+<li>Fehlermeldungen: Fehlerhafte Zeilen werden markiert.</li>
+</ul>
+<p><strong>Tipp:</strong>
+Mit Strg + F kannst du in Properties-Dateien gezielt nach Einstellungen suchen.</p>
+<hr>
+<h3 id="12-yaml-dateien"><strong>1.2. YAML-Dateien</strong></h3>
+<p><strong>Beispiel:</strong>
+<code>application.yml</code> für Spring Boot-Projekte.</p>
+<p><strong>Typische Inhalte:</strong></p>
+<pre><code class="language-yaml"><span class="hljs-attr">server:</span>
+  <span class="hljs-attr">port:</span> <span class="hljs-number">8082</span>
+<span class="hljs-attr">spring:</span>
+  <span class="hljs-attr">datasource:</span>
+    <span class="hljs-attr">url:</span> <span class="hljs-string">jdbc:mysql://localhost:3306/meinedatenbank</span>
+</code></pre>
+<p><strong>Funktionen in IntelliJ:</strong></p>
+<ul>
+<li>Einrückungen werden geprüft und farblich hervorgehoben.</li>
+<li>Faltbare Bereiche (mit <code>-</code> und Einrückung).</li>
+<li>Autovervollständigung für viele Frameworks (z. B. Spring).</li>
+</ul>
+<p><strong>Tipp:</strong>
+Achte bei YAML immer auf korrekte Einrückung (z. B. 2 Leerzeichen pro Ebene).</p>
+<hr>
+<h3 id="13-xml-dateien"><strong>1.3. XML-Dateien</strong></h3>
+<p><strong>Beispiel:</strong>
+<code>pom.xml</code> (Maven) oder Spring-Konfiguration.</p>
+<p><strong>Typische Inhalte:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">project</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">modelVersion</span>&gt;</span>4.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">modelVersion</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.example<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>meine-anwendung<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">project</span>&gt;</span>
+</code></pre>
+<p><strong>Funktionen in IntelliJ:</strong></p>
+<ul>
+<li>Code-Vervollständigung für XML-Tags und Attribute.</li>
+<li>Fehleranzeige (z. B. vergessene schließende Tags).</li>
+<li>Automatische Formatierung (Alt + Shift + L / ⌘ + Alt + L).</li>
+<li>Verlinkung zu Dokumentation (Ctrl + Click auf XML-Tags).</li>
+</ul>
+<hr>
+<h3 id="14-strukturansicht-auch-für-ressourcen"><strong>1.4. Strukturansicht auch für Ressourcen</strong></h3>
+<p><strong>Shortcut:</strong></p>
+<ul>
+<li><strong>Alt + 7</strong> (Windows/Linux), <strong>⌘ + 7</strong> (macOS)
+Öffnet das Strukturfenster für die aktuell geöffnete Datei.</li>
+</ul>
+<p><strong>Was bringt das?</strong></p>
+<ul>
+<li>Zeigt alle Schlüssel (Properties), Knoten (YAML/XML), Tags und Werte übersichtlich an.</li>
+<li>Sehr praktisch für große Konfigurationsdateien!</li>
+</ul>
+<p><strong>Tipp:</strong>
+Auch nutzbar für HTML, JSON und viele andere Dateitypen.</p>
+<hr>
+<h2 id="2-tools-und-zusätzliche-features"><strong>2. Tools und zusätzliche Features</strong></h2>
+<h3 id="21-integriertes-terminal"><strong>2.1. Integriertes Terminal</strong></h3>
+<p>IntelliJ bringt ein vollwertiges Terminal mit, das in dein Projektverzeichnis eingebettet ist.</p>
+<p><strong>Shortcut:</strong></p>
+<ul>
+<li><strong>Alt + F12</strong> (Windows/Linux)</li>
+<li><strong>⌘ + Option + T</strong> (macOS)</li>
+</ul>
+<p><strong>Typische Anwendungen:</strong></p>
+<ul>
+<li>Maven/Gradle-Befehle (z. B. <code>mvn clean install</code>)</li>
+<li>Git-Befehle (<code>git status</code>, <code>git commit</code>)</li>
+<li>Eigene Scripte ausführen</li>
+</ul>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Kein Wechsel zu einem externen Terminal nötig</li>
+<li>Mehrere Tabs möglich (über + Symbol)</li>
+<li>Terminal startet automatisch im Projektordner</li>
+</ul>
+<hr>
+<h3 id="22-kurzer-ausblick-datenbank-tools-optional-für-interessierte"><strong>2.2. Kurzer Ausblick: Datenbank-Tools</strong> <em>(optional, für Interessierte)</em></h3>
+<p>IntelliJ (besonders die Ultimate-Version) bietet eingebaute Datenbank-Tools.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Verbindung zu Datenbanken (z. B. MySQL, PostgreSQL, H2)</li>
+<li>Tabellen anzeigen, abfragen, Daten editieren</li>
+<li>SQL direkt aus IntelliJ ausführen</li>
+</ul>
+<p><strong>Wie einrichten?</strong></p>
+<ol>
+<li>Ansicht „Database“ öffnen (rechts oder über View → Tool Windows → Database).</li>
+<li>„+“ → Datenbanktyp wählen → Zugangsdaten eingeben.</li>
+<li>Verbindung testen, dann Datenbank wie gewohnt nutzen.</li>
+</ol>
+<p><strong>Tipp:</strong>
+So kannst du z. B. SQL-Skripte direkt im Projekt speichern und testen.</p>
+<hr>
+<h3 id="23-build-tools-maven-und-gradle"><strong>2.3. Build-Tools: Maven und Gradle</strong></h3>
+<p>Die wichtigsten Java-Build-Tools sind <strong>Maven</strong> und <strong>Gradle</strong>. Sie automatisieren das Bauen, Testen und Verwalten von Abhängigkeiten deines Projekts.</p>
+<p><strong>Typische Aufgaben:</strong></p>
+<ul>
+<li>Projekt bauen/kompilieren</li>
+<li>Tests ausführen</li>
+<li>Abhängigkeiten aktualisieren</li>
+<li>Pakete (JAR, WAR) erzeugen</li>
+</ul>
+<h4 id="231-maven--und-gradle-tasks-direkt-aus-intellij-starten"><strong>2.3.1. Maven- und Gradle-Tasks direkt aus IntelliJ starten</strong></h4>
+<ul>
+<li>IntelliJ erkennt automatisch <code>pom.xml</code> (Maven) und <code>build.gradle</code> (Gradle).</li>
+<li>Links im „Maven“- oder „Gradle“-Fenster werden alle Tasks und Plugins angezeigt.</li>
+<li>Doppelklick auf einen Task, z. B. <code>clean</code>, <code>install</code> oder <code>test</code>, um ihn auszuführen.</li>
+</ul>
+<p><strong>Tipp:</strong>
+Mit Rechtsklick auf <code>pom.xml</code> oder <code>build.gradle</code> kannst du das Projekt neu laden oder bestimmte Tasks ausführen.</p>
+<hr>
+<h4 id="232-reload-project-bei-änderungen"><strong>2.3.2. &quot;Reload Project&quot; bei Änderungen</strong></h4>
+<p>Immer wenn du Abhängigkeiten oder Einstellungen in <code>pom.xml</code> bzw. <code>build.gradle</code> änderst:</p>
+<ul>
+<li>Klicke auf das kleine „Refresh“-Symbol im Maven/Gradle-Fenster
+<strong>ODER</strong></li>
+<li>Rechtsklick auf die Datei → „Reload Project“</li>
+</ul>
+<p><strong>Warum?</strong>
+So werden neue Abhängigkeiten oder Änderungen korrekt eingelesen.</p>
+<hr>
+<h2 id="übungsaufgaben-zum-selbststudium"><strong>Übungsaufgaben (zum Selbststudium)</strong></h2>
+<ol>
+<li><strong>Öffne und bearbeite eine <code>application.properties</code>- und eine <code>application.yml</code>-Datei. Nutze Autovervollständigung und finde gezielt Einstellungen per Suche.</strong></li>
+<li><strong>Öffne das Strukturfenster (Alt + 7) in einer <code>.properties</code>, <code>.yml</code> oder <code>.xml</code>-Datei. Navigiere zu bestimmten Einstellungen oder Tags.</strong></li>
+<li><strong>Starte das integrierte Terminal und führe einen einfachen Befehl (z. B. <code>dir</code>, <code>ls</code> oder einen Maven/Gradle-Befehl) aus.</strong></li>
+<li><strong>Führe über das Maven-/Gradle-Fenster einen Build oder Test aus.</strong></li>
+<li><em>(Optional)</em> <strong>Erstelle eine Datenbankverbindung, öffne eine Tabelle und sieh dir die Daten an.</strong></li>
+</ol>
+<hr>
+<h2 id="wichtige-shortcuts-und-tipps"><strong>Wichtige Shortcuts und Tipps</strong></h2>
+<table>
+<thead>
+<tr>
+<th><strong>Aktion</strong></th>
+<th><strong>Windows/Linux</strong></th>
+<th><strong>macOS</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Strukturansicht öffnen</td>
+<td>Alt + 7</td>
+<td>⌘ + 7</td>
+</tr>
+<tr>
+<td>Terminal öffnen</td>
+<td>Alt + F12</td>
+<td>⌘ + Option + T</td>
+</tr>
+<tr>
+<td>Code formatieren</td>
+<td>Strg + Alt + L</td>
+<td>⌘ + Alt + L</td>
+</tr>
+<tr>
+<td>Maven-/Gradle-Fenster</td>
+<td>View → Tool Windows → Maven/Gradle</td>
+<td></td>
+</tr>
+<tr>
+<td>Projekt neu laden</td>
+<td>Im Maven-/Gradle-Fenster: Refresh-Symbol</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="zusätzliche-tipps"><strong>Zusätzliche Tipps</strong></h2>
+<ul>
+<li><strong>Nutze das integrierte Terminal, um nahtlos zwischen IDE und Kommandozeile zu arbeiten.</strong></li>
+<li><strong>Mit der Strukturansicht findest du auch in langen Konfigurationsdateien schnell jede Einstellung.</strong></li>
+<li><strong>Für größere Projekte ist es sinnvoll, Build- und Konfigurationsdateien in Git zu versionieren.</strong></li>
+</ul>
+<hr>
+<p><strong>Mit diesen Funktionen hast du wichtige Werkzeuge für professionelle Java-Projekte an der Hand!</strong></p>
+
+            
+            
+        </body>
+        </html>

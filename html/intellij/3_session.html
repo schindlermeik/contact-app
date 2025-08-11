@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&ast;&ast;Handout&colon; Debugging und Versionskontrolle in IntelliJ IDEA&ast;&ast;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-debugging-und-versionskontrolle-in-intellij-idea"><strong>Handout: Debugging und Versionskontrolle in IntelliJ IDEA</strong></h1>
+<hr>
+<h2 id="1-debugging-in-intellij-idea"><strong>1. Debugging in IntelliJ IDEA</strong></h2>
+<h3 id="11-setzen-und-verwalten-von-breakpoints"><strong>1.1. Setzen und Verwalten von Breakpoints</strong></h3>
+<p>Ein <strong>Breakpoint</strong> (Haltepunkt) stoppt die Ausführung deines Programms an einer bestimmten Stelle, damit du den aktuellen Zustand untersuchen kannst.</p>
+<p><strong>So setzt du einen Breakpoint:</strong></p>
+<ul>
+<li>Klicke links neben die Codezeile (auf den grauen Rand) – ein roter Punkt erscheint.</li>
+<li>Alternativ: Cursor in die Zeile und <strong>Strg + F8</strong> (Windows/Linux) bzw. <strong>⌘ + F8</strong> (macOS) drücken.</li>
+</ul>
+<p><strong>Breakpoints verwalten:</strong></p>
+<ul>
+<li>Klicke mit der rechten Maustaste auf einen Breakpoint für weitere Optionen (z. B. „Condition“, um bedingte Breakpoints zu setzen).</li>
+<li>Alle Breakpoints lassen sich in der „Breakpoints“-Ansicht (Strg + Shift + F8 / ⌘ + Shift + F8) verwalten.</li>
+</ul>
+<hr>
+<h3 id="12-debugging-starten"><strong>1.2. Debugging starten</strong></h3>
+<p><strong>Programm im Debug-Modus starten:</strong></p>
+<ul>
+<li>Klicke auf das Käfer-Symbol (grün) oder <strong>Shift + F9</strong>.</li>
+<li>Alternativ: Rechtsklick auf die Datei → „Debug 'Klassenname.main()'“.</li>
+</ul>
+<p><strong>Ablauf:</strong></p>
+<ul>
+<li>Das Programm läuft bis zum nächsten Breakpoint und hält dort an.</li>
+<li>Die Debug-Ansicht öffnet sich unten in IntelliJ.</li>
+</ul>
+<hr>
+<h3 id="13-schrittweise-ausführung-des-codes"><strong>1.3. Schrittweise Ausführung des Codes</strong></h3>
+<p>Im Debug-Modus kannst du dein Programm Zeile für Zeile oder blockweise durchgehen:</p>
+<table>
+<thead>
+<tr>
+<th><strong>Aktion</strong></th>
+<th><strong>Windows/Linux</strong></th>
+<th><strong>macOS</strong></th>
+<th><strong>Beschreibung</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Step Over</strong></td>
+<td>F8</td>
+<td>F8</td>
+<td>Nächste Zeile ausführen, Methode überspringen</td>
+</tr>
+<tr>
+<td><strong>Step Into</strong></td>
+<td>F7</td>
+<td>F7</td>
+<td>In die aufgerufene Methode „hineinspringen“</td>
+</tr>
+<tr>
+<td><strong>Step Out</strong></td>
+<td>Shift + F8</td>
+<td>Shift + F8</td>
+<td>Methode beenden und zurückspringen</td>
+</tr>
+<tr>
+<td><strong>Resume Program</strong></td>
+<td>F9</td>
+<td>⌘ + Option + R</td>
+<td>Fortsetzen bis zum nächsten Breakpoint</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="14-überprüfen-von-variablen-und-ausdrücken"><strong>1.4. Überprüfen von Variablen und Ausdrücken</strong></h3>
+<p><strong>Variablen beobachten:</strong></p>
+<ul>
+<li>Im Debug-Fenster siehst du links alle aktuellen Variablenwerte.</li>
+<li>Mit Doppelklick auf eine Variable kannst du ihren Wert inspizieren.</li>
+</ul>
+<p><strong>Werte „on the fly“ prüfen:</strong></p>
+<ul>
+<li>Fahre mit der Maus über eine Variable im Editor – ein Popup zeigt den aktuellen Wert.</li>
+</ul>
+<p><strong>Expressions auswerten:</strong></p>
+<ul>
+<li>Klicke im Debug-Fenster auf „Evaluate Expression“ (Lupe) oder nutze <strong>Alt + F8</strong>.</li>
+<li>Hier kannst du beliebige Java-Ausdrücke zur Laufzeit auswerten (z. B. Methoden aufrufen, Berechnungen testen).</li>
+</ul>
+<hr>
+<h3 id="15-praktische-tipps"><strong>1.5. Praktische Tipps</strong></h3>
+<ul>
+<li>Du kannst Breakpoints aktivieren/deaktivieren, ohne sie zu löschen (Rechtsklick → Enable/Disable).</li>
+<li><strong>Conditional Breakpoints:</strong> Nur auslösen, wenn eine Bedingung erfüllt ist (z. B. <code>counter == 10</code>).</li>
+<li><strong>Log Breakpoints:</strong> Statt das Programm zu stoppen, wird eine Nachricht ins Log geschrieben.</li>
+</ul>
+<hr>
+<h2 id="2-versionskontrolle-git-in-intellij-idea"><strong>2. Versionskontrolle (Git) in IntelliJ IDEA</strong></h2>
+<h3 id="21-einrichtung-und-konfiguration"><strong>2.1. Einrichtung und Konfiguration</strong></h3>
+<p><strong>Git auf deinem Rechner installieren:</strong></p>
+<ul>
+<li><a href="https://git-scm.com/downloads">https://git-scm.com/downloads</a></li>
+</ul>
+<p><strong>Git in IntelliJ aktivieren:</strong></p>
+<ul>
+<li>Öffne dein Projekt.</li>
+<li>Menü: <strong>VCS → Enable Version Control Integration</strong> → wähle „Git“.</li>
+<li>Bei Bedarf Git-Repository initialisieren (<code>git init</code> wird automatisch ausgeführt).</li>
+</ul>
+<p><strong>Git-Benutzername und E-Mail festlegen:</strong></p>
+<ul>
+<li>Menü: <strong>File → Settings → Version Control → Git</strong></li>
+<li>Dort ggf. Username/Email eintragen.</li>
+</ul>
+<hr>
+<h3 id="22-grundlegende-git-operationen"><strong>2.2. Grundlegende Git-Operationen</strong></h3>
+<p><strong>Änderungen (Changes) anzeigen lassen:</strong></p>
+<ul>
+<li>Ansicht „Version Control“ (unten im Fenster, Tab „Commit“ oder „Local Changes“).</li>
+<li>Dort siehst du alle geänderten, neuen oder gelöschten Dateien.</li>
+</ul>
+<hr>
+<h4 id="a-committen"><strong>a) Committen</strong></h4>
+<p>Speichert Änderungen in deinem lokalen Repository.</p>
+<ul>
+<li><strong>Shortcut:</strong> Strg + K (Windows/Linux), ⌘ + K (macOS)</li>
+<li>Oder: Rechtsklick im Changes-Tab → „Commit…“</li>
+<li>Commit-Nachricht eingeben, ggf. einzelne Dateien auswählen.</li>
+<li>Klicke „Commit“ oder „Commit and Push“, um die Änderungen auch gleich zu versenden.</li>
+</ul>
+<hr>
+<h4 id="b-änderungen-pushen-und-pullen"><strong>b) Änderungen Pushen und Pullen</strong></h4>
+<ul>
+<li>
+<p><strong>Push (Hochladen):</strong></p>
+<ul>
+<li>Überträgt deine Commits auf den zentralen Server (z. B. GitHub).</li>
+<li><strong>Shortcut:</strong> Strg + Shift + K (Windows/Linux), ⌘ + Shift + K (macOS)</li>
+</ul>
+</li>
+<li>
+<p><strong>Pull (Herunterladen):</strong></p>
+<ul>
+<li>Holt Änderungen anderer aus dem Remote-Repository.</li>
+<li>Menü: VCS → Git → Pull, oder Klick auf das Pull-Symbol.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="c-branches-erstellen-und-wechseln"><strong>c) Branches erstellen und wechseln</strong></h4>
+<ul>
+<li>Klicke unten rechts auf den aktuellen Branch-Namen.</li>
+<li>Wähle „New Branch…“, gib einen Namen ein und bestätige.</li>
+<li>Zum Wechseln einfach einen anderen Branch anklicken und „Checkout“ wählen.</li>
+</ul>
+<hr>
+<h4 id="d-ansicht-der-code-änderungen-diff"><strong>d) Ansicht der Code-Änderungen (Diff)</strong></h4>
+<ul>
+<li>Im Changes/Commit-Fenster wähle eine Datei aus und klicke auf das „Show Diff“-Symbol (zwei Pfeile).</li>
+<li>Zeigt alte (links) und neue (rechts) Version direkt an, Unterschiede sind farbig hervorgehoben.</li>
+</ul>
+<hr>
+<h3 id="23-praktische-tipps"><strong>2.3. Praktische Tipps</strong></h3>
+<ul>
+<li>
+<p><strong>.gitignore:</strong></p>
+<ul>
+<li>Lege eine .gitignore-Datei im Projekt an, um bestimmte Dateien/Ordner von der Versionskontrolle auszuschließen (z. B. <code>*.class</code>, <code>/out</code>, <code>.idea</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Konflikte lösen:</strong></p>
+<ul>
+<li>IntelliJ bietet grafische Tools zum Zusammenführen („Merge“) von Konflikten, die beim Pull entstehen können.</li>
+</ul>
+</li>
+<li>
+<p><strong>History und Blame:</strong></p>
+<ul>
+<li>Mit Rechtsklick auf eine Datei → „Git → Show History“ siehst du alle Änderungen.</li>
+<li>„Annotate/Blame“ zeigt, welche Zeile wann von wem geändert wurde.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="übungsaufgaben-zum-selbststudium"><strong>Übungsaufgaben (zum Selbststudium)</strong></h2>
+<ol>
+<li><strong>Setze mindestens drei Breakpoints in deinem Code und starte das Debugging.</strong></li>
+<li><strong>Nutze Step Over und Step Into, um den Ablauf deiner Anwendung nachzuvollziehen.</strong></li>
+<li><strong>Prüfe und verändere während des Debuggens Variablenwerte im Debugger-Fenster.</strong></li>
+<li><strong>Lege ein Git-Repository für dein Projekt an und committe erste Änderungen.</strong></li>
+<li><strong>Erstelle einen neuen Branch, wechsle zu ihm, mache Änderungen und merge zurück in den Haupt-Branch.</strong></li>
+<li><strong>Nutze die Diff-Ansicht, um Änderungen zwischen zwei Versionen zu sehen.</strong></li>
+</ol>
+<hr>
+<h2 id="wichtige-shortcuts-debugging--git"><strong>Wichtige Shortcuts (Debugging &amp; Git)</strong></h2>
+<table>
+<thead>
+<tr>
+<th><strong>Aktion</strong></th>
+<th><strong>Windows/Linux</strong></th>
+<th><strong>macOS</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Breakpoint setzen</td>
+<td>Strg + F8</td>
+<td>⌘ + F8</td>
+</tr>
+<tr>
+<td>Debugging starten</td>
+<td>Shift + F9</td>
+<td>Ctrl + D</td>
+</tr>
+<tr>
+<td>Step Over</td>
+<td>F8</td>
+<td>F8</td>
+</tr>
+<tr>
+<td>Step Into</td>
+<td>F7</td>
+<td>F7</td>
+</tr>
+<tr>
+<td>Step Out</td>
+<td>Shift + F8</td>
+<td>Shift + F8</td>
+</tr>
+<tr>
+<td>Evaluate Expression</td>
+<td>Alt + F8</td>
+<td>Alt + F8</td>
+</tr>
+<tr>
+<td>Commit</td>
+<td>Strg + K</td>
+<td>⌘ + K</td>
+</tr>
+<tr>
+<td>Push</td>
+<td>Strg + Shift + K</td>
+<td>⌘ + Shift + K</td>
+</tr>
+<tr>
+<td>Show Diff</td>
+<td>Strg + D</td>
+<td>⌘ + D</td>
+</tr>
+<tr>
+<td>Branches anzeigen</td>
+<td>Alt + `</td>
+<td>Ctrl + V</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><strong>Tipp:</strong>
+Die Git-Integration von IntelliJ bietet fast alle Standard-Workflows. Für komplexere Szenarien (z. B. Rebase, Cherry-Pick) lohnt ein Blick in die Online-Doku oder ein separates Git-Tool.</p>
+<hr>
+<p><strong>Mit diesen Kenntnissen kannst du Code gezielt debuggen und deine Projekte sicher versionieren. Viel Erfolg beim Ausprobieren!</strong></p>
+
+            
+            
+        </body>
+        </html>

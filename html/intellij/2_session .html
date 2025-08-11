@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&ast;&ast;Handout&colon; Code-Bearbeitung und Automatisierung in IntelliJ IDEA&ast;&ast;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-code-bearbeitung-und-automatisierung-in-intellij-idea"><strong>Handout: Code-Bearbeitung und Automatisierung in IntelliJ IDEA</strong></h1>
+<hr>
+<h2 id="1-code-vervollständigung-und-intelligente-hilfe"><strong>1. Code-Vervollständigung und intelligente Hilfe</strong></h2>
+<h3 id="11-code-vervollständigung-auto-completion"><strong>1.1. Code-Vervollständigung (Auto-Completion)</strong></h3>
+<p>IntelliJ IDEA bietet eine leistungsstarke Codevervollständigung, die dir Methoden, Variablen, Klassennamen usw. passend zum Kontext vorschlägt.</p>
+<p><strong>Wie nutze ich das?</strong></p>
+<ul>
+<li><strong>Windows/Linux:</strong> Strg + Leertaste</li>
+<li><strong>macOS:</strong> ⌃ + Leertaste</li>
+<li>Schreibe z. B. den Anfang eines Klassennamens oder einer Methode und drücke den Shortcut.</li>
+<li>IntelliJ zeigt eine Auswahl möglicher Vorschläge an, oft mit zusätzlichen Hinweisen (z. B. Typ oder aus welcher Bibliothek).</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Du tippst <code>System.o</code> und drückst Strg + Leertaste – IDEA schlägt <code>out</code> vor, du kannst direkt <code>System.out.println()</code> verwenden.</p>
+<p><strong>Tipp:</strong></p>
+<ul>
+<li>Durch mehrmaliges Drücken von Strg + Leertaste bekommst du noch spezifischere Vorschläge.</li>
+<li>Tippfehler werden oft erkannt und „intelligente“ Korrekturvorschläge gemacht.</li>
+</ul>
+<hr>
+<h3 id="12-kontextabhängige-aktionen-und-fehlerbehebung-intention-actions"><strong>1.2. Kontextabhängige Aktionen und Fehlerbehebung (Intention Actions)</strong></h3>
+<p><strong>Shortcut:</strong></p>
+<ul>
+<li><strong>Windows/Linux:</strong> Alt + Enter</li>
+<li><strong>macOS:</strong> ⌥ + Enter</li>
+</ul>
+<p><strong>Was macht das?</strong></p>
+<ul>
+<li>Zeigt kontextabhängige Aktionen an: Fehler beheben, Quick-Fixes vorschlagen, Methoden implementieren, Imports ergänzen etc.</li>
+<li>Immer wenn ein kleines Glühbirnchen oder roter Fehler angezeigt wird, einfach Alt + Enter drücken!</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Du hast eine Klasse verwendet, aber keinen Import. Drücke Alt + Enter und wähle „Import class“.</p>
+<hr>
+<h3 id="13-quick-documentation"><strong>1.3. Quick Documentation</strong></h3>
+<p><strong>Shortcut:</strong></p>
+<ul>
+<li><strong>Windows/Linux:</strong> Strg + Q</li>
+<li><strong>macOS:</strong> F1</li>
+</ul>
+<p><strong>Nutzen:</strong>
+Zeigt die Dokumentation (Javadoc, Beschreibung, Parameter etc.) zum markierten Symbol direkt im Editor an – ohne Google oder externe Hilfe.</p>
+<hr>
+<h2 id="2-codegenerierung"><strong>2. Codegenerierung</strong></h2>
+<p>IntelliJ hilft dir, oft gebrauchte Code-Teile automatisch zu erzeugen.</p>
+<p><strong>Shortcut für Codegenerierung:</strong></p>
+<ul>
+<li><strong>Windows/Linux:</strong> Alt + Einfügen</li>
+<li><strong>macOS:</strong> ⌘ + N</li>
+</ul>
+<p><strong>Was kann generiert werden?</strong></p>
+<ul>
+<li><strong>Konstruktoren</strong></li>
+<li><strong>Getter und Setter</strong></li>
+<li><strong>toString(), equals(), hashCode()</strong></li>
+<li><strong>Testklassen und Testmethoden</strong></li>
+</ul>
+<p><strong>So geht’s:</strong></p>
+<ol>
+<li>Cursor in die Klasse setzen.</li>
+<li>Shortcut drücken.</li>
+<li>Im Menü auswählen, was generiert werden soll.</li>
+<li>Felder/Methoden auswählen, Enter drücken – fertig!</li>
+</ol>
+<hr>
+<h2 id="3-live-templates-und-postfix-operatoren"><strong>3. Live Templates und Postfix-Operatoren</strong></h2>
+<h3 id="31-live-templates"><strong>3.1. Live Templates</strong></h3>
+<p>Live Templates sind Kürzel, die zu häufigen Code-Snippets erweitert werden.</p>
+<p><strong>Beispiele:</strong></p>
+<ul>
+<li><code>psvm</code> → public static void main(String[] args) { … }</li>
+<li><code>sout</code> → System.out.println();</li>
+</ul>
+<p><strong>So geht’s:</strong></p>
+<ul>
+<li>Schreibe z. B. <code>sout</code>, drücke Tab – schon steht der komplette Code da.</li>
+<li>Viele Templates sind schon voreingestellt; eigene lassen sich über die Einstellungen anlegen.</li>
+</ul>
+<p><strong>Tipp:</strong>
+Mit Strg + J (⌘ + J auf Mac) siehst du eine Liste aller verfügbaren Live Templates.</p>
+<hr>
+<h3 id="32-postfix-operatoren"><strong>3.2. Postfix-Operatoren</strong></h3>
+<p>Mit Postfix-Operatoren kannst du den Code nach dem Schreiben eines Ausdrucks schnell umwandeln.</p>
+<p><strong>Beispiele:</strong></p>
+<ul>
+<li>Schreibe <code>list.for</code>, drücke Tab: IntelliJ erstellt automatisch eine for-Schleife über die Liste.</li>
+<li>Schreibe <code>name.if</code>, Tab: IntelliJ baut ein if-Statement um <code>name</code>.</li>
+</ul>
+<p><strong>Tipp:</strong>
+Liste aller Postfix-Templates findest du in den Einstellungen.</p>
+<hr>
+<h2 id="4-refactoring"><strong>4. Refactoring</strong></h2>
+<p>Refactoring bedeutet, den Code umzubauen, ohne die Funktion zu verändern. IntelliJ bietet viele Automatisierungen dafür!</p>
+<table>
+<thead>
+<tr>
+<th>Aktion</th>
+<th>Windows/Linux</th>
+<th>macOS</th>
+<th>Beschreibung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Umbenennen</strong></td>
+<td>Shift + F6</td>
+<td>Shift + F6</td>
+<td>Variablen, Methoden, Klassen sicher umbenennen</td>
+</tr>
+<tr>
+<td><strong>Methode extrahieren</strong></td>
+<td>Strg + Alt + M</td>
+<td>⌘ + Alt + M</td>
+<td>Markierten Codeblock als neue Methode auslagern</td>
+</tr>
+<tr>
+<td><strong>Variable extrahieren</strong></td>
+<td>Strg + Alt + V</td>
+<td>⌘ + Alt + V</td>
+<td>Ausdruck als Variable definieren</td>
+</tr>
+<tr>
+<td><strong>Konstante extrahieren</strong></td>
+<td>Strg + Alt + C</td>
+<td>⌘ + Alt + C</td>
+<td>Wert als Konstante definieren</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Ablauf:</strong></p>
+<ul>
+<li>Markiere den gewünschten Code.</li>
+<li>Drücke den passenden Shortcut.</li>
+<li>Folge dem Dialog, um Namen und Sichtbarkeit zu wählen.</li>
+</ul>
+<hr>
+<h2 id="5-code-struktur"><strong>5. Code-Struktur</strong></h2>
+<h3 id="51-code-formatieren"><strong>5.1. Code formatieren</strong></h3>
+<ul>
+<li><strong>Windows/Linux:</strong> Strg + Alt + L</li>
+<li><strong>macOS:</strong> ⌘ + Alt + L
+Richtet Einrückungen, Abstände, Zeilenumbrüche nach dem Standard sauber aus.</li>
+</ul>
+<h3 id="52-strukturansicht--hierarchie"><strong>5.2. Strukturansicht &amp; Hierarchie</strong></h3>
+<ul>
+<li>
+<p><strong>Strukturansicht (Alt + 7 / ⌘ + 7):</strong>
+Zeigt alle Klassen, Methoden, Felder der aktuellen Datei.</p>
+</li>
+<li>
+<p><strong>Hierarchie (Strg + H / ^ + H):</strong>
+Zeigt Vererbungs- oder Interface-Hierarchien an.</p>
+</li>
+</ul>
+<hr>
+<h2 id="6-produktivitätstipps"><strong>6. Produktivitätstipps</strong></h2>
+<h3 id="61-mehrfach-cursormulticaret"><strong>6.1. Mehrfach-Cursor/Multicaret</strong></h3>
+<ul>
+<li><strong>Alt + Klick:</strong> Setzt mehrere Cursors.</li>
+<li><strong>Strg + Alt + Shift + J (⌘ + Ctrl + Shift + G):</strong> Wählt alle Vorkommen des aktuellen Worts im Dokument aus.</li>
+</ul>
+<h3 id="62-find-action"><strong>6.2. Find Action</strong></h3>
+<ul>
+<li><strong>Strg + Shift + A (⌘ + Shift + A):</strong>
+Damit kannst du jede Funktion oder Einstellung über ein Suchfeld aufrufen.</li>
+</ul>
+<h3 id="63-shortcut-hilfe"><strong>6.3. Shortcut-Hilfe</strong></h3>
+<ul>
+<li><strong>Strg + J (⌘ + J):</strong>
+Zeigt die Liste der verfügbaren Live Templates.</li>
+</ul>
+<hr>
+<h2 id="übungsaufgaben-zum-selbststudium"><strong>Übungsaufgaben (zum Selbststudium)</strong></h2>
+<ol>
+<li>
+<p><strong>Nutze die Codevervollständigung:</strong>
+Schreibe eine neue Klasse und lasse IntelliJ Methoden und Felder automatisch vorschlagen.</p>
+</li>
+<li>
+<p><strong>Generiere Getter/Setter:</strong>
+Erzeuge eine Klasse mit mehreren Feldern, lasse Getter und Setter automatisch erstellen.</p>
+</li>
+<li>
+<p><strong>Wende ein Live Template an:</strong>
+Schreibe <code>sout</code> und prüfe, wie IntelliJ daraus <code>System.out.println()</code> macht.</p>
+</li>
+<li>
+<p><strong>Benutze Refactoring:</strong>
+Extrahiere aus einer längeren Methode einen Teil als eigene Methode.</p>
+</li>
+<li>
+<p><strong>Formatieren:</strong>
+Schreibe absichtlich „krummen“ Code und lasse ihn per Shortcut formatieren.</p>
+</li>
+<li>
+<p><strong>Arbeite mit mehreren Cursors:</strong>
+Ändere denselben Variablennamen an mehreren Stellen gleichzeitig.</p>
+</li>
+<li>
+<p><strong>Finde eine Aktion:</strong>
+Suche mit Strg + Shift + A nach einer Funktion (z. B. „Reformat Code“).</p>
+</li>
+</ol>
+<hr>
+<h2 id="weitere-tipps"><strong>Weitere Tipps</strong></h2>
+<ul>
+<li><strong>Probiere die Postfix-Operatoren an eigenen Beispielen aus!</strong></li>
+<li><strong>Experimentiere mit verschiedenen Live Templates – sie sparen viel Zeit.</strong></li>
+<li><strong>Mach dich mit den Refactoring-Dialogen vertraut, um Änderungen sicher vorzunehmen.</strong></li>
+<li><strong>Passe bei Bedarf die Keymap in den Einstellungen an dein System an (z. B. Mac vs. Windows).</strong></li>
+</ul>
+<hr>
+<p><strong>Du bist jetzt bereit, effektiv und effizient Code mit IntelliJ IDEA zu schreiben und zu pflegen!</strong></p>
+
+            
+            
+        </body>
+        </html>

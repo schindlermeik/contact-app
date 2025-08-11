@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Die &DiacriticalGrave;pom&period;xml&DiacriticalGrave; &ndash; Das Herz des Maven-Projekts</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-die-pomxml--das-herz-des-maven-projekts">Handout: Die <code>pom.xml</code> – Das Herz des Maven-Projekts</h1>
+<hr>
+<h2 id="31-grundstruktur-der-pomxml">3.1 <strong>Grundstruktur der <code>pom.xml</code></strong></h2>
+<p>Die Datei <code>pom.xml</code> steht im Wurzelverzeichnis jedes Maven-Projekts und steuert das gesamte Projekt.
+POM steht für <strong>Project Object Model</strong>.
+Alles, was Maven über dein Projekt wissen muss, steht hier in strukturierter Form.</p>
+<p>Eine <strong>minimale <code>pom.xml</code></strong> sieht so aus:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">project</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://maven.apache.org/POM/4.0.0&quot;</span>
+         <span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+         <span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">modelVersion</span>&gt;</span>4.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">modelVersion</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.beispiel<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>meine-anwendung<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">project</span>&gt;</span>
+</code></pre>
+<h3 id="was-bedeuten-die-einzelnen-tags">Was bedeuten die einzelnen Tags?</h3>
+<ul>
+<li><strong><code>&lt;project&gt;</code></strong>
+Das Wurzelelement – alles steht darin.</li>
+<li><strong><code>&lt;modelVersion&gt;</code></strong>
+Gibt die Version des POM-Modells an (meist immer „4.0.0“).</li>
+<li><strong><code>&lt;groupId&gt;</code></strong>
+Die Gruppierung (z. B. dein Unternehmen, Organisation oder Team):
+z. B. <code>com.beispiel</code></li>
+<li><strong><code>&lt;artifactId&gt;</code></strong>
+Der Name des Projekts oder Moduls (wird später z. B. zum Dateinamen):
+z. B. <code>meine-anwendung</code></li>
+<li><strong><code>&lt;version&gt;</code></strong>
+Die Versionsnummer des Projekts:
+z. B. <code>1.0.0</code>, <code>1.0-SNAPSHOT</code> (letzteres steht für eine Entwicklerversion)</li>
+</ul>
+<p>Diese drei Felder (<code>groupId</code>, <code>artifactId</code>, <code>version</code>) bilden zusammen die <strong>eindeutige Identifikation</strong> deines Artefakts (Bibliothek, Anwendung, etc.) im Maven-Universum.</p>
+<hr>
+<h2 id="32-weitere-wichtige-elemente">3.2 <strong>Weitere wichtige Elemente</strong></h2>
+<p>In der Praxis kommen noch weitere Elemente in die <code>pom.xml</code>.
+Zu den häufigsten gehören:</p>
+<ul>
+<li>
+<p><strong><code>&lt;packaging&gt;</code></strong>
+Legt fest, was Maven am Ende erzeugt:</p>
+<ul>
+<li>
+<p><code>jar</code> (Standard für Java-Bibliotheken/Anwendungen)</p>
+</li>
+<li>
+<p><code>war</code> (Web-Anwendungen)</p>
+</li>
+<li>
+<p><code>pom</code> (nur für Projekt- oder Moduldefinitionen)</p>
+</li>
+<li>
+<p>Beispiel:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">packaging</span>&gt;</span>jar<span class="hljs-tag">&lt;/<span class="hljs-name">packaging</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code>&lt;name&gt;</code></strong>
+Ein lesbarer Name für das Projekt (wird z. B. in Build-Tools oder auf Webseiten angezeigt).</p>
+</li>
+<li>
+<p><strong><code>&lt;description&gt;</code></strong>
+Kurze Beschreibung, wofür das Projekt gedacht ist.</p>
+</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">project</span>&gt;</span>
+    ...
+    <span class="hljs-tag">&lt;<span class="hljs-name">packaging</span>&gt;</span>jar<span class="hljs-tag">&lt;/<span class="hljs-name">packaging</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>Meine Beispielanwendung<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">description</span>&gt;</span>Ein einfaches Maven-Projekt für den Einstieg<span class="hljs-tag">&lt;/<span class="hljs-name">description</span>&gt;</span>
+    ...
+<span class="hljs-tag">&lt;/<span class="hljs-name">project</span>&gt;</span>
+</code></pre>
+<hr>
+<h2 id="33-die-dependency-liste-dependencies">3.3 <strong>Die Dependency-Liste (<code>&lt;dependencies&gt;</code>)</strong></h2>
+<h3 id="was-sind-abhängigkeiten">Was sind Abhängigkeiten?</h3>
+<p>Abhängigkeiten (Dependencies) sind externe Bibliotheken oder Module, die dein Projekt benötigt – z. B. Frameworks, Hilfsbibliotheken oder Test-Frameworks.</p>
+<h3 id="aufbau-eines-dependency-blocks">Aufbau eines <code>&lt;dependency&gt;</code>-Blocks</h3>
+<p>Alle Abhängigkeiten stehen gesammelt im <code>&lt;dependencies&gt;</code>-Block, direkt im Wurzelprojekt.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">project</span>&gt;</span>
+  ...
+  <span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.junit.jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>junit-jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.10.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">project</span>&gt;</span>
+</code></pre>
+<p><strong>Erklärung:</strong></p>
+<ul>
+<li>
+<p><strong><code>&lt;groupId&gt;</code></strong> und <strong><code>&lt;artifactId&gt;</code></strong> identifizieren die Bibliothek.</p>
+</li>
+<li>
+<p><strong><code>&lt;version&gt;</code></strong> gibt die Version der Bibliothek an.</p>
+</li>
+<li>
+<p><strong><code>&lt;scope&gt;</code></strong> legt fest, wann die Abhängigkeit benötigt wird:</p>
+<ul>
+<li><code>compile</code> (Standard): Zur Kompilier- und Laufzeit</li>
+<li><code>test</code>: Nur beim Testen (z. B. für JUnit)</li>
+<li>Weitere Scopes: <code>provided</code>, <code>runtime</code>, <code>system</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="beispiel-junit-5-für-unit-tests-einbinden">Beispiel: JUnit 5 für Unit-Tests einbinden</h3>
+<p>Um Unit-Tests mit JUnit 5 zu schreiben, brauchst du mindestens folgende Dependency:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.junit.jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>junit-jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.10.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<p><strong>Achtung:</strong>
+Für JUnit 5 sollte auch das Maven-Surefire-Plugin richtig konfiguriert werden (siehe separater Abschnitt im Kurs).</p>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li>Die <code>pom.xml</code> ist die zentrale Konfigurationsdatei deines Maven-Projekts.</li>
+<li>Sie beschreibt das Projekt, enthält Meta-Informationen, steuert den Build-Prozess und listet alle Abhängigkeiten auf.</li>
+<li>Änderungen an der <code>pom.xml</code> wirken sich direkt auf das Verhalten deines Projekts und dessen Build aus.</li>
+</ul>
+<hr>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Arbeiten mit Maven in der Praxis</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-arbeiten-mit-maven-in-der-praxis">Handout: Arbeiten mit Maven in der Praxis</h1>
+<hr>
+<h2 id="71-zentrale-befehle-und-ihre-wirkung">7.1 <strong>Zentrale Befehle und ihre Wirkung</strong></h2>
+<p><strong>Im Alltag reichen meist 3–5 Maven-Befehle, um mit Projekten zu arbeiten. Hier die wichtigsten:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Befehl</th>
+<th>Wirkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mvn clean</code></td>
+<td>Löscht alle Build-Ergebnisse (insb. den <code>target</code>-Ordner) – Projekt ist „sauber“ für einen neuen Build.</td>
+</tr>
+<tr>
+<td><code>mvn compile</code></td>
+<td>Übersetzt den Quellcode aus <code>src/main/java</code> nach <code>target/classes</code>.</td>
+</tr>
+<tr>
+<td><code>mvn test</code></td>
+<td>Übersetzt und führt alle Tests in <code>src/test/java</code> aus. Ergebnisse erscheinen auf der Konsole.</td>
+</tr>
+<tr>
+<td><code>mvn package</code></td>
+<td>Baut das Artefakt (z. B. JAR oder WAR) im <code>target</code>-Ordner. Tests werden ebenfalls ausgeführt.</td>
+</tr>
+<tr>
+<td><code>mvn install</code></td>
+<td>Baut das Artefakt und kopiert es ins lokale Repository (<code>~/.m2/repository</code>). Damit steht es auch anderen Projekten auf deinem Rechner zur Verfügung.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="72-analyse-der-ergebnisse">7.2 <strong>Analyse der Ergebnisse</strong></h2>
+<h3 id="wo-findet-man-das-build-ergebnis"><strong>Wo findet man das Build-Ergebnis?</strong></h3>
+<ul>
+<li>
+<p>Nach <code>mvn package</code> oder <code>mvn install</code> befindet sich das <strong>Build-Ergebnis</strong> im Verzeichnis
+<code>target/</code></p>
+</li>
+<li>
+<p>Beispiel:</p>
+<ul>
+<li><code>target/mein-projekt-1.0.0.jar</code></li>
+<li><code>target/mein-projekt-1.0.0-SNAPSHOT.jar</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="wo-erscheinen-fehlermeldungen"><strong>Wo erscheinen Fehlermeldungen?</strong></h3>
+<ul>
+<li>
+<p><strong>Fehlerhafte Befehle, fehlende Abhängigkeiten oder Testfehlschläge</strong> werden direkt im Terminal angezeigt.</p>
+</li>
+<li>
+<p>Nach einem Fehler steht meist ganz unten:</p>
+<ul>
+<li><code>BUILD FAILURE</code></li>
+<li>Es gibt eine genaue Fehlerursache („Could not resolve dependency“, „Compilation failure“, „Tests failed“ etc.)</li>
+</ul>
+</li>
+<li>
+<p>Detaillierte <strong>Stacktraces</strong> zeigen an, in welcher Datei oder in welchem Test der Fehler steckt.</p>
+</li>
+</ul>
+<p><strong>Tipp:</strong>
+Mit <code>mvn ... -X</code> erhältst du noch ausführlichere Fehlermeldungen und Debug-Logs.</p>
+<hr>
+<h2 id="73-tipps-zur-fehlersuche-und--behebung">7.3 <strong>Tipps zur Fehlersuche und -behebung</strong></h2>
+<h3 id="häufige-fehlerursachen"><strong>Häufige Fehlerursachen</strong></h3>
+<ul>
+<li><strong>Tippfehler</strong> in der <code>pom.xml</code> (z. B. falscher Dependency-Name oder Version).</li>
+<li><strong>Fehlende/inkompatible Abhängigkeiten</strong>.</li>
+<li><strong>Java-Version</strong> im Projekt passt nicht zur installierten JDK-Version.</li>
+<li><strong>Tests schlagen fehl</strong> (rote Fehler in der Konsole).</li>
+<li><strong>Alte Build-Reste</strong> im <code>target</code>-Verzeichnis (hier hilft oft ein <code>mvn clean</code>).</li>
+<li><strong>Verbindung zum Repository fehlt</strong> (z. B. Proxy/Firewall/Netzwerkproblem).</li>
+</ul>
+<h3 id="wichtige-log-ausgaben-erkennen"><strong>Wichtige Log-Ausgaben erkennen</strong></h3>
+<ul>
+<li>Suche nach Schlüsselwörtern wie <code>ERROR</code>, <code>FAILURE</code>, <code>Could not resolve</code>, <code>NoClassDefFoundError</code>, <code>Compilation failure</code>.</li>
+<li>Oft hilft es, ganz <strong>ans Ende der Ausgabe zu scrollen</strong> – dort steht meist die Zusammenfassung.</li>
+</ul>
+<h3 id="das-effective-pom-nutzen"><strong>Das <code>effective-pom</code> nutzen</strong></h3>
+<ul>
+<li>
+<p>Mit</p>
+<pre><code class="language-sh">mvn <span class="hljs-built_in">help</span>:effective-pom
+</code></pre>
+<p>siehst du die <strong>vollständig aufgelöste POM deines Projekts</strong> – inklusive aller erbten Einstellungen, Profile, Defaults usw.</p>
+</li>
+<li>
+<p><strong>Nutzen:</strong></p>
+<ul>
+<li>Gut, um zu prüfen, welche Plugins und Dependencies tatsächlich (mit welcher Version) zum Einsatz kommen.</li>
+<li>Hilft, wenn du dich wunderst, warum ein bestimmtes Verhalten auftritt (z. B. durch vererbte Parent-POMs oder Unternehmensprofile).</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li>
+<p>Die wichtigsten Maven-Befehle reichen für 90% der Fälle.</p>
+</li>
+<li>
+<p>Build-Ergebnisse findest du immer im <code>target</code>-Verzeichnis.</p>
+</li>
+<li>
+<p>Fehlerquellen können oft durch Logs und den <code>effective-pom</code> erkannt werden.</p>
+</li>
+<li>
+<p>Bei hartnäckigen Problemen:</p>
+<ul>
+<li>Konsolenausgabe genau lesen</li>
+<li>Schrittweise einzelne Phasen testen (<code>clean</code>, dann <code>compile</code>, dann <code>test</code>…)</li>
+</ul>
+</li>
+</ul>
+<hr>
+
+            
+            
+        </body>
+        </html>

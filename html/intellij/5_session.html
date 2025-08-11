@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&ast;&ast;Handout&colon; Individualisierung und Erweiterungen in IntelliJ IDEA&ast;&ast;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-individualisierung-und-erweiterungen-in-intellij-idea"><strong>Handout: Individualisierung und Erweiterungen in IntelliJ IDEA</strong></h1>
+<hr>
+<h2 id="1-plugins-in-intellij-idea"><strong>1. Plugins in IntelliJ IDEA</strong></h2>
+<h3 id="11-was-sind-plugins"><strong>1.1. Was sind Plugins?</strong></h3>
+<p><strong>Plugins</strong> sind Zusatzmodule, mit denen du den Funktionsumfang von IntelliJ IDEA nach deinen Bedürfnissen erweitern kannst. Es gibt Plugins für Programmiersprachen, Frameworks, Produktivität, Design, Tools und vieles mehr.</p>
+<hr>
+<h3 id="12-plugin-marktplatz-entdecken"><strong>1.2. Plugin-Marktplatz entdecken</strong></h3>
+<p><strong>So öffnest du den Plugin-Marktplatz:</strong></p>
+<ol>
+<li>
+<p><strong>Menü:</strong></p>
+<ul>
+<li>„File“ → „Settings“ (oder <strong>Strg + Alt + S</strong>)</li>
+<li>Navigiere zu „Plugins“</li>
+</ul>
+</li>
+<li>
+<p><strong>Alternativ:</strong></p>
+<ul>
+<li>„Preferences“ → „Plugins“ (macOS: <strong>⌘ + ,</strong>)</li>
+</ul>
+</li>
+</ol>
+<p>Im Fenster siehst du:</p>
+<ul>
+<li><strong>Marketplace:</strong> Tausende frei verfügbare Plugins durchsuchen.</li>
+<li><strong>Installed:</strong> Übersicht deiner bereits installierten Plugins.</li>
+<li><strong>Updates:</strong> Updates für vorhandene Plugins.</li>
+</ul>
+<p><strong>Suche:</strong>
+Im Marketplace kannst du nach Stichworten suchen (z. B. „Lombok“ oder „Theme“).</p>
+<hr>
+<h3 id="13-plugins-installieren"><strong>1.3. Plugins installieren</strong></h3>
+<p><strong>Beispiel: Installation von Lombok</strong></p>
+<ol>
+<li>Gehe im Plugin-Tab auf „Marketplace“.</li>
+<li>Suche nach <strong>Lombok</strong>.</li>
+<li>Klicke „Install“.</li>
+<li>Nach der Installation: <strong>Restart IDE</strong>, damit das Plugin aktiviert wird.</li>
+</ol>
+<p><strong>Weitere empfohlene Plugins:</strong></p>
+<ul>
+<li><strong>Key Promoter X</strong>: Zeigt zu häufig per Maus genutzten Aktionen den passenden Shortcut an – optimal zum Shortcuts-Lernen.</li>
+<li><strong>Rainbow Brackets</strong>: Hebt verschachtelte Klammern farbig hervor.</li>
+<li><strong>Material Theme UI</strong>: Für individuelle, moderne Oberflächen.</li>
+<li><strong>GitToolBox</strong>: Erweiterte Git-Features.</li>
+</ul>
+<p><strong>Tipp:</strong>
+Weniger ist oft mehr – installiere nur Plugins, die du wirklich brauchst, um die Performance der IDE nicht zu beeinträchtigen.</p>
+<hr>
+<h3 id="14-plugins-verwalten-und-entfernen"><strong>1.4. Plugins verwalten und entfernen</strong></h3>
+<ul>
+<li>Im Tab „Installed“ siehst du alle aktiven Plugins.</li>
+<li>Mit „Disable“ kannst du ein Plugin deaktivieren (z. B. zum Testen, ob ein Fehler dadurch verursacht wird).</li>
+<li>Mit „Uninstall“ entfernst du das Plugin komplett.</li>
+</ul>
+<hr>
+<h2 id="2-hilfe--troubleshooting"><strong>2. Hilfe &amp; Troubleshooting</strong></h2>
+<h3 id="21-invalidate-caches--restart"><strong>2.1. „Invalidate Caches / Restart“</strong></h3>
+<p>Manchmal „spinnt“ IntelliJ (falsche Fehleranzeigen, merkwürdiges Verhalten).
+<strong>Lösung:</strong> „Invalidate Caches / Restart“ – das leert interne Speicher und startet die IDE neu.</p>
+<p><strong>So geht’s:</strong></p>
+<ol>
+<li>Menü: <strong>File</strong> → <strong>Invalidate Caches / Restart…</strong></li>
+<li>Im Dialog „Invalidate and Restart“ wählen.</li>
+</ol>
+<p><strong>Wirkung:</strong></p>
+<ul>
+<li>IntelliJ räumt temporäre Dateien auf, läd Indizes und Projekte neu.</li>
+<li>Keine Angst: Dein Code bleibt erhalten!</li>
+</ul>
+<p><strong>Tipp:</strong>
+Sollte ein Projekt sich plötzlich seltsam verhalten, hilft diese Funktion oft Wunder.</p>
+<hr>
+<h3 id="22-hilfe--support-in-intellij"><strong>2.2. Hilfe &amp; Support in IntelliJ</strong></h3>
+<p><strong>Schnelle Hilfen:</strong></p>
+<ul>
+<li><strong>Quick Documentation:</strong> Strg + Q (macOS: F1)</li>
+<li><strong>Find Action:</strong> Strg + Shift + A (macOS: ⌘ + Shift + A) – hier auch nach Hilfe suchen!</li>
+<li><strong>Kontextbezogene Hilfe:</strong> Rechtsklick auf Menüpunkt → „Help“</li>
+<li><strong>Online-Hilfe:</strong> Menü <strong>Help</strong> → „Help“ oder <a href="https://www.jetbrains.com/help/idea/">IntelliJ IDEA Online-Dokumentation</a></li>
+</ul>
+<p><strong>Weitere Anlaufstellen:</strong></p>
+<ul>
+<li><a href="https://www.jetbrains.com/idea/support/">JetBrains Support Center</a></li>
+<li>Stack Overflow (Fragen zu „intellij-idea“ taggen)</li>
+<li>JetBrains Community-Foren</li>
+</ul>
+<hr>
+<h2 id="3-optional-arbeitsorganisation--zusammenarbeit"><strong>3. (Optional) Arbeitsorganisation &amp; Zusammenarbeit</strong></h2>
+<h3 id="31-aufgabentasks-kontextwechsel"><strong>3.1. Aufgaben/Tasks (Kontextwechsel)</strong></h3>
+<p>IntelliJ bietet eine Task-Funktion (Aufgabenverwaltung), z. B. zur Integration mit Issue-Trackern wie Jira, YouTrack oder GitHub Issues.</p>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Wechsel zwischen Aufgaben legt automatisch neue Branches an und speichert offenen Stand.</li>
+<li>Du kannst schnell zwischen Aufgaben/Branch-Kontexten wechseln.</li>
+</ul>
+<p><strong>So nutzt du Tasks:</strong></p>
+<ol>
+<li>Menü: <strong>View → Tool Windows → Tasks</strong> (oder Strg + Shift + F4)</li>
+<li>Neue Aufgabe starten: „Create New Task“</li>
+<li>Bei verknüpften Issue-Trackern: Aufgaben können automatisch angelegt und synchronisiert werden.</li>
+</ol>
+<p><strong>Tipp:</strong>
+Für Einsteiger reicht meist die Git-Branch-Verwaltung – Tasks werden vor allem in größeren Teams genutzt.</p>
+<hr>
+<h3 id="32-optional-code-review-features-ultimate-edition"><strong>3.2. (Optional) Code-Review-Features (Ultimate Edition)</strong></h3>
+<p>Mit der <strong>Ultimate Edition</strong> bietet IntelliJ eingebaute Tools für Code-Reviews und Pull Requests, z. B. für GitHub oder GitLab.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Anzeigen und Kommentieren von Pull Requests direkt in der IDE.</li>
+<li>Inline-Diskussionen und Reviews, ohne IntelliJ zu verlassen.</li>
+<li>Anzeigen von Review-Kommentaren im Editor.</li>
+</ul>
+<p><strong>So findest du die Review-Ansicht:</strong></p>
+<ul>
+<li><strong>View → Tool Windows → Git</strong> (oder VCS → Git → Pull Requests)</li>
+<li>Dort kannst du Pull Requests durchsuchen, ansehen und kommentieren.</li>
+</ul>
+<p><strong>Tipp:</strong>
+Für Open-Source-Projekte und Teamarbeit extrem praktisch – für private oder Einzelprojekte meist nicht nötig.</p>
+<hr>
+<h2 id="übungsaufgaben-zum-selbststudium"><strong>Übungsaufgaben (zum Selbststudium)</strong></h2>
+<ol>
+<li><strong>Installiere das Plugin „Key Promoter X“ und lerne die ersten Shortcuts, die dir angezeigt werden.</strong></li>
+<li><strong>Probiere „Invalidate Caches / Restart“ aus, nachdem du eine kleine Änderung gemacht hast.</strong></li>
+<li><strong>Installiere und deaktiviere ein Plugin – prüfe, wie sich das auf deine IDE auswirkt.</strong></li>
+<li><em>(Optional)</em> <strong>Lege eine Aufgabe im Task-Tool an oder öffne die Pull-Request-Ansicht (wenn du Zugriff auf ein GitHub/GitLab-Repo hast).</strong></li>
+<li><strong>Nutze die Hilfe-Funktion (Strg + Q oder Strg + Shift + A), um eine Erklärung zu einem Menüpunkt zu finden.</strong></li>
+</ol>
+<hr>
+<h2 id="wichtige-shortcuts-und-tipps"><strong>Wichtige Shortcuts und Tipps</strong></h2>
+<table>
+<thead>
+<tr>
+<th><strong>Aktion</strong></th>
+<th><strong>Windows/Linux</strong></th>
+<th><strong>macOS</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Einstellungen öffnen</td>
+<td>Strg + Alt + S</td>
+<td>⌘ + ,</td>
+</tr>
+<tr>
+<td>Plugins durchsuchen</td>
+<td>Einstellungen &gt; Plugins</td>
+<td>dito</td>
+</tr>
+<tr>
+<td>Invalidate Caches/Restart</td>
+<td>File &gt; Invalidate Caches / Restart</td>
+<td>dito</td>
+</tr>
+<tr>
+<td>Quick Documentation</td>
+<td>Strg + Q</td>
+<td>F1</td>
+</tr>
+<tr>
+<td>Find Action</td>
+<td>Strg + Shift + A</td>
+<td>⌘ + Shift + A</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><strong>Tipp:</strong>
+Nimm dir regelmäßig Zeit, um Plugins, Themes oder neue Tools zu entdecken und zu bewerten. So bleibt deine IDE optimal für deine Arbeitsweise eingestellt!</p>
+<hr>
+<p><strong>Mit diesen Kenntnissen kannst du IntelliJ IDEA optimal auf dich zuschneiden und Probleme gezielt beheben. Viel Spaß beim Ausprobieren!</strong></p>
+
+            
+            
+        </body>
+        </html>

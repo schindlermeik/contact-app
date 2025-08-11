@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&ast;&ast;Maven-Einf&uuml;hrung &ndash; Ausf&uuml;hrliche Gliederung&ast;&ast;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="maven-einführung--ausführliche-gliederung"><strong>Maven-Einführung – Ausführliche Gliederung</strong></h1>
+<hr>
+<h2 id="1-was-ist-maven-und-warum-nutzen-wir-es">1. Was ist Maven und warum nutzen wir es?</h2>
+<ul>
+<li>
+<p>1.1 Herausforderungen ohne Build-Tool:</p>
+<ul>
+<li>Manuelle Verwaltung von Abhängigkeiten</li>
+<li>Unterschiedliche Projektstrukturen</li>
+<li>Schwierigkeiten beim Teilen/Deployen von Projekten</li>
+</ul>
+</li>
+<li>
+<p>1.2 Ziele von Maven:</p>
+<ul>
+<li>Einheitlicher Build-Prozess</li>
+<li>Automatisiertes Dependency-Management</li>
+<li>Nachvollziehbare Builds</li>
+</ul>
+</li>
+<li>
+<p>1.3 Kurzüberblick: Was ist ein Build-Tool?</p>
+<ul>
+<li>Beispiele: Maven, Gradle, Ant</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-aufbau-eines-maven-projekts--die-standardstruktur">2. Aufbau eines Maven-Projekts – Die Standardstruktur</h2>
+<ul>
+<li>
+<p>2.1 Wichtige Verzeichnisse:</p>
+<ul>
+<li><code>src/main/java</code>: Quellcode</li>
+<li><code>src/main/resources</code>: Ressourcen (z.B. Properties-Dateien)</li>
+<li><code>src/test/java</code>: Testcode</li>
+<li><code>src/test/resources</code>: Testressourcen</li>
+<li><code>target</code>: Build-Ergebnisse (automatisch erzeugt)</li>
+</ul>
+</li>
+<li>
+<p>2.2 Konvention über Konfiguration</p>
+<ul>
+<li>Was passiert automatisch, wenn man sich an die Struktur hält?</li>
+</ul>
+</li>
+<li>
+<p>2.3 Projekterstellung:</p>
+<ul>
+<li>Mit IDE (z.B. IntelliJ, Eclipse)</li>
+<li>Mit Maven Archetype (<code>mvn archetype:generate</code>)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-die-pomxml--das-herz-des-projekts">3. Die <code>pom.xml</code> – Das Herz des Projekts</h2>
+<ul>
+<li>
+<p>3.1 Grundstruktur:</p>
+<ul>
+<li><code>&lt;project&gt;</code></li>
+<li><code>&lt;modelVersion&gt;</code></li>
+<li><code>&lt;groupId&gt;</code>, <code>&lt;artifactId&gt;</code>, <code>&lt;version&gt;</code>: Identifikation des Projekts</li>
+</ul>
+</li>
+<li>
+<p>3.2 Weitere wichtige Elemente:</p>
+<ul>
+<li><code>&lt;packaging&gt;</code> (z.B. <code>jar</code>, <code>war</code>)</li>
+<li><code>&lt;name&gt;</code>, <code>&lt;description&gt;</code></li>
+</ul>
+</li>
+<li>
+<p>3.3 Die Dependency-Liste (<code>&lt;dependencies&gt;</code>)</p>
+<ul>
+<li>Aufbau eines <code>&lt;dependency&gt;</code>-Blocks</li>
+<li>Beispiel: JUnit 5 einbinden</li>
+<li><strong>Übung:</strong> Teilnehmer fügen eine eigene Abhängigkeit hinzu</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-abhängigkeiten-und-das-repository-konzept">4. Abhängigkeiten und das Repository-Konzept</h2>
+<ul>
+<li>
+<p>4.1 Woher bekommt Maven die Bibliotheken?</p>
+<ul>
+<li>Lokales Repository (<code>~/.m2/repository</code>)</li>
+<li>Firmeninterne Repositories (Nexus, Artifactory)</li>
+<li>Zentrales Maven-Repository (Internet)</li>
+</ul>
+</li>
+<li>
+<p>4.2 Wie funktioniert das Auflösen?</p>
+<ul>
+<li>Reihenfolge: Lokal → Intern → Zentral</li>
+<li>Was passiert beim ersten Hinzufügen einer Dependency?</li>
+</ul>
+</li>
+<li>
+<p>4.3 Transitive Abhängigkeiten</p>
+<ul>
+<li>Was bedeutet das?</li>
+<li>Demo: <code>mvn dependency:tree</code></li>
+</ul>
+</li>
+<li>
+<p>4.4 Typische Probleme beim Dependency-Management</p>
+<ul>
+<li>Versionskonflikte („Dependency Hell“)</li>
+<li>Fehlende oder falsche Abhängigkeiten</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-maven-build-lifecycle--der-build-prozess">5. Maven Build-Lifecycle – Der Build-Prozess</h2>
+<ul>
+<li>
+<p>5.1 Was ist ein Lifecycle?</p>
+<ul>
+<li>Standard-Lifecycle: <em>clean</em>, <em>default</em>, <em>site</em></li>
+</ul>
+</li>
+<li>
+<p>5.2 Die wichtigsten Phasen im Standard-Lifecycle</p>
+<ul>
+<li><code>validate</code></li>
+<li><code>compile</code></li>
+<li><code>test</code></li>
+<li><code>package</code></li>
+<li><code>verify</code></li>
+<li><code>install</code></li>
+<li><code>deploy</code></li>
+</ul>
+</li>
+<li>
+<p>5.3 Unterschied: Phase vs. Goal</p>
+<ul>
+<li>Was passiert, wenn man <code>mvn test</code> oder <code>mvn package</code> eingibt?</li>
+</ul>
+</li>
+<li>
+<p>5.4 <strong>Übung:</strong> Teilnehmer führen selbst Konsolenbefehle aus und beobachten den Output</p>
+</li>
+</ul>
+<hr>
+<h2 id="6-maven-plugins--die-werkzeuge-des-build-prozesses">6. Maven-Plugins – Die Werkzeuge des Build-Prozesses</h2>
+<ul>
+<li>
+<p>6.1 Was sind Plugins?</p>
+<ul>
+<li>Plugins als Ausführende der Phasen</li>
+<li>Beispiele: Compiler, Surefire, Assembly</li>
+</ul>
+</li>
+<li>
+<p>6.2 Plugins konfigurieren in der <code>pom.xml</code></p>
+<ul>
+<li>Grundaufbau eines <code>&lt;plugin&gt;</code>-Blocks</li>
+<li>Wo findet man passende Plugins?</li>
+</ul>
+</li>
+<li>
+<p>6.3 Das Maven-Surefire-Plugin</p>
+<ul>
+<li>Aufgabe: Testausführung in der <code>test</code>-Phase</li>
+<li>Standardverhalten und Besonderheiten bei JUnit 5</li>
+<li><strong>Konfiguration:</strong> Beispiel-Eintrag für JUnit 5 (<code>junit-jupiter-engine</code>)</li>
+<li><strong>Übung:</strong> Teilnehmer konfigurieren Surefire selbst für JUnit 5</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="7-arbeiten-mit-maven-in-der-praxis">7. Arbeiten mit Maven in der Praxis</h2>
+<ul>
+<li>
+<p>7.1 Zentrale Befehle und ihre Wirkung</p>
+<ul>
+<li><code>mvn clean</code></li>
+<li><code>mvn compile</code></li>
+<li><code>mvn test</code></li>
+<li><code>mvn package</code></li>
+<li><code>mvn install</code></li>
+</ul>
+</li>
+<li>
+<p>7.2 Analyse der Ergebnisse</p>
+<ul>
+<li>Wo findet man das Build-Ergebnis?</li>
+<li>Wo erscheinen Fehlermeldungen?</li>
+</ul>
+</li>
+<li>
+<p>7.3 Tipps zur Fehlersuche und -behebung</p>
+<ul>
+<li>Häufige Fehlerursachen</li>
+<li>Wichtige Log-Ausgaben erkennen</li>
+<li>Das <code>effective-pom</code> nutzen (<code>mvn help:effective-pom</code>)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="8-erweiterte-konzepte-optionalkurzer-ausblick">8. Erweiterte Konzepte (optional/kurzer Ausblick)</h2>
+<ul>
+<li>8.1 Build-Profile für verschiedene Umgebungen</li>
+<li>8.2 Eigene Plugins und Erweiterungen</li>
+<li>8.3 Dependency Management für Multi-Modul-Projekte</li>
+<li>8.4 Alternative Build-Tools (Gradle, Ant – Kurzüberblick)</li>
+</ul>
+<hr>
+<h2 id="9-zusammenfassung--ausblick">9. Zusammenfassung &amp; Ausblick</h2>
+<ul>
+<li>9.1 Wiederholung der wichtigsten Punkte</li>
+<li>9.2 Typische Anwendungsfälle im Arbeitsalltag</li>
+<li>9.3 Weiterführende Ressourcen</li>
+</ul>
+<hr>
+
+            
+            
+        </body>
+        </html>

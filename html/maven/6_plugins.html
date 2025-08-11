@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Maven-Plugins &ndash; Die Werkzeuge des Build-Prozesses</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-maven-plugins--die-werkzeuge-des-build-prozesses">Handout: Maven-Plugins – Die Werkzeuge des Build-Prozesses</h1>
+<hr>
+<h2 id="61-was-sind-plugins">6.1 <strong>Was sind Plugins?</strong></h2>
+<ul>
+<li>
+<p><strong>Plugins sind zentrale Bausteine in Maven.</strong></p>
+</li>
+<li>
+<p>Sie erledigen die eigentliche Arbeit in den verschiedenen Phasen des Build-Lifecycles:</p>
+<ul>
+<li>Kompilieren des Codes</li>
+<li>Ausführen von Tests</li>
+<li>Erzeugen von JAR-/WAR-Dateien</li>
+<li>Erstellen von Berichten, u. v. m.</li>
+</ul>
+</li>
+</ul>
+<h3 id="wie-funktionieren-plugins"><strong>Wie funktionieren Plugins?</strong></h3>
+<ul>
+<li>
+<p>Jede <strong>Phase</strong> im Maven-Lifecycle (wie <code>compile</code>, <code>test</code>, <code>package</code>) ruft eins oder mehrere <strong>Goals</strong> von Plugins auf.</p>
+</li>
+<li>
+<p><strong>Beispiel:</strong></p>
+<ul>
+<li>In der Phase <code>compile</code> wird das Goal <code>compile</code> vom <code>maven-compiler-plugin</code> ausgeführt.</li>
+<li>In der Phase <code>test</code> wird das Goal <code>test</code> vom <code>maven-surefire-plugin</code> ausgeführt.</li>
+</ul>
+</li>
+</ul>
+<h3 id="beispiele-wichtiger-plugins"><strong>Beispiele wichtiger Plugins</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Plugin</th>
+<th>Zweck</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>maven-compiler-plugin</td>
+<td>Kompiliert den Quellcode</td>
+</tr>
+<tr>
+<td>maven-surefire-plugin</td>
+<td>Führt die Unit-Tests aus</td>
+</tr>
+<tr>
+<td>maven-assembly-plugin</td>
+<td>Baut ausführbare JARs, ZIPs usw.</td>
+</tr>
+<tr>
+<td>maven-jar-plugin</td>
+<td>Erstellt das JAR-Artefakt</td>
+</tr>
+<tr>
+<td>maven-clean-plugin</td>
+<td>Löscht Build-Verzeichnisse</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="62-plugins-konfigurieren-in-der-pomxml">6.2 <strong>Plugins konfigurieren in der <code>pom.xml</code></strong></h2>
+<h3 id="grundaufbau-eines-plugin-blocks"><strong>Grundaufbau eines <code>&lt;plugin&gt;</code>-Blocks:</strong></h3>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">build</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">plugins</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">plugin</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.10.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">source</span>&gt;</span>17<span class="hljs-tag">&lt;/<span class="hljs-name">source</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">target</span>&gt;</span>17<span class="hljs-tag">&lt;/<span class="hljs-name">target</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">plugin</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- Weitere Plugins ... --&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">plugins</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">build</span>&gt;</span>
+</code></pre>
+<p><strong>Hinweise:</strong></p>
+<ul>
+<li>Plugins werden im <code>&lt;build&gt;</code>-Abschnitt unter <code>&lt;plugins&gt;</code> eingetragen.</li>
+<li>Viele Plugins laufen <strong>out of the box</strong> – für spezielle Anforderungen gibt es <code>&lt;configuration&gt;</code>.</li>
+</ul>
+<h3 id="wo-findet-man-passende-plugins"><strong>Wo findet man passende Plugins?</strong></h3>
+<ul>
+<li><strong>Offiziell:</strong> <a href="https://maven.apache.org/plugins/">Maven Plugin Documentation</a></li>
+<li><strong>Suche:</strong> <a href="https://search.maven.org/">search.maven.org</a> – nach „maven-plugin“ filtern.</li>
+<li><strong>Tipp:</strong> Die wichtigsten Plugins sind von <code>org.apache.maven.plugins</code> (offiziell, stabil, gut dokumentiert).</li>
+</ul>
+<hr>
+<h2 id="63-das-maven-surefire-plugin">6.3 <strong>Das Maven-Surefire-Plugin</strong></h2>
+<h3 id="wofür-ist-das-surefire-plugin-zuständig"><strong>Wofür ist das Surefire-Plugin zuständig?</strong></h3>
+<ul>
+<li>Es <strong>führt alle Unit-Tests</strong> in der Phase <code>test</code> aus.</li>
+<li>Erkennt automatisch alle Testklassen, die bestimmte Namensmuster haben (z. B. <code>*Test.java</code>, <code>*Tests.java</code>, <code>Test*.java</code>).</li>
+</ul>
+<h3 id="standardverhalten"><strong>Standardverhalten:</strong></h3>
+<ul>
+<li>
+<p>Läuft automatisch bei <code>mvn test</code>, <code>mvn package</code>, etc.</p>
+</li>
+<li>
+<p>Benötigt ab JUnit 5 <strong>eine kleine Anpassung</strong>:</p>
+<ul>
+<li>JUnit 5 ist modular aufgebaut.</li>
+<li>Es muss mindestens die Engine <code>junit-jupiter-engine</code> als Dependency vorhanden sein.</li>
+<li>Teilweise muss das Surefire-Plugin in der <code>pom.xml</code> angepasst werden, um Tests zu erkennen.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="beispiel-surefire-konfiguration-für-junit-5"><strong>Beispiel: Surefire-Konfiguration für JUnit 5</strong></h3>
+<h4 id="1-dependencies-in-der-pomxml"><strong>1. Dependencies in der <code>pom.xml</code>:</strong></h4>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.junit.jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>junit-jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.10.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<h4 id="2-plugin-konfiguration-empfohlen"><strong>2. Plugin-Konfiguration (empfohlen):</strong></h4>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">build</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">plugins</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">plugin</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>maven-surefire-plugin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.2.5<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">useModulePath</span>&gt;</span>false<span class="hljs-tag">&lt;/<span class="hljs-name">useModulePath</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">plugin</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">plugins</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">build</span>&gt;</span>
+</code></pre>
+<h4 id="erläuterung"><strong>Erläuterung:</strong></h4>
+<ul>
+<li>Die Version ab 3.0.0-M5 unterstützt JUnit 5 offiziell.</li>
+<li><code>&lt;useModulePath&gt;false&lt;/useModulePath&gt;</code> deaktiviert das Java-Modulsystem beim Testen – das ist bei manchen Projekten oder Bibliotheken hilfreich, falls du z. B. noch kein <code>module-info.java</code> verwendest oder Bibliotheken auf dem Classpath brauchst.</li>
+</ul>
+<hr>
+<h3 id="übung-surefire-für-junit-5-selbst-konfigurieren"><strong>Übung: Surefire für JUnit 5 selbst konfigurieren</strong></h3>
+<ol>
+<li>
+<p><strong>Lege ein Maven-Projekt mit JUnit 5 als Dependency an.</strong></p>
+</li>
+<li>
+<p><strong>Füge das Surefire-Plugin wie oben in deine <code>pom.xml</code> ein.</strong></p>
+</li>
+<li>
+<p><strong>Schreibe eine einfache Testklasse in <code>src/test/java</code>:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.junit.jupiter.api.Assertions.*;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">BeispielTest</span> {
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testAddition</span><span class="hljs-params">()</span> {
+        assertEquals(<span class="hljs-number">4</span>, <span class="hljs-number">2</span> + <span class="hljs-number">2</span>);
+    }
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Führe den Test aus:</strong></p>
+<pre><code class="language-sh">mvn <span class="hljs-built_in">test</span>
+</code></pre>
+</li>
+<li>
+<p><strong>Beobachte die Konsole:</strong>
+Siehst du „BUILD SUCCESS“ und „Tests run: ...“? Glückwunsch, deine JUnit-Tests wurden erfolgreich mit Surefire ausgeführt!</p>
+</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li>Plugins sind die „Werkzeuge“ im Maven-Build, sie führen die einzelnen Aufgaben aus.</li>
+<li>Konfiguration erfolgt im <code>&lt;build&gt;</code>-Abschnitt der <code>pom.xml</code>.</li>
+<li>Surefire ist für Tests zuständig; bei JUnit 5 sollte man Version und ggf. Optionen wie <code>&lt;useModulePath&gt;</code> beachten.</li>
+<li>Eigene Anpassungen an Plugins sind einfach möglich und oft für spezielle Projekte nötig.</li>
+</ul>
+<hr>
+<h3 id="selbstkontrolle-fragen-zum-kapitel"><strong>Selbstkontrolle: Fragen zum Kapitel</strong></h3>
+<ol>
+<li>Was ist ein Maven-Plugin? Nenne zwei Beispiele.</li>
+<li>Wie wird ein Plugin in der <code>pom.xml</code> konfiguriert?</li>
+<li>Was ist die Aufgabe des Maven-Surefire-Plugins?</li>
+<li>Wie muss das Surefire-Plugin konfiguriert werden, damit JUnit 5-Tests zuverlässig laufen?</li>
+</ol>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Aufbau eines Maven-Projekts &ndash; Die Standardstruktur</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-aufbau-eines-maven-projekts--die-standardstruktur">Handout: Aufbau eines Maven-Projekts – Die Standardstruktur</h1>
+<hr>
+<h2 id="21-wichtige-verzeichnisse-in-einem-maven-projekt">2.1 Wichtige Verzeichnisse in einem Maven-Projekt</h2>
+<p>Maven gibt eine <strong>feste Verzeichnisstruktur</strong> vor, die auf Konventionen basiert. Das bedeutet:
+Wenn du dich an diese Struktur hältst, erkennt Maven automatisch, wo der Quellcode, Testcode und die Ressourcen liegen. Das erspart viel Konfigurationsaufwand und sorgt für Übersichtlichkeit.</p>
+<p>Hier die wichtigsten Ordner:</p>
+<h3 id="1-srcmainjava">1. <code>src/main/java</code></h3>
+<ul>
+<li><strong>Hier kommt der eigentliche Quellcode deiner Anwendung hin</strong>.</li>
+<li>Alles, was später in der fertigen Anwendung landen soll, liegt in diesem Ordner.</li>
+<li><strong>Beispiel:</strong>
+<code>src/main/java/com/beispiel/app/Main.java</code></li>
+</ul>
+<h3 id="2-srcmainresources">2. <code>src/main/resources</code></h3>
+<ul>
+<li><strong>Hier liegen die Ressourcen</strong>, die deine Anwendung benötigt, wie z. B. Konfigurationsdateien (<code>.properties</code>), Bilder oder andere Dateien.</li>
+<li>Diese Dateien werden beim Build in das endgültige Artefakt (z. B. JAR) übernommen.</li>
+</ul>
+<h3 id="3-srctestjava">3. <code>src/test/java</code></h3>
+<ul>
+<li><strong>Hier kommt der Testcode hin</strong>, zum Beispiel Unit-Tests (z. B. mit JUnit).</li>
+<li>Der Code in diesem Ordner wird <strong>nicht</strong> in die fertige Anwendung übernommen, sondern dient nur zum Testen während der Entwicklung.</li>
+</ul>
+<h3 id="4-srctestresources">4. <code>src/test/resources</code></h3>
+<ul>
+<li>Ressourcen, die <strong>nur für Tests</strong> benötigt werden.</li>
+<li>Beispiele: Testdaten, alternative Konfigurationen für Testzwecke.</li>
+</ul>
+<h3 id="5-target">5. <code>target</code></h3>
+<ul>
+<li><strong>Dieser Ordner wird von Maven automatisch erzeugt</strong>, wenn du dein Projekt baust.</li>
+<li>Hier legt Maven alle Build-Ergebnisse ab, z. B. die fertige JAR-Datei, kompilierten Code und temporäre Dateien.</li>
+<li>Du solltest niemals manuell Dateien in diesem Ordner ablegen oder ändern!
+Bei <code>mvn clean</code> wird er gelöscht.</li>
+</ul>
+<hr>
+<p><strong>Tipp:</strong>
+Diese Struktur ist in fast allen Java-Projekten Standard. Wenn du dich daran hältst, findest du dich auch in fremden Projekten schnell zurecht.</p>
+<hr>
+<h2 id="22-konvention-über-konfiguration">2.2 Konvention über Konfiguration</h2>
+<p>Maven arbeitet nach dem Prinzip <strong>„Konvention über Konfiguration“</strong>:</p>
+<ul>
+<li>
+<p><strong>Das heißt:</strong>
+Wenn du dich an die vorgegebene Struktur hältst, funktioniert alles „out of the box“ – du musst <strong>nichts extra konfigurieren</strong>.</p>
+</li>
+<li>
+<p>Maven erkennt automatisch,</p>
+<ul>
+<li>wo der Quellcode liegt,</li>
+<li>wo die Tests liegen,</li>
+<li>welche Ressourcen übernommen werden sollen.</li>
+</ul>
+</li>
+<li>
+<p>Das spart Zeit, verhindert Fehler und macht die Projekte leicht verständlich – für dich und für andere!</p>
+</li>
+</ul>
+<h3 id="was-passiert-automatisch">Was passiert automatisch?</h3>
+<ul>
+<li>Maven <strong>kompiliert</strong> nur die Dateien aus <code>src/main/java</code> (für die Anwendung) und <code>src/test/java</code> (für die Tests).</li>
+<li>Ressourcen aus <code>src/main/resources</code> werden <strong>automatisch ins Zielartefakt</strong> (z. B. in die JAR) kopiert.</li>
+<li>Testressourcen werden <strong>nur für die Testphase</strong> verwendet.</li>
+<li>Alles, was in <code>target</code> landet, ist <strong>das Ergebnis des Build-Prozesses</strong> – hier findest du nach dem Bauen z. B. deine fertige <code>.jar</code>-Datei.</li>
+</ul>
+<p><strong>Beispiel für einen typischen Build-Prozess:</strong></p>
+<ol>
+<li>Quellcode wird aus <code>src/main/java</code> kompiliert.</li>
+<li>Ressourcen aus <code>src/main/resources</code> werden ins Ziel eingebunden.</li>
+<li>Testcode aus <code>src/test/java</code> wird kompiliert und ausgeführt.</li>
+<li>Testergebnisse werden im <code>target</code>-Verzeichnis abgelegt.</li>
+<li>Das fertige Artefakt (z. B. eine <code>myapp-1.0.jar</code>) erscheint ebenfalls in <code>target</code>.</li>
+</ol>
+<hr>
+<h2 id="23-projekterstellung-mit-maven">2.3 Projekterstellung mit Maven</h2>
+<p>Wie startest du ein neues Maven-Projekt? Es gibt zwei übliche Wege:</p>
+<h3 id="1-projekterstellung-mit-einer-ide">1. Projekterstellung mit einer IDE</h3>
+<p>Die meisten modernen IDEs (z. B. <strong>IntelliJ IDEA</strong>, <strong>Eclipse</strong>, <strong>NetBeans</strong>) bieten eine bequeme Möglichkeit, neue Maven-Projekte per Mausklick zu erzeugen.</p>
+<ul>
+<li>
+<p>Du wählst „Neues Projekt“ → „Maven“ aus.</p>
+</li>
+<li>
+<p>Die IDE fragt dich nach wichtigen Angaben:</p>
+<ul>
+<li><em>GroupId</em> (z. B. <code>com.meinprojekt</code>)</li>
+<li><em>ArtifactId</em> (z. B. <code>mein-tool</code>)</li>
+<li><em>Version</em></li>
+</ul>
+</li>
+<li>
+<p>Die IDE legt das Verzeichnis und die <code>pom.xml</code> automatisch an – alles ist sofort einsatzbereit!</p>
+</li>
+</ul>
+<p><strong>Vorteil:</strong>
+Schnell, komfortabel, keine Tippfehler.</p>
+<hr>
+<h3 id="2-projekterstellung-per-kommandozeile-maven-archetype">2. Projekterstellung per Kommandozeile (Maven Archetype)</h3>
+<p>Maven kann Projekte <strong>auch direkt aus der Konsole</strong> mit einer Vorlage („Archetype“) erzeugen. Das geht so:</p>
+<pre><code class="language-sh">mvn archetype:generate -DgroupId=com.beispiel.app -DartifactId=meine-anwendung -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=<span class="hljs-literal">false</span>
+</code></pre>
+<p><strong>Bedeutung der Parameter:</strong></p>
+<ul>
+<li><code>-DgroupId</code> – Name deiner Organisation/Firma (um Projekte zu unterscheiden)</li>
+<li><code>-DartifactId</code> – Name des Projekts</li>
+<li><code>-DarchetypeArtifactId</code> – Vorlage (häufig: <code>maven-archetype-quickstart</code> für einfache Java-Projekte)</li>
+<li><code>-DinteractiveMode=false</code> – keine weiteren Rückfragen, alles automatisch</li>
+</ul>
+<p><strong>Ergebnis:</strong>
+Maven legt die komplette Projektstruktur (inkl. <code>src/main/java</code>, <code>src/test/java</code>, <code>pom.xml</code>) automatisch für dich an!</p>
+<hr>
+<p><strong>Hinweis:</strong>
+Ob mit IDE oder Kommandozeile:
+Am Ende hast du immer ein Projekt, das die <strong>Standard-Maven-Struktur</strong> verwendet und sofort baubar ist!</p>
+<hr>
+<h2 id="fazit"><strong>Fazit</strong></h2>
+<ul>
+<li>Die von Maven vorgegebene Projektstruktur hilft dir, Zeit zu sparen und Fehler zu vermeiden.</li>
+<li>Wenn du diese Struktur verwendest, profitierst du vom vollen Funktionsumfang von Maven – ohne extra Konfiguration.</li>
+<li>Neue Projekte lassen sich schnell und einfach starten, sowohl mit IDE als auch per Kommandozeile.</li>
+</ul>
+<hr>
+
+            
+            
+        </body>
+        </html>

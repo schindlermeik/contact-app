@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Was ist Maven und warum nutzen wir es&quest;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-was-ist-maven-und-warum-nutzen-wir-es">Handout: Was ist Maven und warum nutzen wir es?</h1>
+<hr>
+<h2 id="11-herausforderungen-ohne-build-tool">1.1 Herausforderungen ohne Build-Tool</h2>
+<p>Stell dir vor, du entwickelst ein größeres Java-Projekt – vielleicht sogar im Team. Was sind typische Probleme, wenn man <strong>kein Build-Tool</strong> verwendet?</p>
+<h3 id="manuelle-verwaltung-von-abhängigkeiten">Manuelle Verwaltung von Abhängigkeiten</h3>
+<ul>
+<li>In modernen Java-Projekten benötigt man fast immer Bibliotheken von Dritten (z. B. für Logging, Tests, Datenbankzugriffe).</li>
+<li>Ohne Build-Tool muss jeder Entwickler diese <strong>Bibliotheken (JAR-Dateien)</strong> selbst zusammensuchen und im Projekt einbinden.</li>
+<li>Bei Updates muss jeder manuell die neue Version einbauen – das kostet Zeit und führt zu Fehlern.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Du möchtest JUnit für Unit-Tests verwenden. Ohne Build-Tool musst du die JAR-Dateien suchen, herunterladen, korrekt in dein Projekt legen und ggf. mit anderen Bibliotheken abgleichen.</p>
+<hr>
+<h3 id="unterschiedliche-projektstrukturen">Unterschiedliche Projektstrukturen</h3>
+<ul>
+<li>In jedem Unternehmen, manchmal sogar in jedem Team, gibt es andere Konventionen, wo Quellcode, Ressourcen und Tests liegen sollen.</li>
+<li>Das führt zu <strong>Verwirrung und Zeitverlust</strong>, wenn man neue Projekte übernimmt oder als Team zusammenarbeitet.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Im einen Projekt liegen die Tests im Ordner <code>/test</code>, im anderen unter <code>/src/tests</code>, im dritten vielleicht nur irgendwo im Projektbaum.</p>
+<hr>
+<h3 id="schwierigkeiten-beim-teilen-und-deployen-von-projekten">Schwierigkeiten beim Teilen und Deployen von Projekten</h3>
+<ul>
+<li>Ein „fertiges“ Java-Projekt besteht meist aus mehreren Bausteinen: Quellcode, Ressourcen, Bibliotheken, Build-Skripten.</li>
+<li>Ohne Build-Tool ist es <strong>aufwändig</strong>, ein lauffähiges Artefakt (z. B. ein JAR) zu erstellen, das auf anderen Rechnern/Servern auch funktioniert.</li>
+<li>Kollegen oder Build-Server müssen exakt wissen, welche Schritte (und Bibliotheken!) benötigt werden.</li>
+</ul>
+<p><strong>Problem:</strong>
+Das führt oft zu Problemen, wenn jemand anderes das Projekt nachbauen oder ausliefern will („It works on my machine...“).</p>
+<hr>
+<h2 id="12-ziele-von-maven">1.2 Ziele von Maven</h2>
+<p><strong>Maven</strong> ist ein sogenanntes <strong>Build-Management-Tool</strong>. Es wurde entwickelt, um die oben genannten Probleme systematisch zu lösen. Was sind die Ziele von Maven?</p>
+<h3 id="einheitlicher-build-prozess">Einheitlicher Build-Prozess</h3>
+<ul>
+<li>Maven gibt eine <strong>Standardstruktur</strong> für Projekte vor (Konvention über Konfiguration).</li>
+<li>Es gibt <strong>fest definierte Phasen</strong> (wie <code>compile</code>, <code>test</code>, <code>package</code>, <code>install</code>), die auf jedem Rechner gleich ablaufen.</li>
+<li>Dadurch weiß jeder Entwickler und auch jeder Build-Server, <strong>was</strong> wie gebaut wird.</li>
+</ul>
+<p><strong>Vorteil:</strong>
+Neue Projekte können schneller gestartet und von anderen leichter verstanden werden.</p>
+<hr>
+<h3 id="automatisiertes-dependency-management">Automatisiertes Dependency-Management</h3>
+<ul>
+<li>Abhängigkeiten werden <strong>zentral in einer Konfigurationsdatei (<code>pom.xml</code>)</strong> verwaltet.</li>
+<li>Maven lädt die benötigten Bibliotheken (und deren Abhängigkeiten!) automatisch aus dem Internet oder von internen Servern herunter.</li>
+<li>Updates auf neue Versionen sind mit wenigen Änderungen erledigt.</li>
+</ul>
+<p><strong>Vorteil:</strong>
+Kein manuelles Suchen und Verwalten von JAR-Dateien mehr!</p>
+<hr>
+<h3 id="nachvollziehbare-builds">Nachvollziehbare Builds</h3>
+<ul>
+<li>Jeder Build mit Maven ist <strong>reproduzierbar</strong> – das heißt, auf jedem Rechner wird aus dem gleichen Quellcode und den gleichen Abhängigkeiten <strong>das gleiche Ergebnis</strong> gebaut.</li>
+<li>Die einzelnen Build-Schritte und deren Ergebnisse sind <strong>transparent</strong> und dokumentiert.</li>
+</ul>
+<p><strong>Vorteil:</strong>
+Builds sind stabil und Fehler lassen sich leichter nachvollziehen und beheben.</p>
+<hr>
+<h2 id="13-kurzüberblick-was-ist-ein-build-tool">1.3 Kurzüberblick: Was ist ein Build-Tool?</h2>
+<h3 id="was-ist-ein-build-tool">Was ist ein Build-Tool?</h3>
+<p>Ein <strong>Build-Tool</strong> ist ein Programm, das den gesamten Prozess vom Quellcode bis zur fertigen Anwendung automatisiert und strukturiert ablaufen lässt. Dazu gehören unter anderem:</p>
+<ul>
+<li>Übersetzen (Kompilieren) des Quellcodes</li>
+<li>Ausführen von Tests</li>
+<li>Einbinden von Bibliotheken</li>
+<li>Packen der fertigen Anwendung (z. B. als JAR oder WAR)</li>
+<li>Optional: Deployment auf Servern</li>
+</ul>
+<p><strong>Ziel:</strong>
+Den Build-Prozess vereinfachen, standardisieren und automatisieren.</p>
+<hr>
+<h3 id="beispiele-für-build-tools">Beispiele für Build-Tools</h3>
+<ul>
+<li><strong>Maven</strong>
+Der De-facto-Standard im Java-Bereich; arbeitet mit Konventionen und deklarativer Konfiguration.</li>
+<li><strong>Gradle</strong>
+Moderneres Build-Tool, das flexibler und skriptbarer ist (nutzt Groovy/Kotlin-Skripte).</li>
+<li><strong>Ant</strong>
+Früher sehr weit verbreitet, benötigt jedoch mehr manuelle Konfiguration („Build-Skripte“).</li>
+</ul>
+<hr>
+<h3 id="vergleich-kurzüberblick">Vergleich (Kurzüberblick)</h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Hauptmerkmal</th>
+<th>Konfiguration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Maven</td>
+<td>Konvention über Konfiguration</td>
+<td>XML (<code>pom.xml</code>)</td>
+</tr>
+<tr>
+<td>Gradle</td>
+<td>Hohe Flexibilität, Skripting</td>
+<td>Groovy/Kotlin</td>
+</tr>
+<tr>
+<td>Ant</td>
+<td>Alles muss manuell definiert werden</td>
+<td>XML</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="fazit"><strong>Fazit</strong></h2>
+<p>Ohne ein Build-Tool wie Maven wird das Arbeiten an modernen Java-Projekten schnell <strong>kompliziert, fehleranfällig und ineffizient</strong>. Maven sorgt für:</p>
+<ul>
+<li>Übersichtlichkeit und Standardisierung,</li>
+<li>Automatische Verwaltung von Abhängigkeiten,</li>
+<li>Wiederholbare und nachvollziehbare Builds.</li>
+</ul>
+<p>Im nächsten Schritt schauen wir uns an, <strong>wie</strong> Maven-Projekte aufgebaut sind und was genau in der <code>pom.xml</code> passiert!</p>
+<hr>
+<p><strong>Tipp:</strong>
+Wenn du tiefer einsteigen willst, findest du auf der offiziellen <a href="https://maven.apache.org/">Maven-Website</a> viele Ressourcen und Tutorials.</p>
+<hr>
+
+            
+            
+        </body>
+        </html>

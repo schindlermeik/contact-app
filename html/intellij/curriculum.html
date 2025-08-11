@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&ast;&ast;Curriculum&colon; Einf&uuml;hrung in IntelliJ IDEA&ast;&ast;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h2 id="curriculum-einführung-in-intellij-idea"><strong>Curriculum: Einführung in IntelliJ IDEA</strong></h2>
+<hr>
+<h3 id="1-einführung-und-grundlagen"><strong>1. Einführung und Grundlagen</strong></h3>
+<p><strong>Installation und erster Start:</strong></p>
+<ul>
+<li>Kurze Erklärung der Installationsprozesse und der verschiedenen Versionen.</li>
+<li>Überblick über die Benutzeroberfläche und die wichtigsten Fenster.</li>
+</ul>
+<p><strong>Projektverwaltung:</strong></p>
+<ul>
+<li>Erstellen eines neuen Projekts (z. B. Maven, Gradle oder einfaches Java-Projekt).</li>
+<li>Erklärung der Projektstruktur und der Konfigurationsdateien.</li>
+<li>Öffnen und Schließen von Projekten.</li>
+</ul>
+<p><strong>Grundlegende Navigation:</strong></p>
+<ul>
+<li>
+<p>Schnelle Suche nach Klassen (Strg + N) und Dateien (Strg + Shift + N).</p>
+</li>
+<li>
+<p>Suche überall mit Doppel-Shift.</p>
+</li>
+<li>
+<p>Wechsel zwischen zuletzt geöffneten Dateien (Strg + E).</p>
+</li>
+<li>
+<p><strong>Navigation zwischen Methoden und Implementierungen:</strong></p>
+<ul>
+<li>Springe zu Implementierung (Strg + Alt + B)</li>
+<li>Zu Deklaration (Strg + B)</li>
+<li>Zurück (Alt + Links) und Vor (Alt + Rechts)</li>
+</ul>
+</li>
+<li>
+<p><strong>Bookmark-Funktion:</strong></p>
+<ul>
+<li>Schnelles Markieren und Anspringen von Code-Stellen (F11, Shift + F11)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-code-bearbeitung-und-automatisierung"><strong>2. Code-Bearbeitung und Automatisierung</strong></h3>
+<p><strong>Code-Vervollständigung und intelligente Hilfe:</strong></p>
+<ul>
+<li>
+<p>Erklärung der intelligenten Code-Vervollständigung.</p>
+</li>
+<li>
+<p>Die Rolle von Alt + Enter für kontextabhängige Aktionen und Fehlerbehebung.</p>
+</li>
+<li>
+<p><strong>Quick Documentation (Strg + Q):</strong></p>
+<ul>
+<li>Dokumentation und Javadoc direkt anzeigen</li>
+</ul>
+</li>
+</ul>
+<p><strong>Codegenerierung:</strong></p>
+<ul>
+<li>
+<p>Verwendung von Alt + Einfügen (oder ⌘ + N auf Mac), um:</p>
+<ul>
+<li>Konstruktoren zu generieren</li>
+<li>Getter und Setter zu erstellen</li>
+<li>toString(), equals() und hashCode() Methoden zu generieren</li>
+<li>Testklassen und Testmethoden zu erstellen</li>
+</ul>
+</li>
+</ul>
+<p><strong>Live Templates und Postfix-Operatoren:</strong></p>
+<ul>
+<li>Demonstration von Live Templates (psvm für main-Methode, sout für System.out.println).</li>
+<li>Einführung in Postfix-Operatoren (variablenname.if, liste.for).</li>
+</ul>
+<p><strong>Refactoring:</strong></p>
+<ul>
+<li>Umbenennen von Variablen, Methoden und Klassen (Shift + F6).</li>
+<li>Extrahieren von Methoden (Strg + Alt + M).</li>
+<li>Extrahieren von Variablen (Strg + Alt + V) und Konstanten.</li>
+</ul>
+<p><strong>Code-Struktur:</strong></p>
+<ul>
+<li>Formatieren des Codes (Strg + Alt + L).</li>
+<li>Code-Struktur (Alt + 7) und Hierarchie (Strg + H).</li>
+</ul>
+<p><strong>Produktivitätstipps:</strong></p>
+<ul>
+<li>
+<p><strong>Mehrfach-Cursor/Multicaret:</strong></p>
+<ul>
+<li>Mehrere Stellen gleichzeitig bearbeiten (Alt + Klick oder Strg + Alt + Shift + J)</li>
+</ul>
+</li>
+<li>
+<p><strong>Find Action (Strg + Shift + A):</strong></p>
+<ul>
+<li>Suchen und Ausführen aller Befehle/Features</li>
+</ul>
+</li>
+<li>
+<p><strong>Nutzung von Shortcut-Hilfe (Strg + J)</strong></p>
+</li>
+</ul>
+<hr>
+<h3 id="3-debugging-und-versionskontrolle"><strong>3. Debugging und Versionskontrolle</strong></h3>
+<p><strong>Debugging:</strong></p>
+<ul>
+<li>Setzen und Verwalten von Breakpoints.</li>
+<li>Schrittweise Ausführung des Codes (F8, F7).</li>
+<li>Überprüfen von Variablen und Ausführen von Ausdrücken.</li>
+</ul>
+<p><strong>Versionskontrolle (Git):</strong></p>
+<ul>
+<li>Einrichtung und Konfiguration von Git.</li>
+<li>Grundlegende Operationen: Committen (Strg + K), Pushing und Pulling von Änderungen.</li>
+<li>Erstellen und Wechseln von Branches.</li>
+<li>Ansicht der Code-Änderungen (Diff).</li>
+</ul>
+<hr>
+<h3 id="4-arbeiten-mit-ressourcen-tools-und-konfigurationen"><strong>4. Arbeiten mit Ressourcen, Tools und Konfigurationen</strong></h3>
+<p><strong>Arbeiten mit Ressourcen:</strong></p>
+<ul>
+<li>Arbeiten mit Properties-, YAML- oder XML-Dateien (z. B. für Spring Boot)</li>
+<li>Strukturansicht auch für Nicht-Java-Dateien (Alt + 7)</li>
+</ul>
+<p><strong>Tools und zusätzliche Features:</strong></p>
+<ul>
+<li>Verwendung des integrierten Terminals (Alt + F12)</li>
+<li>(Optional) Kurzer Ausblick auf Datenbank-Tools</li>
+<li>Build-Tools: Maven/Gradle-Tasks aus der IDE starten, &quot;Reload project&quot;</li>
+</ul>
+<p><strong>Editor-Konfiguration:</strong></p>
+<ul>
+<li>Anpassen des Farbschemas und der Schriftart.</li>
+</ul>
+<p><strong>Projekteinstellungen:</strong></p>
+<ul>
+<li>Konfiguration des SDK und der Projekt-Module.</li>
+<li>Erstellung und Verwaltung von Run/Debug-Konfigurationen.</li>
+</ul>
+<hr>
+<h3 id="5-individualisierung-und-erweiterungen"><strong>5. Individualisierung und Erweiterungen</strong></h3>
+<p><strong>Plugins:</strong></p>
+<ul>
+<li>Verständnis für Plugins und den Plugin-Marktplatz.</li>
+<li>Empfehlung und Installation nützlicher Plugins (z. B. Lombok, Key Promoter X).</li>
+</ul>
+<p><strong>Hilfe &amp; Troubleshooting:</strong></p>
+<ul>
+<li>„Invalidate Caches / Restart“ bei Problemen.</li>
+<li>Hinweise zu IntelliJ-Hilfe und Support.</li>
+</ul>
+<p><strong>(Optional) Arbeitsorganisation &amp; Zusammenarbeit:</strong></p>
+<ul>
+<li>Aufgaben/Tasks (Kontextwechsel)</li>
+<li>(Optional) Hinweise auf Code-Review-Features (Ultimate-Version)</li>
+</ul>
+<hr>
+<h3 id="6-abschluss--praxistipps"><strong>6. Abschluss &amp; Praxistipps</strong></h3>
+<ul>
+<li><strong>Wichtige Shortcuts als Onepager (je OS) austeilen</strong></li>
+<li>(Optional) „Was tun, wenn...?“ (FAQ zu häufigen Anfänger-Problemen)</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

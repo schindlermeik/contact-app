@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Maven Build-Lifecycle &ndash; Der Build-Prozess</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-maven-build-lifecycle--der-build-prozess">Handout: Maven Build-Lifecycle – Der Build-Prozess</h1>
+<hr>
+<h2 id="51-was-ist-ein-lifecycle">5.1 <strong>Was ist ein Lifecycle?</strong></h2>
+<p>Maven steuert den kompletten <strong>Build-Prozess</strong> eines Projekts mit dem Konzept des „Build-Lifecycle“ (Lebenszyklus).
+Ein Lifecycle ist eine <strong>vordefinierte Abfolge von Schritten</strong>, die beim Bauen eines Projekts automatisch in einer bestimmten Reihenfolge durchlaufen werden.</p>
+<p>Maven kennt drei Standard-Lifecycles:</p>
+<ul>
+<li><strong>default</strong> (auch: build): Der Haupt-Lifecycle für das Erzeugen von Artefakten (z. B. JAR, WAR).</li>
+<li><strong>clean</strong>: Für das Aufräumen des Projekts (z. B. Löschen des <code>target</code>-Ordners).</li>
+<li><strong>site</strong>: Für das Erstellen von Webseiten und Berichten zum Projekt.</li>
+</ul>
+<p><strong>Merke:</strong>
+Wenn du einen bestimmten Befehl wie <code>mvn package</code> oder <code>mvn test</code> eingibst, startet Maven den entsprechenden Lifecycle und durchläuft automatisch alle nötigen Phasen bis zu diesem Schritt!</p>
+<hr>
+<h2 id="52-die-wichtigsten-phasen-im-standard-lifecycle">5.2 <strong>Die wichtigsten Phasen im Standard-Lifecycle</strong></h2>
+<p>Ein Lifecycle besteht aus <strong>Phasen</strong>.
+Die wichtigsten Phasen des „default“-Lifecycles sind:</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Bedeutung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>validate</strong></td>
+<td>Prüft, ob das Projekt korrekt aufgebaut und vollständig ist</td>
+</tr>
+<tr>
+<td><strong>compile</strong></td>
+<td>Übersetzt den Quellcode (src/main/java) in Bytecode (target/classes)</td>
+</tr>
+<tr>
+<td><strong>test</strong></td>
+<td>Führt automatisierte Tests im Testverzeichnis (src/test/java) aus</td>
+</tr>
+<tr>
+<td><strong>package</strong></td>
+<td>Packt das kompilierte Projekt in ein Artefakt (z. B. JAR, WAR)</td>
+</tr>
+<tr>
+<td><strong>verify</strong></td>
+<td>Führt ggf. zusätzliche Prüfungen durch (z. B. Integrations-Tests)</td>
+</tr>
+<tr>
+<td><strong>install</strong></td>
+<td>Installiert das Artefakt im lokalen Maven-Repository (für andere Projekte auf deinem Rechner verfügbar)</td>
+</tr>
+<tr>
+<td><strong>deploy</strong></td>
+<td>Lädt das fertige Artefakt in ein zentrales Repository (z. B. Nexus/Artifactory)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Weitere Lifecycles/Phasen:</strong></p>
+<ul>
+<li>
+<p><strong>clean:</strong></p>
+<ul>
+<li><code>pre-clean</code></li>
+<li><code>clean</code> (löscht <code>target</code>)</li>
+<li><code>post-clean</code></li>
+</ul>
+</li>
+<li>
+<p><strong>site:</strong></p>
+<ul>
+<li><code>pre-site</code></li>
+<li><code>site</code> (erstellt Projektseite/Reports)</li>
+<li><code>post-site</code></li>
+<li><code>site-deploy</code> (veröffentlicht die Seite)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="53-unterschied-phase-vs-goal">5.3 <strong>Unterschied: Phase vs. Goal</strong></h2>
+<h3 id="was-ist-eine-phase"><strong>Was ist eine Phase?</strong></h3>
+<ul>
+<li>Ein logischer Schritt im Build-Prozess, z. B. <code>compile</code> oder <code>test</code>.</li>
+</ul>
+<h3 id="was-ist-ein-goal"><strong>Was ist ein Goal?</strong></h3>
+<ul>
+<li>Ein <strong>Kommando</strong> oder eine Aufgabe, die von einem Maven-Plugin ausgeführt wird, z. B. <code>compiler:compile</code> oder <code>surefire:test</code>.</li>
+<li>Jedes Goal kann einer Phase zugeordnet sein.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<ul>
+<li>Die Phase <code>test</code> ruft das Goal <code>surefire:test</code> (vom Surefire-Plugin) auf.</li>
+</ul>
+<h3 id="was-passiert-wenn-du-mvn-test-oder-mvn-package-eingibst"><strong>Was passiert, wenn du <code>mvn test</code> oder <code>mvn package</code> eingibst?</strong></h3>
+<p><strong>Beispiel 1: <code>mvn test</code></strong></p>
+<ul>
+<li>
+<p>Maven führt <strong>alle Phasen von Anfang bis einschließlich <code>test</code></strong> aus:</p>
+<ul>
+<li><code>validate</code> → <code>compile</code> → <code>test</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel 2: <code>mvn package</code></strong></p>
+<ul>
+<li>
+<p>Maven führt <strong>alle Phasen von Anfang bis einschließlich <code>package</code></strong> aus:</p>
+<ul>
+<li><code>validate</code> → <code>compile</code> → <code>test</code> → <code>package</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>Wichtig:</strong></p>
+<ul>
+<li><strong>Alle vorangehenden Phasen werden immer mitausgeführt!</strong></li>
+<li>Wenn du z. B. <code>mvn package</code> aufrufst, wird immer auch kompiliert und getestet (außer du schaltest Tests explizit aus).</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li>Der Maven Build-Lifecycle sorgt für einen <strong>klaren, reproduzierbaren Ablauf</strong> beim Bauen eines Projekts.</li>
+<li>Phasen und Goals sind die zentralen Bausteine.</li>
+<li>Mit einfachen Befehlen steuerst du, <strong>bis zu welchem Schritt</strong> Maven arbeiten soll – alle nötigen Schritte davor werden automatisch erledigt.</li>
+<li>Mit gezielten Konsolenbefehlen lernst du, die Abläufe besser zu verstehen und Probleme gezielt zu erkennen.</li>
+</ul>
+<hr>
+<p><strong>Tipp:</strong>
+Wenn du dir den Ablauf grafisch darstellen lassen möchtest, probiere z. B. den Befehl</p>
+<pre><code class="language-sh">mvn <span class="hljs-built_in">help</span>:describe -Dcmd=package
+</code></pre>
+<p>aus – oder schau in die <a href="https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html">offizielle Maven-Lifecycle-Doku</a>.</p>
+
+            
+            
+        </body>
+        </html>
