@@ -19,12 +19,13 @@ public class Main {
             System.out.println(contactManager.findById(3L));
             Contact byId = contactManager.findById(5l);
             if (byId != null) {
-               byId .getId();
+                byId.getId();
             }
-        } catch (ContactNotSaveException e) {
+        } catch (ContactNotSaveException | ContactNotFoundException e) {
             e.printStackTrace();
+            System.out.println("Error: es ist was schief gelaufen");
         } catch (Exception e) {
-            System.out.println("irgenwas ist aufgetren");
+            System.out.println("Error: irgendwas ist aufgetren");
         }
         System.out.println("INFO: --- Anwendung beendet ---");
 

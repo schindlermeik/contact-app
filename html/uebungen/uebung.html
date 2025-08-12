@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Refactoring-Aufgabe&colon; Kontaktverwaltungssystem</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <p>Sicher, hier ist die übersetzte Version der Refactoring-Aufgabe für Ihre Teilnehmer.</p>
+<hr>
+<h3 id="refactoring-aufgabe-kontaktverwaltungssystem">Refactoring-Aufgabe: Kontaktverwaltungssystem</h3>
+<p>Ihre Aufgabe ist es, die bestehende Klasse <code>ContactManager</code> in ein wartbareres und skalierbareres Design umzugestalten. Sie werden dabei so viele Refactoring-Funktionen von IntelliJ IDEA wie möglich verwenden, um die folgenden Ziele zu erreichen:</p>
+<ol>
+<li><strong><code>ContactManager</code> in <code>ContactService</code> umbenennen</strong>: Die Klasse <code>ContactManager</code> ist für die Geschäftslogik der Kontaktverwaltung zuständig. Gemäß den Prinzipien der Clean Architecture sollte diese Klasse in <strong><code>ContactService</code></strong> umbenannt werden, um ihre Rolle besser widerzuspiegeln.</li>
+<li><strong>Ein Interface (<code>ContactRepository</code>) extrahieren</strong>: Der <code>ContactService</code> handhabt derzeit sowohl die Geschäftslogik als auch die Datenpersistenz (Kontakte hinzufügen, finden). Wir müssen diese Zuständigkeiten trennen. Erstellen Sie ein neues <strong>Interface namens <code>ContactRepository</code></strong>, das die grundlegenden CRUD-Operationen (Create, Read, Update, Delete) für <code>Contact</code>-Objekte definiert.</li>
+<li><strong>Eine Repository-Implementierung erstellen (<code>ContactRepositoryImpl</code>)</strong>: Implementieren Sie das <code>ContactRepository</code>-Interface in einer neuen Klasse namens <strong><code>ContactRepositoryImpl</code></strong>. Diese Klasse wird die eigentliche Logik zum Speichern und Abrufen von Kontakten enthalten, wie die Verwendung der <code>List&lt;Contact&gt;</code> und die Verwaltung der <code>nextId</code>.</li>
+<li><strong><code>ContactService</code> zur Verwendung des neuen Repositories anpassen</strong>: Die Klasse <code>ContactService</code> sollte die <code>List&lt;Contact&gt;</code> nicht mehr direkt verwalten. Stattdessen sollte ihr eine <strong>Instanz von <code>ContactRepository</code> injiziert werden</strong> (über den Konstruktor), die sie zur Durchführung datenbezogener Operationen verwendet. Die Methoden <code>createContact</code> und <code>findById</code> rufen dann die entsprechenden Methoden des Repositories auf.</li>
+<li><strong>Die Main-Methoden-Logik in einen <code>ContactClient</code> auslagern</strong>: Die <code>main</code>-Methode in der Klasse <code>Main</code> enthält derzeit die Startlogik der Anwendung und eine einfache Demonstration der Funktionalität des <code>ContactManager</code>. Dieser Code sollte in eine neue Klasse namens <strong><code>ContactClient</code></strong> verschoben werden. Die <code>main</code>-Methode sollte dann einfach eine Instanz des <code>ContactClient</code> erstellen und ausführen. Diese Trennung macht die Hauptklasse zu einem einfachen Einstiegspunkt und den <code>ContactClient</code> zu einer dedizierten Test- oder Demonstrationsklasse.</li>
+</ol>
+<h3 id="anweisungen-und-schritte">Anweisungen und Schritte:</h3>
+<p>Verwenden Sie die Refactoring-Tools von IntelliJ für diese Schritte:</p>
+<ol>
+<li>
+<p><strong><code>ContactManager</code> umbenennen</strong>:</p>
+<ul>
+<li>Klicken Sie mit der rechten Maustaste auf den Klassennamen <code>ContactManager</code>.</li>
+<li>Wählen Sie <strong>Refactor &gt; Rename...</strong> und geben Sie <strong><code>ContactService</code></strong> ein. Dadurch werden alle Verweise in der Klasse <code>Main</code> automatisch aktualisiert.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>ContactRepository</code> Interface extrahieren</strong>:</p>
+<ul>
+<li>Klicken Sie mit der rechten Maustaste auf die Klasse <code>ContactService</code>.</li>
+<li>Wählen Sie <strong>Refactor &gt; Extract &gt; Interface...</strong>.</li>
+<li>Nennen Sie das Interface <strong><code>ContactRepository</code></strong>.</li>
+<li>Wählen Sie die Methoden aus, die in das Interface aufgenommen werden sollen: <code>createContact(Contact contact)</code> und <code>findById(Long id)</code>. <em>Hinweis: Die Methode <code>createAndAdd</code> ist privat und sollte daher nicht Teil des öffentlichen Interfaces sein.</em></li>
+</ul>
+</li>
+<li>
+<p><strong><code>ContactRepositoryImpl</code> implementieren</strong>:</p>
+<ul>
+<li>Erstellen Sie eine neue Klasse namens <strong><code>ContactRepositoryImpl</code></strong>, die das <code>ContactRepository</code>-Interface implementiert.</li>
+<li>Verschieben Sie die <code>List&lt;Contact&gt; contacts</code>, <code>Long nextId</code> und die Methode <code>createAndAdd</code> von <code>ContactService</code> nach <code>ContactRepositoryImpl</code>.</li>
+<li>Die Methode <code>findById</code> aus dem Interface sollte hier implementiert werden, indem die lokale <code>contacts</code>-Liste verwendet wird.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>ContactService</code> anpassen</strong>:</p>
+<ul>
+<li>Entfernen Sie die <code>contacts</code>-Liste, <code>nextId</code> und die Methode <code>createAndAdd</code>.</li>
+<li>Fügen Sie ein privates Feld für das <code>ContactRepository</code> hinzu und erstellen Sie einen <strong>Konstruktor</strong>, der eine <code>ContactRepository</code>-Instanz akzeptiert.</li>
+<li>Aktualisieren Sie die Methoden <code>createContact</code> und <code>findById</code> so, dass sie ihre Arbeit an das injizierte Repository delegieren. Zum Beispiel sollte <code>createContact(contact)</code> die Methode <code>contactRepository.createContact(contact)</code> aufrufen.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Main</code> refactoren und <code>ContactClient</code> erstellen</strong>:</p>
+<ul>
+<li>Erstellen Sie eine neue Klasse namens <strong><code>ContactClient</code></strong>.</li>
+<li>Verschieben Sie den gesamten Inhalt der <code>main</code>-Methode von <code>Main</code> in eine neue Methode in <code>ContactClient</code> (z. B. <code>run()</code>).</li>
+<li>In der <code>main</code>-Methode der Klasse <code>Main</code> instanziieren Sie <code>ContactRepositoryImpl</code> und <code>ContactService</code>.</li>
+<li>Erstellen Sie eine Instanz von <code>ContactClient</code>, übergeben Sie bei Bedarf den <code>ContactService</code> und rufen Sie dessen <code>run()</code>-Methode auf.</li>
+</ul>
+</li>
+</ol>
+<p>Die Befolgung dieser Schritte führt zu einer besser organisierten Architektur, die die Zuständigkeiten trennt und die Anwendung leichter testbar und wartbar macht.</p>
+
+            
+            
+        </body>
+        </html>
