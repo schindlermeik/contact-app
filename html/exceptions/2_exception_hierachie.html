@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>2&period;2 Die Java-Exception-Hierarchie</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="22-die-java-exception-hierarchie">2.2 Die Java-Exception-Hierarchie</h1>
+<hr>
+<h2 id="221-überblick-throwable-error-exception-runtimeexception">2.2.1 Überblick: <code>Throwable</code>, <code>Error</code>, <code>Exception</code>, <code>RuntimeException</code></h2>
+<h3 id="die-wurzel-throwable">Die Wurzel: <code>Throwable</code></h3>
+<ul>
+<li>In Java sind <strong>alle Fehler und Ausnahmen Objekte</strong>, die von der Basisklasse <code>java.lang.Throwable</code> erben.</li>
+<li>Das ermöglicht es, Fehlerzustände objektorientiert zu behandeln und Details über die Art des Fehlers weiterzugeben.</li>
+</ul>
+<p><strong>Direkte Unterklassen von <code>Throwable</code>:</strong></p>
+<ul>
+<li><code>Error</code></li>
+<li><code>Exception</code></li>
+</ul>
+<h3 id="was-ist-ein-error">Was ist ein <code>Error</code>?</h3>
+<ul>
+<li>
+<p><strong><code>Error</code></strong> repräsentiert schwerwiegende Fehler, die von der Java Virtual Machine (JVM) oder dem Laufzeitsystem ausgelöst werden.</p>
+</li>
+<li>
+<p>Diese Fehler entstehen meist durch Systemprobleme, nicht durch einen Fehler im Anwendungsprogramm.</p>
+</li>
+<li>
+<p><strong>Beispiele:</strong></p>
+<ul>
+<li><code>OutOfMemoryError</code>: Der Speicher ist erschöpft.</li>
+<li><code>StackOverflowError</code>: Der Aufruf-Stack ist zu tief (z.B. Endlosschleife mit Rekursion).</li>
+</ul>
+</li>
+<li>
+<p><strong>Wichtig:</strong></p>
+<ul>
+<li>Errors zeigen an, dass das Programm sich in einem Zustand befindet, aus dem es sich meistens <em>nicht</em> erholen kann.</li>
+</ul>
+</li>
+</ul>
+<h3 id="was-ist-eine-exception">Was ist eine <code>Exception</code>?</h3>
+<ul>
+<li>
+<p><strong><code>Exception</code></strong> steht für „gewöhnliche“ Ausnahmen, mit denen dein Programm rechnen sollte.</p>
+</li>
+<li>
+<p>Sie können durch Fehler im Code, fehlerhafte Benutzereingaben oder Probleme mit externen Ressourcen (Dateien, Netzwerke) ausgelöst werden.</p>
+</li>
+<li>
+<p><strong>Beispiele:</strong></p>
+<ul>
+<li><code>IOException</code>: Fehler beim Datei- oder Netzwerkzugriff.</li>
+<li><code>FileNotFoundException</code>: Datei existiert nicht.</li>
+<li><code>NullPointerException</code>: Zugriff auf eine Variable, die <code>null</code> ist.</li>
+<li><code>IllegalArgumentException</code>: Falsche Methoden-Parameter.</li>
+</ul>
+</li>
+</ul>
+<h4 id="checked-vs-unchecked-exceptions">Checked vs. Unchecked Exceptions</h4>
+<ul>
+<li>
+<p><strong>Checked Exceptions:</strong></p>
+<ul>
+<li>Müssen im Code behandelt werden (try-catch oder throws).</li>
+<li>Erben von <code>Exception</code>, aber <em>nicht</em> von <code>RuntimeException</code>.</li>
+<li>Beispiele: <code>IOException</code>, <code>SQLException</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Unchecked Exceptions:</strong></p>
+<ul>
+<li>Müssen <em>nicht</em> explizit behandelt werden.</li>
+<li>Erben von <code>RuntimeException</code>.</li>
+<li>Beispiele: <code>NullPointerException</code>, <code>IllegalArgumentException</code>, <code>ArrayIndexOutOfBoundsException</code>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="was-ist-eine-runtimeexception">Was ist eine <code>RuntimeException</code>?</h3>
+<ul>
+<li>
+<p><strong><code>RuntimeException</code></strong> ist die Basisklasse für Exceptions, die <em>während der Programmlaufzeit</em> auftreten und meist durch Programmierfehler verursacht werden.</p>
+</li>
+<li>
+<p>Beispiele:</p>
+<ul>
+<li><code>NullPointerException</code></li>
+<li><code>ArithmeticException</code> (z.B. Division durch null)</li>
+<li><code>ArrayIndexOutOfBoundsException</code></li>
+</ul>
+</li>
+<li>
+<p>Sie müssen <strong>nicht</strong> abgefangen werden und werden häufig nicht behandelt, sondern durch Verbesserung des Codes vermieden.</p>
+</li>
+</ul>
+<hr>
+<h2 id="222-visualisierung-der-klassenhierarchie">2.2.2 Visualisierung der Klassenhierarchie</h2>
+<p>Hier ist eine vereinfachte Darstellung der Java-Exception-Hierarchie:</p>
+<pre><code>              +----------------------+
+              |      Throwable       |
+              +----------------------+
+                  /             \
+       +-----------+           +-----------+
+       |   Error   |           | Exception |
+       +-----------+           +-----------+
+            |                      |
+    +-----------------+      +-----------------------+
+    | OutOfMemoryError|      |  IOException          |
+    | StackOverflow...|      |  SQLException         |
+    | ...             |      |  ...                  |
+                            +-----------------------+
+                                  |
+                          +---------------+
+                          | RuntimeException
+                          +---------------+
+                               |
+                +-------------------------------+
+                | NullPointerException          |
+                | IllegalArgumentException      |
+                | ArrayIndexOutOfBoundsException|
+                | ...                           |
+                +-------------------------------+
+</code></pre>
+<p><strong>Legende:</strong></p>
+<ul>
+<li>Von oben nach unten: Vererbungsbeziehungen.</li>
+<li><em>Checked Exceptions:</em> Von <code>Exception</code> abgeleitet, aber <strong>nicht</strong> von <code>RuntimeException</code>.</li>
+<li><em>Unchecked Exceptions:</em> Von <code>RuntimeException</code> abgeleitet.</li>
+<li><em>Errors:</em> Von <code>Error</code> abgeleitet.</li>
+</ul>
+<hr>
+<h2 id="223-bedeutung-von-error-und-warum-man-fehler-nicht-behandeln-sollte">2.2.3 Bedeutung von <code>Error</code> und warum man Fehler nicht behandeln sollte</h2>
+<h3 id="was-genau-ist-ein-error">Was genau ist ein <code>Error</code>?</h3>
+<ul>
+<li>
+<p><code>Error</code>-Objekte zeigen an, dass ein Problem im System oder der JVM selbst aufgetreten ist.</p>
+</li>
+<li>
+<p>Beispiele:</p>
+<ul>
+<li><strong><code>OutOfMemoryError</code>:</strong> Der JVM-Speicher reicht nicht mehr aus.</li>
+<li><strong><code>StackOverflowError</code>:</strong> Zuviele Methodenaufrufe (z.B. Endlosrekursion).</li>
+<li><strong><code>InternalError</code>:</strong> Interner Fehler der JVM.</li>
+</ul>
+</li>
+</ul>
+<h3 id="warum-sollte-man-error-nicht-behandeln">Warum sollte man <code>Error</code> <strong>nicht</strong> behandeln?</h3>
+<ul>
+<li>
+<p><strong><code>Error</code> signalisiert katastrophale Zustände</strong>, die das Programmieren außerhalb deiner Kontrolle liegen lassen.</p>
+</li>
+<li>
+<p>Fehlerbehandlung (catch) ist zwar technisch möglich, aber fast nie sinnvoll:</p>
+<ul>
+<li>Die JVM ist meist nicht mehr in der Lage, zuverlässig weiterzulaufen.</li>
+<li>Ressourcen können inkonsistent oder beschädigt sein.</li>
+<li>Ein Weiterarbeiten würde zu undefiniertem Verhalten führen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Best Practice:</strong></p>
+<ul>
+<li>Schreibe niemals <code>catch (Error e)</code> – überlasse Errors der JVM.</li>
+<li>Konzentriere dich auf die Behandlung von Exceptions, nicht Errors.</li>
+</ul>
+</li>
+</ul>
+<h3 id="merksatz">Merksatz:</h3>
+<blockquote>
+<p><strong>Exceptions sind für Fehlerfälle, auf die dein Programm reagieren kann.
+Errors zeigen, dass etwas sehr Grundlegendes schiefgegangen ist – und sollten das Programm (meist) beenden.</strong></p>
+</blockquote>
+<hr>
+<h2 id="zusammenfassung--reflexionsfragen">Zusammenfassung &amp; Reflexionsfragen</h2>
+<ul>
+<li><strong>Alle Exceptions und Errors sind von <code>Throwable</code> abgeleitet.</strong></li>
+<li><code>Error</code>: Schwerwiegende Fehler (z.B. OutOfMemory), <strong>nicht behandeln!</strong></li>
+<li><code>Exception</code>: „Normale“ Ausnahmen, die im Programm behandelt werden können.</li>
+<li><code>RuntimeException</code>: Unchecked, meist Programmierfehler.</li>
+</ul>
+<h3 id="teste-dein-wissen">Teste dein Wissen:</h3>
+<ol>
+<li>Was ist der Unterschied zwischen <code>Exception</code> und <code>Error</code>?</li>
+<li>Warum sollten <code>Errors</code> normalerweise nicht behandelt werden?</li>
+<li>Was unterscheidet <code>checked</code> von <code>unchecked</code> Exceptions?</li>
+<li>Nenne Beispiele für Exceptions, Errors und RuntimeExceptions!</li>
+</ol>
+<hr>
+<p><strong>Tipp:</strong>
+Schau dir beim Programmieren die Klassenhierarchie im JavaDoc oder in deiner IDE an, um immer zu wissen, mit welchem Typ du es zu tun hast.</p>
+
+            
+            
+        </body>
+        </html>

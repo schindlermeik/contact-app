@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Der Aufbau von Logback &lpar;Logger&comma; Appender&comma; Layout&comma; Log-Levels&comma; Konfiguration&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-der-aufbau-von-logback-logger-appender-layout-log-levels-konfiguration">Handout: Der Aufbau von Logback (Logger, Appender, Layout, Log-Levels, Konfiguration)</h1>
+<hr>
+<h2 id="21-die-drei-kernkomponenten-von-logback">2.1 Die drei Kernkomponenten von Logback</h2>
+<h3 id="logger"><strong>Logger</strong></h3>
+<p><strong>Logger</strong> sind die Hauptschnittstelle für das Erzeugen von Log-Nachrichten. Jede Klasse oder Komponente in deiner Anwendung kann (und sollte) ihren eigenen Logger besitzen.</p>
+<h4 id="erzeugen-von-log-nachrichten"><strong>Erzeugen von Log-Nachrichten</strong></h4>
+<ul>
+<li>
+<p>Logger werden in der Regel <strong>pro Klasse</strong> erstellt, meist als statische Variable.</p>
+</li>
+<li>
+<p>Ein Logger hat einen Namen (meist den Klassennamen), unter dem er in den Logs erscheint.</p>
+</li>
+<li>
+<p>Beispiel:</p>
+<pre><code class="language-java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(MyClass.class);
+
+logger.info(<span class="hljs-string">&quot;Starte Anwendung&quot;</span>);
+logger.debug(<span class="hljs-string">&quot;Variable x: {}&quot;</span>, x);
+</code></pre>
+</li>
+</ul>
+<h4 id="hierarchien-und-vererbung"><strong>Hierarchien und Vererbung</strong></h4>
+<ul>
+<li>
+<p>Logback (wie viele Logging-Frameworks) organisiert Logger <strong>hierarchisch</strong> nach Paketstruktur:</p>
+<ul>
+<li><code>de.meinprojekt</code> ist Parent von <code>de.meinprojekt.modul</code></li>
+</ul>
+</li>
+<li>
+<p>Konfigurationen (z. B. Log-Level) werden <strong>vererbt</strong>. Du kannst global oder pro Paket/Klasse festlegen, wie geloggt wird.</p>
+<ul>
+<li>
+<p>Beispiel:</p>
+<ul>
+<li><code>root</code>-Logger = Standard für alles</li>
+<li><code>logger name=&quot;de.meinprojekt.modul&quot;</code> = gilt für alles darunter</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="appender"><strong>Appender</strong></h3>
+<p><strong>Appender</strong> legen fest, <strong>wohin</strong> Log-Nachrichten geschrieben werden. Logback bringt viele vordefinierte Appender mit.</p>
+<h4 id="ziele-für-logs"><strong>Ziele für Logs</strong></h4>
+<ul>
+<li><strong>Konsole</strong> (ConsoleAppender): Log-Ausgabe im Terminal/Fenster</li>
+<li><strong>Datei</strong> (FileAppender): Schreiben in eine (Log-)Datei</li>
+<li><strong>RollingFile</strong> (RollingFileAppender): Wie Datei, aber automatisches Rotieren/Archivieren nach Größe/Zeit</li>
+<li><strong>Datenbank</strong> (DBAppender): Speichert Logs direkt in einer Datenbank</li>
+<li><strong>Andere</strong>: z. B. SMTP (E-Mail), Socket, Syslog, usw.</li>
+</ul>
+<h4 id="wichtige-appender-im-überblick"><strong>Wichtige Appender im Überblick</strong></h4>
+<table>
+<thead>
+<tr>
+<th>Appender</th>
+<th>Zweck</th>
+<th>Typischer Einsatz</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ConsoleAppender</td>
+<td>Log auf Konsole/Terminal</td>
+<td>Entwicklung, schnelle Analyse</td>
+</tr>
+<tr>
+<td>FileAppender</td>
+<td>Log in eine feste Datei</td>
+<td>Einfache Produktionslogs</td>
+</tr>
+<tr>
+<td>RollingFileAppender</td>
+<td>Log in Dateien mit automatischem Wechsel</td>
+<td>Produktivbetrieb, Langzeitarchiv</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tipp:</strong>
+Du kannst beliebig viele Appender kombinieren – z. B. gleichzeitig auf Konsole und Datei loggen!</p>
+<hr>
+<h3 id="layoutencoder"><strong>Layout/Encoder</strong></h3>
+<p><strong>Layout/Encoder</strong> bestimmen das <strong>Format</strong> der Log-Nachrichten (wie sie dargestellt werden).</p>
+<h4 id="was-ist-ein-pattern"><strong>Was ist ein Pattern?</strong></h4>
+<ul>
+<li>
+<p>Ein Pattern ist eine <strong>Schablone</strong> für den Log-Ausgabetext.</p>
+</li>
+<li>
+<p>Platzhalter (z. B. <code>%d</code>, <code>%level</code>, <code>%logger</code>, <code>%msg</code>) werden beim Schreiben ersetzt.</p>
+</li>
+<li>
+<p>Beispiel-Pattern:</p>
+<pre><code>[%d{yyyy-MM-dd HH:mm:ss}] %-5level %logger{36} - %msg%n
+</code></pre>
+<p>Ausgabe:</p>
+<pre><code>[2025-08-04 13:42:22] INFO  de.meinprojekt.MyClass - Starte Anwendung
+</code></pre>
+</li>
+</ul>
+<h4 id="gestaltung-eines-aussagekräftigen-log-formats"><strong>Gestaltung eines aussagekräftigen Log-Formats</strong></h4>
+<ul>
+<li>
+<p>Gute Patterns helfen, schnell relevante Infos zu erkennen:</p>
+<ul>
+<li>Zeitstempel (<code>%d</code>)</li>
+<li>Log-Level (<code>%level</code>)</li>
+<li>Logger-Name oder Klasse (<code>%logger</code>)</li>
+<li>Nachricht (<code>%msg</code>)</li>
+<li>Thread-Name (<code>%thread</code>) – bei Multi-Threading sinnvoll</li>
+</ul>
+</li>
+<li>
+<p>Beispiel für ein ausführliches Pattern:</p>
+<pre><code>[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36} - %msg%n
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="22-log-levels">2.2 Log-Levels</h2>
+<p><strong>Log-Levels</strong> bestimmen, <strong>wie wichtig</strong> oder <strong>kritisch</strong> eine Log-Nachricht ist – und ob sie überhaupt ausgegeben wird.</p>
+<h3 id="die-verschiedenen-level"><strong>Die verschiedenen Level</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Bedeutung</th>
+<th>Typische Anwendung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TRACE</td>
+<td>Sehr feine Details, meist zur tiefen Fehleranalyse</td>
+<td>Komplexe Debug-Sessions</td>
+</tr>
+<tr>
+<td>DEBUG</td>
+<td>Detaillierte Infos für Entwickler</td>
+<td>Entwicklung, Fehleranalyse</td>
+</tr>
+<tr>
+<td>INFO</td>
+<td>Allgemeine Hinweise zum Programmablauf</td>
+<td>Start, Stopp, wichtige Zustandsänderungen</td>
+</tr>
+<tr>
+<td>WARN</td>
+<td>Warnungen, Hinweis auf (noch) harmlose Probleme</td>
+<td>Unerwartete Situationen, kein Absturz</td>
+</tr>
+<tr>
+<td>ERROR</td>
+<td>Fehler, die das Programm beeinträchtigen</td>
+<td>Ausnahmen, Abbrüche, Datenverlust</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">logger.trace(<span class="hljs-string">&quot;Detailschritt X erreicht&quot;</span>);
+logger.debug(<span class="hljs-string">&quot;Debug-Variable a={}&quot;</span>, a);
+logger.info(<span class="hljs-string">&quot;Anwendung gestartet&quot;</span>);
+logger.warn(<span class="hljs-string">&quot;Verbindung langsam, retry in 10s&quot;</span>);
+logger.error(<span class="hljs-string">&quot;Fehler beim Laden der Datei!&quot;</span>, e);
+</code></pre>
+<h3 id="richtiger-einsatz-der-level-in-der-praxis"><strong>Richtiger Einsatz der Level in der Praxis</strong></h3>
+<ul>
+<li><strong>TRACE/DEBUG:</strong> Nur in Entwicklung oder gezielter Fehlersuche aktivieren. In Produktion meist ausgeschaltet (Performance!).</li>
+<li><strong>INFO:</strong> Für normale Betriebsinfos, die in Logs landen dürfen.</li>
+<li><strong>WARN/ERROR:</strong> Immer aktiv, damit kritische Ereignisse sofort auffallen.</li>
+<li><strong>Nicht alles als ERROR loggen:</strong> Sonst übersiehst du echte Fehler im Log-Rauschen!</li>
+</ul>
+<h3 id="filtern-und-steuern-von-log-ausgaben"><strong>Filtern und Steuern von Log-Ausgaben</strong></h3>
+<ul>
+<li>
+<p>In der <code>logback.xml</code> stellst du das Level global oder pro Logger ein:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">root</span> <span class="hljs-attr">level</span>=<span class="hljs-string">&quot;INFO&quot;</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">root</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">logger</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;de.meinprojekt.debug&quot;</span> <span class="hljs-attr">level</span>=<span class="hljs-string">&quot;DEBUG&quot;</span>/&gt;</span>
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="23-konfigurationsdatei-logbackxml">2.3 Konfigurationsdatei logback.xml</h2>
+<p>Die Datei <strong>logback.xml</strong> ist das Herzstück der Logback-Konfiguration. Sie legt fest, wie, wohin und in welchem Format geloggt wird.</p>
+<h3 id="aufbau-und-syntax"><strong>Aufbau und Syntax</strong></h3>
+<ul>
+<li>Die Datei liegt meist in <code>src/main/resources/</code>.</li>
+<li>Sie ist im XML-Format und beginnt mit <code>&lt;configuration&gt;...&lt;/configuration&gt;</code>.</li>
+<li>Enthält Definitionen für Appender, Logger, Pattern usw.</li>
+</ul>
+<h3 id="zentrale-konfigurationsmöglichkeiten"><strong>Zentrale Konfigurationsmöglichkeiten</strong></h3>
+<ol>
+<li><strong>Appender definieren</strong> (wohin geloggt wird)</li>
+<li><strong>Logger festlegen</strong> (wer loggt, z. B. global oder für bestimmte Packages/Klassen)</li>
+<li><strong>Pattern/Layout festlegen</strong> (wie sieht das Log aus)</li>
+</ol>
+<p><strong>Beispiel-Struktur:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">appender</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;STDOUT&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;ch.qos.logback.core.ConsoleAppender&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">encoder</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">pattern</span>&gt;</span>[%d{yyyy-MM-dd HH:mm:ss}] %-5level %logger{36} - %msg%n<span class="hljs-tag">&lt;/<span class="hljs-name">pattern</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">encoder</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">appender</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">root</span> <span class="hljs-attr">level</span>=<span class="hljs-string">&quot;INFO&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">appender-ref</span> <span class="hljs-attr">ref</span>=<span class="hljs-string">&quot;STDOUT&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">root</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span>
+</code></pre>
+<h3 id="beispiel-einer-minimalen-logbackxml"><strong>Beispiel einer minimalen logback.xml</strong></h3>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">appender</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;STDOUT&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;ch.qos.logback.core.ConsoleAppender&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">encoder</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">pattern</span>&gt;</span>[%d{HH:mm:ss}] %-5level %logger{36} - %msg%n<span class="hljs-tag">&lt;/<span class="hljs-name">pattern</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">encoder</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">appender</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">root</span> <span class="hljs-attr">level</span>=<span class="hljs-string">&quot;DEBUG&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">appender-ref</span> <span class="hljs-attr">ref</span>=<span class="hljs-string">&quot;STDOUT&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">root</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span>
+</code></pre>
+<ul>
+<li><strong>Appender</strong>: Hier <code>STDOUT</code> für die Konsole</li>
+<li><strong>Pattern</strong>: Kurzes Zeitformat, Level, Logger-Name, Nachricht</li>
+<li><strong>root level</strong>: <code>DEBUG</code> zeigt alle wichtigen Level (DEBUG und höher)</li>
+<li><strong>appender-ref</strong>: Verknüpft den Appender mit dem root-Logger</li>
+</ul>
+<hr>
+<h2 id="praktische-tipps"><strong>Praktische Tipps</strong></h2>
+<ul>
+<li><strong>Bei großen Anwendungen:</strong> Pro Paket/Klasse ein eigenes Log-Level setzen, um bei Problemen gezielt mehr Infos zu loggen.</li>
+<li><strong>Logs regelmäßig kontrollieren</strong> – zu viele Infos (v. a. DEBUG/TRACE) machen Logs schnell unübersichtlich.</li>
+<li><strong>Nie sensible Daten loggen</strong> (Passwörter, Kreditkartennummern etc.).</li>
+</ul>
+<hr>
+<h2 id="fragen-und-übungen-zum-selbststudium"><strong>Fragen und Übungen zum Selbststudium</strong></h2>
+<ol>
+<li>Was ist der Unterschied zwischen Appender und Logger?</li>
+<li>Erstelle ein eigenes Pattern für Log-Ausgaben, das Uhrzeit, Thread-Name und Nachricht zeigt.</li>
+<li>Wie könntest du erreichen, dass nur für ein bestimmtes Package DEBUG-Nachrichten geloggt werden?</li>
+<li>Ändere in einer Beispielanwendung das Log-Level in der <code>logback.xml</code> und beobachte die Auswirkung.</li>
+</ol>
+<hr>
+<h2 id="weiterführende-ressourcen"><strong>Weiterführende Ressourcen</strong></h2>
+<ul>
+<li><a href="https://logback.qos.ch/manual/index.html">Logback Manual (offiziell)</a></li>
+<li><a href="https://www.slf4j.org/manual.html">SLF4J Manual</a></li>
+<li><a href="https://logback.qos.ch/manual/layouts.html#conversionWord">Pattern Layout Übersicht</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

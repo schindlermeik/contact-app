@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praxis &ndash; Logging mit SLF4J &amp; Logback</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praxis--logging-mit-slf4j--logback">Handout: Praxis – Logging mit SLF4J &amp; Logback</h1>
+<hr>
+<h2 id="31-kurzes-live-codingdemo">3.1 Kurzes Live-Coding/Demo</h2>
+<h3 id="a-beispielprojekt-aufsetzen"><strong>A. Beispielprojekt aufsetzen</strong></h3>
+<p><strong>Voraussetzung:</strong></p>
+<ul>
+<li>Java &amp; Maven (oder Gradle) installiert</li>
+</ul>
+<p><strong>Projektstruktur (Empfehlung):</strong></p>
+<pre><code>logging-demo/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── de/
+│       │       └── beispiel/
+│       │           └── LoggingDemo.java
+│       └── resources/
+│           └── logback.xml
+└── pom.xml
+</code></pre>
+<h3 id="b-abhängigkeiten-maven"><strong>B. Abhängigkeiten (Maven)</strong></h3>
+<p>In die <code>pom.xml</code> einfügen:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- SLF4J-API --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.slf4j<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>slf4j-api<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.0.9<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- Logback (Implementierung) --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>ch.qos.logback<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>logback-classic<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.4.14<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
+</code></pre>
+<hr>
+<h3 id="c-logger-deklarieren-und-nutzen"><strong>C. Logger deklarieren und nutzen</strong></h3>
+<p><strong>Beispielcode (LoggingDemo.java):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">package</span> de.beispiel;
+
+<span class="hljs-keyword">import</span> org.slf4j.Logger;
+<span class="hljs-keyword">import</span> org.slf4j.LoggerFactory;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LoggingDemo</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(LoggingDemo.class);
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        logger.trace(<span class="hljs-string">&quot;Dies ist eine TRACE-Nachricht (sehr fein).&quot;</span>);
+        logger.debug(<span class="hljs-string">&quot;Dies ist eine DEBUG-Nachricht (Detail für Entwickler).&quot;</span>);
+        logger.info(<span class="hljs-string">&quot;Dies ist eine INFO-Nachricht (allgemeine Infos).&quot;</span>);
+        logger.warn(<span class="hljs-string">&quot;Achtung! Dies ist eine WARN-Nachricht.&quot;</span>);
+        logger.error(<span class="hljs-string">&quot;Fehler! Dies ist eine ERROR-Nachricht.&quot;</span>);
+
+        <span class="hljs-type">int</span> <span class="hljs-variable">zahl</span> <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+        logger.info(<span class="hljs-string">&quot;Beispiel für Variablen im Log: zahl={}&quot;</span>, zahl);
+
+        <span class="hljs-keyword">try</span> {
+            wirfFehler();
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            logger.error(<span class="hljs-string">&quot;Ein Fehler ist aufgetreten!&quot;</span>, e);
+        }
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">wirfFehler</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Exception</span>(<span class="hljs-string">&quot;Demo-Exception für Logging.&quot;</span>);
+    }
+}
+</code></pre>
+<p><strong>Erklärung:</strong></p>
+<ul>
+<li>Pro Klasse ein Logger (<code>LoggerFactory.getLogger(…)</code>).</li>
+<li>Verschiedene Log-Levels werden genutzt.</li>
+<li>Variablen können mit <code>{}</code> eingebunden werden.</li>
+<li>Fehler werden inkl. Stacktrace geloggt.</li>
+</ul>
+<hr>
+<h3 id="d-beispiel-konfiguration-logbackxml"><strong>D. Beispiel-Konfiguration (logback.xml):</strong></h3>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">appender</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;STDOUT&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;ch.qos.logback.core.ConsoleAppender&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">encoder</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">pattern</span>&gt;</span>[%d{HH:mm:ss}] %-5level %logger{36} - %msg%n<span class="hljs-tag">&lt;/<span class="hljs-name">pattern</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">encoder</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">appender</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">root</span> <span class="hljs-attr">level</span>=<span class="hljs-string">&quot;DEBUG&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">appender-ref</span> <span class="hljs-attr">ref</span>=<span class="hljs-string">&quot;STDOUT&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">root</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span>
+</code></pre>
+<p><strong>Erklärung:</strong></p>
+<ul>
+<li>Log-Ausgabe auf Konsole.</li>
+<li>Zeigt Zeit, Level, Logger-Name, Nachricht.</li>
+<li><code>root level=&quot;DEBUG&quot;</code> gibt alles ab DEBUG-Level aus (DEBUG, INFO, WARN, ERROR).</li>
+</ul>
+<hr>
+<h3 id="e-anwendung-starten"><strong>E. Anwendung starten</strong></h3>
+<ul>
+<li>Mit IDE oder</li>
+<li><code>mvn clean compile exec:java -Dexec.mainClass=de.beispiel.LoggingDemo</code></li>
+</ul>
+<p><strong>Ergebnis:</strong>
+Du siehst alle Log-Ausgaben in der Konsole.</p>
+<hr>
+<h2 id="32-konfigurationsänderungen-live-zeigen">3.2 Konfigurationsänderungen live zeigen</h2>
+<h3 id="a-log-level-ändern-und-ergebnis-beobachten"><strong>A. Log-Level ändern und Ergebnis beobachten</strong></h3>
+<ul>
+<li>
+<p>Ändere in <code>logback.xml</code> das Root-Level:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">root</span> <span class="hljs-attr">level</span>=<span class="hljs-string">&quot;INFO&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">appender-ref</span> <span class="hljs-attr">ref</span>=<span class="hljs-string">&quot;STDOUT&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">root</span>&gt;</span>
+</code></pre>
+</li>
+<li>
+<p><strong>Erwartung:</strong> TRACE- und DEBUG-Nachrichten werden NICHT mehr ausgegeben, nur noch INFO, WARN und ERROR.</p>
+</li>
+</ul>
+<p><strong>Teste das Verhalten:</strong></p>
+<ul>
+<li>Anwendung starten → weniger Log-Ausgaben.</li>
+</ul>
+<hr>
+<h3 id="b-appender--log-format-anpassen"><strong>B. Appender &amp; Log-Format anpassen</strong></h3>
+<p><strong>1. Log-Format verändern:</strong></p>
+<ul>
+<li>
+<p>In <code>&lt;pattern&gt;</code> ergänzen, z.B. um Thread und Methode:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">pattern</span>&gt;</span>[%d{HH:mm:ss}] [%thread] %-5level %logger{36} %M - %msg%n<span class="hljs-tag">&lt;/<span class="hljs-name">pattern</span>&gt;</span>
+</code></pre>
+</li>
+<li>
+<p>Anwendung starten → Du siehst Thread und Methodennamen im Log.</p>
+</li>
+</ul>
+<p><strong>2. Einen FileAppender ergänzen:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">appender</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;FILE&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;ch.qos.logback.core.FileAppender&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">file</span>&gt;</span>logs/demo.log<span class="hljs-tag">&lt;/<span class="hljs-name">file</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">encoder</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">pattern</span>&gt;</span>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %logger{36} - %msg%n<span class="hljs-tag">&lt;/<span class="hljs-name">pattern</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">encoder</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">appender</span>&gt;</span>
+</code></pre>
+<ul>
+<li>
+<p>In <code>&lt;root&gt;</code> zusätzlich:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">appender-ref</span> <span class="hljs-attr">ref</span>=<span class="hljs-string">&quot;FILE&quot;</span> /&gt;</span>
+</code></pre>
+</li>
+</ul>
+<p><strong>Ergebnis:</strong>
+Log-Ausgaben erscheinen jetzt zusätzlich in der Datei <code>logs/demo.log</code>.</p>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung:</strong></h2>
+<ul>
+<li>SLF4J + Logback lassen sich schnell einrichten.</li>
+<li>Das Log-Level steuert, was ausgegeben wird.</li>
+<li>Mit Appender und Pattern gestaltest du Ziel und Aussehen der Logs flexibel.</li>
+</ul>
+<hr>
+<p><strong>Erweiterungen:</strong></p>
+<ul>
+<li>Probiere weitere Log-Levels.</li>
+<li>Ergänze einen RollingFileAppender für produktiven Einsatz.</li>
+<li>Passe das Pattern an eigene Wünsche an.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

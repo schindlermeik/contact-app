@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundlagen und Motivation von Logging in Java &lpar;SLF4J &amp; Logback&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundlagen-und-motivation-von-logging-in-java-slf4j--logback">Handout: Grundlagen und Motivation von Logging in Java (SLF4J &amp; Logback)</h1>
+<hr>
+<h2 id="11-warum-logging">1.1 Warum Logging?</h2>
+<p><strong>Logging</strong> bedeutet, dass eine Anwendung während ihres Betriebs Informationen, Warnungen oder Fehler in sogenannten Logdateien protokolliert. Diese Protokolle sind ein zentrales Werkzeug in der Softwareentwicklung und im Betrieb moderner Anwendungen.</p>
+<h3 id="bedeutung-von-logging-für-debugging-und-fehleranalyse">Bedeutung von Logging für Debugging und Fehleranalyse</h3>
+<ul>
+<li><strong>Fehler finden:</strong> Mit Log-Nachrichten lassen sich Fehler oft gezielt aufspüren, auch wenn sie beim Nutzer auftreten, aber nicht direkt reproduzierbar sind.</li>
+<li><strong>Ablauf nachvollziehen:</strong> Logs dokumentieren, was im System passiert ist – wann ein Fehler aufgetreten ist, in welchem Zusammenhang, mit welchen Eingabedaten.</li>
+<li><strong>Entwicklerhilfe:</strong> Während der Entwicklung ist Logging ein unverzichtbares Werkzeug, um Probleme im Code frühzeitig zu erkennen und zu beheben.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Ein Benutzer meldet einen Fehler, aber du kannst ihn nicht nachstellen. Im Logfile findest du die exakte Fehlermeldung und den Ablauf davor. So kannst du gezielt nachbessern.</p>
+<h3 id="logging-für-monitoring-und-betrieb">Logging für Monitoring und Betrieb</h3>
+<ul>
+<li><strong>Überwachung:</strong> Logs liefern Einblicke in den Zustand einer Anwendung im laufenden Betrieb. Damit können Systemadministratoren oder Entwickler frühzeitig reagieren, falls Fehler, Performanceprobleme oder ungewöhnliches Verhalten auftreten.</li>
+<li><strong>Alarme:</strong> Viele Monitoring-Tools analysieren Logfiles und schlagen bei bestimmten Mustern (z. B. viele Fehlermeldungen in kurzer Zeit) automatisch Alarm.</li>
+<li><strong>Langzeitbeobachtung:</strong> Trends oder wiederkehrende Probleme lassen sich über längere Zeiträume analysieren.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Du stellst fest, dass eine bestimmte Warnung regelmäßig im Log auftaucht – und kannst so ein sich ankündigendes Problem frühzeitig erkennen.</p>
+<h3 id="audit-trails-und-nachvollziehbarkeit">Audit-Trails und Nachvollziehbarkeit</h3>
+<ul>
+<li><strong>Nachvollziehbarkeit:</strong> Wer hat wann was gemacht? Besonders in sicherheitskritischen Systemen sind vollständige Protokolle (Audit-Trails) gesetzlich vorgeschrieben.</li>
+<li><strong>Revisionssicherheit:</strong> Bei Prüfungen oder rechtlichen Fragen helfen Logs, Abläufe und Systemzustände eindeutig zu belegen.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Ein Kunde behauptet, eine Überweisung nicht getätigt zu haben. Im Logfile ist nachweisbar, dass sie über das Kundenkonto initiiert wurde.</p>
+<hr>
+<h2 id="12-logging-frameworks-in-java--überblick">1.2 Logging-Frameworks in Java – Überblick</h2>
+<p>Im Java-Ökosystem gibt es mehrere verbreitete Logging-Frameworks. Sie unterscheiden sich in Features, Bedienung und Kompatibilität.</p>
+<h3 id="log4j-log4j2">Log4j, Log4j2</h3>
+<ul>
+<li><strong>Log4j</strong> war lange Zeit der Standard für Logging in Java-Anwendungen.</li>
+<li><strong>Log4j2</strong> ist die komplett überarbeitete und verbesserte Version mit höherer Performance, neuen Features und besserer Sicherheit.</li>
+<li><strong>Hinweis:</strong> Nach der Sicherheitslücke „Log4Shell“ ist besondere Vorsicht bei alten Versionen geboten.</li>
+</ul>
+<h3 id="logback">Logback</h3>
+<ul>
+<li><strong>Logback</strong> ist der „inoffizielle Nachfolger“ von Log4j und wurde vom selben Entwickler (Ceki Gülcü) geschrieben.</li>
+<li>Native Unterstützung für die <strong>SLF4J-API</strong> (dazu mehr im nächsten Kapitel).</li>
+<li>Bietet viele Features, hohe Performance und flexible Konfiguration.</li>
+</ul>
+<h3 id="java-util-logging-jul">Java Util Logging (JUL)</h3>
+<ul>
+<li><strong>JUL</strong> ist das Logging-Framework, das direkt in die Java-Standardbibliothek eingebaut ist (seit Java 1.4).</li>
+<li>Sehr einfach und „basic“, für kleine Projekte ausreichend, aber weniger flexibel und performant als moderne Frameworks.</li>
+</ul>
+<p><strong>Vergleich:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Vorteile</th>
+<th>Nachteile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Log4j</td>
+<td>Weit verbreitet (bis ca. 2012), viele Beispiele</td>
+<td>Veraltet, Sicherheitsprobleme</td>
+</tr>
+<tr>
+<td>Log4j2</td>
+<td>Schnell, moderne Features</td>
+<td>Man muss gezielt Version wählen</td>
+</tr>
+<tr>
+<td>Logback</td>
+<td>Moderne Features, SLF4J-native</td>
+<td>Eigene Konfigurationssyntax</td>
+</tr>
+<tr>
+<td>JUL</td>
+<td>Immer verfügbar</td>
+<td>Sehr einfach, wenig Features</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="13-slf4j-als-fassade">1.3 SLF4J als Fassade</h2>
+<h3 id="konzept-trennung-von-api-und-implementierung">Konzept: Trennung von API und Implementierung</h3>
+<ul>
+<li><strong>API</strong> = Schnittstelle, über die im Code geloggt wird (z. B. <code>logger.info(&quot;Text&quot;)</code>).</li>
+<li><strong>Implementierung</strong> = Die eigentliche Logik, die entscheidet, wohin und wie geloggt wird (z. B. Logback, Log4j2).</li>
+</ul>
+<p><strong>Wozu diese Trennung?</strong>
+So wie JDBC eine Schnittstelle für Datenbanken bereitstellt, ohne auf eine konkrete Datenbank festgelegt zu sein, gibt SLF4J eine allgemeine Logging-API vor, unabhängig davon, welches Framework letztlich „hinten dran“ arbeitet.</p>
+<h3 id="vorteile-einer-abstraktionsschicht-flexibilität-austauschbarkeit">Vorteile einer Abstraktionsschicht (Flexibilität, Austauschbarkeit)</h3>
+<ul>
+<li><strong>Austauschbarkeit:</strong> Man kann das Logging-Framework im Projekt einfach wechseln (z. B. von Logback zu Log4j2), ohne im Code überall Anpassungen machen zu müssen.</li>
+<li><strong>Framework-Kompatibilität:</strong> Viele externe Bibliotheken nutzen SLF4J – es wird vermieden, dass verschiedene Teile der Anwendung mit unterschiedlichen Logging-Lösungen arbeiten und das Logging „zerfasert“.</li>
+<li><strong>Wartbarkeit:</strong> Zentrale Stelle für Logging im Code.</li>
+</ul>
+<h3 id="warum-nicht-direkt-logback-risiken-harter-abhängigkeiten">Warum nicht direkt Logback? Risiken harter Abhängigkeiten</h3>
+<ul>
+<li>Wer direkt Logback verwendet, koppelt sich fest an dieses Framework.</li>
+<li>Falls aus Sicherheits-, Performance- oder Betriebsgründen später ein Wechsel zu Log4j2 oder einem anderen Framework nötig ist, müsste der gesamte Quellcode umgeschrieben werden.</li>
+<li>Mit SLF4J bleibt der Code flexibel und zukunftssicher.</li>
+</ul>
+<p><strong>Praxis-Tipp:</strong>
+In modernen Java-Projekten wird (fast) immer SLF4J als API und Logback oder Log4j2 als Implementierung verwendet.</p>
+<hr>
+<h2 id="14-logback-als-implementierung">1.4 Logback als Implementierung</h2>
+<h3 id="historie-und-entwicklung-nachfolger-von-log4j">Historie und Entwicklung (Nachfolger von Log4j)</h3>
+<ul>
+<li>Der Entwickler von Log4j hat Logback als moderneres, schnelleres und flexibleres Logging-Framework neu entwickelt.</li>
+<li>Logback baut viele Erfahrungen und Lessons Learned aus Log4j ein.</li>
+</ul>
+<h3 id="native-slf4j-unterstützung">Native SLF4J-Unterstützung</h3>
+<ul>
+<li>Logback ist <strong>das Referenz-Framework</strong> für SLF4J und daher besonders gut integriert.</li>
+<li>Die Konfiguration und Bedienung ist konsequent auf SLF4J-Nutzung ausgelegt.</li>
+</ul>
+<h3 id="vorteile-performance-konfigurierbarkeit-features">Vorteile: Performance, Konfigurierbarkeit, Features</h3>
+<ul>
+<li>
+<p><strong>Performance:</strong> Logback ist in der Regel schneller und ressourcenschonender als ältere Logging-Frameworks.</p>
+</li>
+<li>
+<p><strong>Konfigurierbarkeit:</strong> Sehr flexible und mächtige Konfiguration per XML, Properties oder Groovy.</p>
+</li>
+<li>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Viele Appender (Konsole, Datei, RollingFile, DB, usw.)</li>
+<li>Flexible Layouts/Encoder (Pattern-Layout, farbige Logs, u. v. m.)</li>
+<li>Filter, asynchrones Logging, MDC (Mapped Diagnostic Context) für korrelierte Logs</li>
+<li>Unterstützung für komplexe Log-Strategien (z. B. unterschiedliche Log-Levels pro Package/Klasse)</li>
+</ul>
+</li>
+<li>
+<p><strong>Weit verbreitet:</strong> In Spring-Boot-Projekten ist Logback oft das Standard-Logging.</p>
+</li>
+</ul>
+<p><strong>Tipp:</strong>
+Wenn du mit modernen Java-Anwendungen arbeitest, ist Logback meistens eine sehr gute Wahl als Logging-Implementierung.</p>
+<hr>
+<h3 id="weiterführende-links--ressourcen">Weiterführende Links &amp; Ressourcen</h3>
+<ul>
+<li><a href="http://www.slf4j.org/manual.html">Offizielle SLF4J-Dokumentation</a></li>
+<li><a href="https://logback.qos.ch/documentation.html">Logback Dokumentation</a></li>
+<li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.logging">Logging in Spring Boot (Offizielles Handbuch)</a></li>
+</ul>
+<hr>
+<p><strong>Hinweis:</strong>
+Im nächsten Schritt lernst du, wie Logback konkret aufgebaut ist (Logger, Appender, Layouts) und wie du es in der Praxis einsetzt!</p>
+<hr>
+<p><strong>Fragen &amp; Aufgaben zum Selbststudium:</strong></p>
+<ol>
+<li>Warum ist Logging wichtig, auch wenn deine Anwendung scheinbar „fehlerfrei“ läuft?</li>
+<li>Was ist der Unterschied zwischen Logging-API und -Implementierung?</li>
+<li>Welche Vorteile bietet dir SLF4J im Projektalltag?</li>
+<li>Nenne zwei Vorteile, die Logback gegenüber älteren Logging-Frameworks hat.</li>
+</ol>
+
+            
+            
+        </body>
+        </html>

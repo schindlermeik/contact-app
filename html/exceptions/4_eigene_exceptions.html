@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>2&period;4 Eigene Exceptions schreiben</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="24-eigene-exceptions-schreiben">2.4 Eigene Exceptions schreiben</h1>
+<hr>
+<h2 id="241-warum-eigene-exceptions">2.4.1 Warum eigene Exceptions?</h2>
+<h3 id="wozu-braucht-man-eigene-exception-klassen">Wozu braucht man eigene Exception-Klassen?</h3>
+<p>Java stellt bereits viele Exception-Klassen bereit. Trotzdem stößt man in der Praxis schnell an Grenzen, bei denen die Standard-Exceptions zu allgemein oder unpassend sind:</p>
+<ul>
+<li><strong>Klarheit &amp; Lesbarkeit:</strong>
+Mit einer eigenen Exception kannst du spezifisch und aussagekräftig beschreiben, was im Programm schiefgelaufen ist.
+<em>Beispiel:</em> <code>TaskNotFoundException</code> ist viel verständlicher als eine allgemeine <code>RuntimeException</code> oder gar eine <code>NullPointerException</code>.</li>
+<li><strong>Sinnvolle Fehlerunterscheidung:</strong>
+Verschiedene Fehlerfälle können unterschiedlich behandelt werden. Mit eigenen Exception-Typen kannst du gezielt darauf reagieren.</li>
+<li><strong>Bessere Wartbarkeit:</strong>
+Fehlerursachen sind für dich und andere Entwickler*innen sofort nachvollziehbar.</li>
+<li><strong>Feingranulares Fehler-Handling:</strong>
+In komplexen Anwendungen (z.B. mit vielen Modulen oder Bibliotheken) ist eine gezielte Fehlerbehandlung oft nur mit eigenen Exception-Klassen möglich.</li>
+</ul>
+<p><strong>Praxisbeispiel:</strong>
+Du entwickelst eine ToDo-App. Wenn eine Aufgabe mit einer bestimmten ID nicht gefunden wird, willst du <em>nicht</em> einfach <code>null</code> zurückgeben oder eine allgemeine Exception werfen, sondern explizit einen eigenen Fehlerfall kennzeichnen:
+→ <code>TaskNotFoundException</code></p>
+<hr>
+<h2 id="242-implementierung-einer-eigenen-exception">2.4.2 Implementierung einer eigenen Exception</h2>
+<h3 id="schritt-1-auswählen-des-basistyps">Schritt 1: Auswählen des Basistyps</h3>
+<ul>
+<li>
+<p>Soll deine Exception <strong>checked</strong> oder <strong>unchecked</strong> sein?</p>
+<ul>
+<li><strong>Checked Exception:</strong> Erbt von <code>Exception</code></li>
+<li><strong>Unchecked Exception:</strong> Erbt von <code>RuntimeException</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="schritt-2-eigene-klasse-erstellen">Schritt 2: Eigene Klasse erstellen</h3>
+<p><strong>Beispiel: Eine Unchecked Exception</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Neue Exception: Unchecked, weil sie von RuntimeException erbt</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">TaskNotFoundException</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">RuntimeException</span> {
+    <span class="hljs-comment">// Standard-Konstruktor mit Nachricht</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">TaskNotFoundException</span><span class="hljs-params">(String message)</span> {
+        <span class="hljs-built_in">super</span>(message);
+    }
+    <span class="hljs-comment">// Optional: Konstruktor mit Ursache (Exception Chaining)</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">TaskNotFoundException</span><span class="hljs-params">(String message, Throwable cause)</span> {
+        <span class="hljs-built_in">super</span>(message, cause);
+    }
+}
+</code></pre>
+<p><strong>Beispiel: Eine Checked Exception</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Neue Exception: Checked, weil sie von Exception erbt</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DataImportException</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Exception</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">DataImportException</span><span class="hljs-params">(String message)</span> {
+        <span class="hljs-built_in">super</span>(message);
+    }
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">DataImportException</span><span class="hljs-params">(String message, Throwable cause)</span> {
+        <span class="hljs-built_in">super</span>(message, cause);
+    }
+}
+</code></pre>
+<h3 id="schritt-3-die-exception-im-code-verwenden">Schritt 3: Die Exception im Code verwenden</h3>
+<ul>
+<li>
+<p><strong>Exception werfen:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">if</span> (!taskExists(id)) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TaskNotFoundException</span>(<span class="hljs-string">&quot;Aufgabe mit ID &quot;</span> + id + <span class="hljs-string">&quot; wurde nicht gefunden!&quot;</span>);
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Exception behandeln:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">try</span> {
+    updateTask(<span class="hljs-number">5</span>, <span class="hljs-string">&quot;Neue Aufgabe&quot;</span>);
+} <span class="hljs-keyword">catch</span> (TaskNotFoundException e) {
+    System.out.println(<span class="hljs-string">&quot;Fehler: &quot;</span> + e.getMessage());
+}
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="243-anwendung-und-vorteile-im-code">2.4.3 Anwendung und Vorteile im Code</h2>
+<h3 id="typische-anwendungsfälle-für-eigene-exceptions">Typische Anwendungsfälle für eigene Exceptions</h3>
+<ul>
+<li><strong>Spezielle Fehlerfälle:</strong>
+Wenn ein bestimmtes Problem häufig und eindeutig auftritt, z.B. „Benutzer nicht gefunden“, „Ungültige Bestellung“, „Keine Berechtigung“.</li>
+<li><strong>Fein abgestufte Fehlerbehandlung:</strong>
+In komplexeren Anwendungen können so verschiedene Ausnahmen unterschiedlich behandelt oder an die Benutzeroberfläche gemeldet werden.</li>
+<li><strong>Bibliotheken/Frameworks:</strong>
+Eigene Exception-Klassen ermöglichen es Nutzern deiner Bibliothek, gezielt auf Fehlerfälle zu reagieren.</li>
+</ul>
+<h3 id="vorteile-im-code">Vorteile im Code</h3>
+<ul>
+<li>
+<p><strong>Erhöhte Lesbarkeit und Verständlichkeit</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">catch</span> (TaskNotFoundException e) {
+    <span class="hljs-comment">// Jetzt ist klar, was passiert ist!</span>
+    ...
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Bessere Fehleranalyse und Logging</strong>
+Durch spezifische Fehlertypen ist das Finden und Beheben von Fehlern deutlich einfacher.</p>
+</li>
+<li>
+<p><strong>Vermeidung von zu allgemeinen Fehlerbehandlungen</strong>
+Es wird verhindert, dass unterschiedliche Fehlerarten „in einen Topf“ geworfen werden.</p>
+</li>
+</ul>
+<h3 id="best-practice">Best Practice</h3>
+<ul>
+<li><strong>Aussagekräftige Namen wählen:</strong>
+Nutze einen Namen, der den Fehlerfall exakt beschreibt.</li>
+<li><strong>Konstruktoren anbieten:</strong>
+Mindestens mit <code>String message</code>, besser auch mit <code>Throwable cause</code> (für Exception Chaining).</li>
+<li><strong>Javadoc hinzufügen:</strong>
+Dokumentiere, wann und warum diese Exception geworfen wird.</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Eigene Exceptions verbessern die Lesbarkeit, Wartbarkeit und Fehlerbehandlung deines Codes.</li>
+<li>Sie sollten immer dann verwendet werden, wenn Standard-Exceptions zu ungenau sind oder du spezielle Fehlerfälle unterscheiden möchtest.</li>
+<li>Die Implementierung ist einfach: Erbe von <code>Exception</code> oder <code>RuntimeException</code> und definiere sinnvolle Konstruktoren.</li>
+</ul>
+<hr>
+<h2 id="selbsttest--übungen">Selbsttest &amp; Übungen</h2>
+<ol>
+<li>Warum lohnt es sich, eigene Exceptions zu definieren?</li>
+<li>Was ist der Unterschied zwischen einer eigenen checked und unchecked Exception?</li>
+<li>Implementiere eine Exception <code>UserNotAuthorizedException</code>, die beim Versuch ausgelöst wird, wenn ein Benutzer nicht genügend Rechte hat.</li>
+</ol>
+<hr>
+<p><strong>Tipp für die Praxis:</strong>
+Überlege bei jeder Fehlerbehandlung: Hilft eine eigene Exception dabei, den Fehlerfall klarer und gezielter abzubilden? Dann solltest du eine eigene Klasse schreiben!</p>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>2&period;3 Arten von Exceptions&colon; Checked vs&period; Unchecked</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="23-arten-von-exceptions-checked-vs-unchecked">2.3 Arten von Exceptions: Checked vs. Unchecked</h1>
+<hr>
+<h2 id="231-unchecked-exceptions-runtimeexceptions">2.3.1 Unchecked Exceptions (RuntimeExceptions)</h2>
+<h3 id="was-sind-unchecked-exceptions">Was sind Unchecked Exceptions?</h3>
+<ul>
+<li>Unchecked Exceptions sind <strong>Laufzeit-Ausnahmen</strong>, die von der Klasse <code>RuntimeException</code> (bzw. ihren Unterklassen) erben.</li>
+<li>Sie werden <strong>nicht</strong> vom Compiler dazu gezwungen, explizit behandelt zu werden (weder durch <code>try-catch</code> noch durch <code>throws</code>).</li>
+<li>Treten typischerweise durch Programmierfehler oder logische Fehler im Code auf.</li>
+</ul>
+<h3 id="typische-unchecked-exceptions">Typische Unchecked Exceptions</h3>
+<ul>
+<li><strong><code>NullPointerException</code>:</strong> Zugriff auf ein Objekt, das <code>null</code> ist.</li>
+<li><strong><code>ArrayIndexOutOfBoundsException</code>:</strong> Zugriff auf ein Array außerhalb seiner Grenzen.</li>
+<li><strong><code>IllegalArgumentException</code>:</strong> Ein ungültiges Argument wird an eine Methode übergeben.</li>
+<li><strong><code>ArithmeticException</code>:</strong> Rechenfehler wie Division durch null.</li>
+<li><strong><code>ClassCastException</code>:</strong> Fehlerhafter Typumwandlungsversuch.</li>
+</ul>
+<h3 id="umgang-mit-unchecked-exceptions">Umgang mit Unchecked Exceptions</h3>
+<ul>
+<li><strong>Prävention statt Behandlung:</strong>
+Der Code sollte so gestaltet werden, dass diese Ausnahmen im Normalfall <em>nicht</em> auftreten.</li>
+<li><strong>Beispiel:</strong>
+Vor dem Zugriff prüfen, ob eine Variable <code>null</code> ist.</li>
+</ul>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getStringLength</span><span class="hljs-params">(String s)</span> {
+    <span class="hljs-keyword">if</span> (s == <span class="hljs-literal">null</span>) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;String darf nicht null sein!&quot;</span>);
+    }
+    <span class="hljs-keyword">return</span> s.length();
+}
+</code></pre>
+<hr>
+<h2 id="232-checked-exceptions">2.3.2 Checked Exceptions</h2>
+<h3 id="was-sind-checked-exceptions">Was sind Checked Exceptions?</h3>
+<ul>
+<li>Checked Exceptions sind <strong>geprüfte Ausnahmen</strong>, die von <code>Exception</code> erben, aber <strong>nicht</strong> von <code>RuntimeException</code>.</li>
+<li>Der Compiler erzwingt, dass diese Exceptions <em>entweder abgefangen</em> (<code>try-catch</code>) <em>oder weitergegeben</em> (<code>throws</code>) werden.</li>
+<li>Sie treten häufig bei <strong>externen Fehlerquellen</strong> auf, die nicht durch einen Programmierfehler verursacht werden (z.B. I/O, Netzwerk).</li>
+</ul>
+<h3 id="typische-checked-exceptions">Typische Checked Exceptions</h3>
+<ul>
+<li><strong><code>IOException</code>:</strong> Fehler beim Lesen/Schreiben von Daten (z.B. Datei nicht gefunden).</li>
+<li><strong><code>SQLException</code>:</strong> Fehler beim Zugriff auf eine Datenbank.</li>
+<li><strong><code>ClassNotFoundException</code>:</strong> Klasse zur Laufzeit nicht gefunden.</li>
+<li><strong><code>FileNotFoundException</code>:</strong> Eine bestimmte Datei existiert nicht.</li>
+</ul>
+<h3 id="umgang-mit-checked-exceptions">Umgang mit Checked Exceptions</h3>
+<ul>
+<li><strong>Fehlerbehandlung erzwingen:</strong>
+Der Programmierer muss entscheiden, wie auf diese Ausnahme reagiert werden soll – z.B. Nutzer informieren, Alternative anbieten, Fehler weiterreichen.</li>
+<li><strong>Beispiel:</strong></li>
+</ul>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">readFile</span><span class="hljs-params">(String filename)</span> <span class="hljs-keyword">throws</span> IOException {
+    <span class="hljs-type">FileReader</span> <span class="hljs-variable">reader</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FileReader</span>(filename); <span class="hljs-comment">// Kann IOException werfen</span>
+    <span class="hljs-comment">// Datei lesen ...</span>
+}
+</code></pre>
+<pre><code class="language-java"><span class="hljs-keyword">try</span> {
+    readFile(<span class="hljs-string">&quot;daten.txt&quot;</span>);
+} <span class="hljs-keyword">catch</span> (IOException e) {
+    System.out.println(<span class="hljs-string">&quot;Dateifehler: &quot;</span> + e.getMessage());
+}
+</code></pre>
+<hr>
+<h2 id="233-praktische-beispiele-für-beide-arten">2.3.3 Praktische Beispiele für beide Arten</h2>
+<h3 id="beispiel-1-unchecked-exception">Beispiel 1: Unchecked Exception</h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">divide</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span> {
+    <span class="hljs-keyword">return</span> a / b; <span class="hljs-comment">// Kann ArithmeticException werfen (b = 0)</span>
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> {
+    divide(<span class="hljs-number">10</span>, <span class="hljs-number">0</span>); <span class="hljs-comment">// Führt zu ArithmeticException, wenn b = 0</span>
+    <span class="hljs-comment">// Wird meist nicht abgefangen, sondern als Programmierfehler betrachtet</span>
+}
+</code></pre>
+<h3 id="beispiel-2-checked-exception">Beispiel 2: Checked Exception</h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">saveToFile</span><span class="hljs-params">(String filename, String data)</span> <span class="hljs-keyword">throws</span> IOException {
+    <span class="hljs-type">FileWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FileWriter</span>(filename); <span class="hljs-comment">// Kann IOException werfen</span>
+    writer.write(data);
+    writer.close();
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> {
+    <span class="hljs-keyword">try</span> {
+        saveToFile(<span class="hljs-string">&quot;output.txt&quot;</span>, <span class="hljs-string">&quot;Hallo Welt!&quot;</span>);
+    } <span class="hljs-keyword">catch</span> (IOException e) {
+        System.out.println(<span class="hljs-string">&quot;Fehler beim Schreiben: &quot;</span> + e.getMessage());
+    }
+}
+</code></pre>
+<h3 id="beispiel-3-checked-und-unchecked-kombiniert">Beispiel 3: Checked und Unchecked kombiniert</h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">addTask</span><span class="hljs-params">(String title)</span> {
+    <span class="hljs-keyword">if</span> (title == <span class="hljs-literal">null</span> || title.isEmpty()) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Titel darf nicht leer sein!&quot;</span>); <span class="hljs-comment">// Unchecked</span>
+    }
+    <span class="hljs-comment">// Checked Exception könnte z.B. beim Speichern auftreten:</span>
+    <span class="hljs-comment">// saveToFile(title); // throws IOException</span>
+}
+</code></pre>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<table>
+<thead>
+<tr>
+<th>Merkmal</th>
+<th>Checked Exception</th>
+<th>Unchecked Exception (Runtime)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Muss behandelt werden?</td>
+<td>Ja (try/catch oder throws)</td>
+<td>Nein</td>
+</tr>
+<tr>
+<td>Ableitung von</td>
+<td>Exception (nicht Runtime)</td>
+<td>RuntimeException</td>
+</tr>
+<tr>
+<td>Typische Ursache</td>
+<td>Externe Faktoren</td>
+<td>Programmierfehler</td>
+</tr>
+<tr>
+<td>Beispiele</td>
+<td>IOException, SQLException</td>
+<td>NullPointerException, IllegalArgumentException</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Woran erkennst du im Code, ob es sich um eine checked oder unchecked Exception handelt?</li>
+<li>Warum erzwingt Java für checked Exceptions die Fehlerbehandlung?</li>
+<li>Wann solltest du selbst eine checked Exception verwenden, wann lieber eine unchecked?</li>
+</ol>
+<hr>
+<p><strong>Tipp:</strong>
+Schau dir die Java-Dokumentation zu <code>Exception</code> und <code>RuntimeException</code> an und probiere kleine Beispiele, um beide Typen bewusst zu erzeugen und zu behandeln!</p>
+
+            
+            
+        </body>
+        </html>

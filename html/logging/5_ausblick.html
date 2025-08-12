@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Weiterf&uuml;hrende Logging-Themen &amp; Ausblick</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-weiterführende-logging-themen--ausblick">Handout: Weiterführende Logging-Themen &amp; Ausblick</h1>
+<hr>
+<h2 id="51-logs-in-modernen-architekturen">5.1 Logs in modernen Architekturen</h2>
+<h3 id="warum-reicht-klassische-logdatei-oft-nicht-mehr-aus"><strong>Warum reicht klassische Logdatei oft nicht mehr aus?</strong></h3>
+<ul>
+<li>Früher: Eine Anwendung auf einem Server → Logdatei lokal anschauen.</li>
+<li>Heute: <strong>Microservices</strong>, <strong>Cloud</strong>, verteilte Systeme – Logs entstehen auf vielen Servern, Containern, Instanzen gleichzeitig.</li>
+<li><strong>Problem:</strong> Wie findest du relevante Informationen, wenn sie über viele Dateien und Systeme verteilt sind?</li>
+</ul>
+<hr>
+<h3 id="automatisierte-log-auswertung"><strong>Automatisierte Log-Auswertung</strong></h3>
+<p><strong>Lösung:</strong>
+Logs werden zentral gesammelt, gespeichert und ausgewertet. Das macht</p>
+<ul>
+<li>Fehlerdiagnose schneller,</li>
+<li>Monitoring und Alarmierung möglich,</li>
+<li>und erlaubt z. B. die Analyse von Trends oder Security-Vorfällen.</li>
+</ul>
+<p><strong>Bekannte Tools und Begriffe:</strong></p>
+<h4 id="elk-stack-elasticsearch-logstash-kibana"><strong>ELK-Stack (Elasticsearch, Logstash, Kibana)</strong></h4>
+<ul>
+<li>
+<p><strong>Elasticsearch:</strong> Schnelle, skalierbare Suchmaschine und Speicher für Logs (Indexierung).</p>
+</li>
+<li>
+<p><strong>Logstash:</strong> Log-Sammler &amp; -Verarbeiter; nimmt Logs aus vielen Quellen entgegen, filtert, wandelt um und speichert sie weiter.</p>
+</li>
+<li>
+<p><strong>Kibana:</strong> Web-Oberfläche für Suchen, Dashboards und Visualisierung von Logs.</p>
+</li>
+<li>
+<p><strong>Ablauf:</strong></p>
+<ol>
+<li>Anwendung schreibt Logfile (oder sendet Logs direkt)</li>
+<li>Logstash sammelt/verschickt die Logs an Elasticsearch</li>
+<li>Kibana macht sie durchsuchbar und sichtbar</li>
+</ol>
+</li>
+</ul>
+<h4 id="grafana-loki"><strong>Grafana Loki</strong></h4>
+<ul>
+<li>Moderne, leichtgewichtige Alternative für Cloud- und Container-Umgebungen.</li>
+<li>Integriert sich direkt mit Grafana-Dashboards.</li>
+<li>Fokus auf Performance, Skalierbarkeit und Cloud-Nutzung.</li>
+<li><strong>Prometheus</strong> für Metriken, <strong>Loki</strong> für Logs, <strong>Grafana</strong> für Visualisierung.</li>
+</ul>
+<h4 id="graylog-splunk-andere-lösungen"><strong>Graylog, Splunk, andere Lösungen</strong></h4>
+<ul>
+<li>Viele Unternehmen setzen weitere Werkzeuge ein, je nach Bedarf.</li>
+</ul>
+<p><strong>Praxis-Tipp:</strong>
+Logs sollten möglichst strukturiert geschrieben werden (z. B. JSON), um die Auswertung und Suche zu erleichtern!</p>
+<hr>
+<h2 id="52-weitere-features">5.2 Weitere Features</h2>
+<h3 id="a-asynchrones-logging"><strong>A. Asynchrones Logging</strong></h3>
+<p><strong>Warum?</strong>
+Normales Logging schreibt synchron (d.h. der Thread wartet, bis Lognachricht geschrieben ist) – bei sehr vielen Logs oder Performance-kritischen Anwendungen kann das verlangsamen.</p>
+<p><strong>Asynchrones Logging:</strong></p>
+<ul>
+<li>Log-Nachrichten werden in eine Queue gelegt und im Hintergrund von einem eigenen Thread geschrieben.</li>
+<li>Die Anwendung läuft direkt weiter – Logging bremst nicht aus.</li>
+<li><strong>Logback:</strong> Mit <code>&lt;asyncAppender&gt;</code> konfigurierbar.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">appender</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;ASYNC_CONSOLE&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;ch.qos.logback.classic.AsyncAppender&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">appender-ref</span> <span class="hljs-attr">ref</span>=<span class="hljs-string">&quot;CONSOLE&quot;</span>/&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">appender</span>&gt;</span>
+</code></pre>
+<p><strong>Wann sinnvoll?</strong></p>
+<ul>
+<li>In hochperformanten, parallelen Anwendungen</li>
+<li>Bei sehr vielen Log-Nachrichten pro Sekunde</li>
+</ul>
+<hr>
+<h3 id="b-mapped-diagnostic-context-mdc"><strong>B. Mapped Diagnostic Context (MDC)</strong></h3>
+<p><strong>Was ist das?</strong></p>
+<ul>
+<li>Mit <strong>MDC</strong> kannst du Kontext-Informationen (z. B. Benutzer-ID, Session-ID, Transaktions-ID) für jeden Log-Eintrag mitgeben, <strong>ohne</strong> sie in jedem Log-Statement einzeln zu übergeben.</li>
+<li>Das ist wichtig, wenn du z. B. Anfragen verschiedener Benutzer auf demselben Server unterscheiden willst.</li>
+</ul>
+<p><strong>Wie funktioniert das?</strong></p>
+<ul>
+<li>
+<p>Im Code:</p>
+<pre><code class="language-java">MDC.put(<span class="hljs-string">&quot;userId&quot;</span>, user.getId());
+logger.info(<span class="hljs-string">&quot;Nutzer führt Aktion aus&quot;</span>);
+<span class="hljs-comment">// später:</span>
+MDC.remove(<span class="hljs-string">&quot;userId&quot;</span>);
+</code></pre>
+</li>
+<li>
+<p>Im Pattern:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">pattern</span>&gt;</span>%d %-5level [%X{userId}] %logger - %msg%n<span class="hljs-tag">&lt;/<span class="hljs-name">pattern</span>&gt;</span>
+</code></pre>
+<p>→ Gibt für jeden Log-Eintrag die aktuelle <code>userId</code> aus, falls gesetzt.</p>
+</li>
+</ul>
+<p><strong>Wofür gut?</strong></p>
+<ul>
+<li>Korrelation von Log-Nachrichten über mehrere Systeme hinweg</li>
+<li>Nachvollziehbarkeit, welche Aktion zu welchem Benutzer gehörte</li>
+</ul>
+<hr>
+<h3 id="c-alternative-konfigurationsformate-yamlproperties"><strong>C. Alternative Konfigurationsformate (YAML/Properties)</strong></h3>
+<p><strong>Standard:</strong>
+Logback wird traditionell per <code>logback.xml</code> konfiguriert.</p>
+<p><strong>Alternativen:</strong></p>
+<ul>
+<li><strong>Groovy:</strong> <code>logback.groovy</code> – mächtiger, weil echte Programmiersprache (z. B. Bedingungen, Schleifen).</li>
+<li><strong>Properties:</strong> (seltener, v. a. mit kleineren Libraries oder via SLF4J-Bridges)</li>
+<li><strong>YAML:</strong> Nicht direkt von Logback unterstützt, aber in Spring Boot und modernen Frameworks gängig.</li>
+</ul>
+<p><strong>Beispiel: Spring Boot mit YAML</strong></p>
+<pre><code class="language-yaml"><span class="hljs-attr">logging:</span>
+  <span class="hljs-attr">level:</span>
+    <span class="hljs-attr">root:</span> <span class="hljs-string">INFO</span>
+    <span class="hljs-attr">de.beispiel:</span> <span class="hljs-string">DEBUG</span>
+  <span class="hljs-attr">file:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">logs/app.log</span>
+  <span class="hljs-attr">pattern:</span>
+    <span class="hljs-attr">console:</span> <span class="hljs-string">&quot;[%d{HH:mm:ss}] %-5level %logger{36} - %msg%n&quot;</span>
+</code></pre>
+<ul>
+<li>Mit Spring Boot reicht das oft für viele Anwendungsfälle.</li>
+</ul>
+<p><strong>Praxis-Hinweis:</strong>
+Für komplexe, individuelle Anforderungen ist weiterhin die <code>logback.xml</code> das flexibelste Format.</p>
+<hr>
+<h2 id="zusammenfassung--ausblick"><strong>Zusammenfassung &amp; Ausblick</strong></h2>
+<ul>
+<li>Logging ist heute viel mehr als „nur eine Datei schreiben“ – es ist zentral für Monitoring, Fehleranalyse und Security.</li>
+<li>Moderne Anwendungen profitieren von zentraler Log-Auswertung (ELK, Loki).</li>
+<li>Features wie asynchrones Logging und MDC machen Logs leistungsfähig und aussagekräftig.</li>
+<li>Die Wahl des Konfigurationsformats richtet sich nach Projekt und Umgebung.</li>
+</ul>
+<p><strong>Tipp:</strong></p>
+<ul>
+<li>Probiere aus, Logs mit MDC anzureichern (z. B. userId, requestId).</li>
+<li>Schau dir bei Interesse Grafana, Kibana oder Graylog an – viele kostenlose Demos &amp; Tutorials im Netz!</li>
+</ul>
+<hr>
+<p><strong>Selbststudium:</strong></p>
+<ol>
+<li>Wann wäre asynchrones Logging in deinem Projekt sinnvoll?</li>
+<li>Wie würdest du MDC für „Request-IDs“ oder „Benutzer“ nutzen?</li>
+<li>Suche ein Beispiel für eine Log-Auswertung mit Kibana oder Grafana.</li>
+</ol>
+<hr>
+<p><strong>Weiterführende Links:</strong></p>
+<ul>
+<li><a href="https://logback.qos.ch/manual/mdc.html">Logback MDC Manual</a></li>
+<li><a href="https://www.elastic.co/what-is/elk-stack">ELK Stack Einführung</a></li>
+<li><a href="https://grafana.com/oss/loki/">Grafana Loki Docs</a></li>
+<li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.logging">Spring Boot Logging</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

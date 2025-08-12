@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>2&period;5 Zusammenfassung &amp; Ausblick</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="25-zusammenfassung--ausblick">2.5 Zusammenfassung &amp; Ausblick</h1>
+<hr>
+<h2 id="251-wiederholung-der-wichtigsten-begriffe-und-konzepte">2.5.1 Wiederholung der wichtigsten Begriffe und Konzepte</h2>
+<ul>
+<li>
+<p><strong>Exception:</strong>
+Ein objektorientiertes Konzept zur Behandlung von Fehlern und besonderen Situationen im Programmablauf. Exceptions sind Objekte, die von der Basisklasse <code>Throwable</code> erben.</p>
+</li>
+<li>
+<p><strong>try-catch-finally:</strong>
+Das Konstrukt zur strukturierten Fehlerbehandlung in Java:</p>
+<ul>
+<li><code>try</code>: Block mit potenziell fehleranfälligem Code</li>
+<li><code>catch</code>: Block für das Abfangen und Behandeln von Exceptions</li>
+<li><code>finally</code>: (Optional) Wird immer ausgeführt, z.B. zum Freigeben von Ressourcen</li>
+</ul>
+</li>
+<li>
+<p><strong>Checked Exception:</strong>
+Von <code>Exception</code> abgeleitet (aber nicht von <code>RuntimeException</code>). Müssen behandelt oder weitergegeben werden. Häufig externe Fehlerquellen (Dateien, Netzwerke).</p>
+</li>
+<li>
+<p><strong>Unchecked Exception:</strong>
+Von <code>RuntimeException</code> abgeleitet. Müssen <em>nicht</em> behandelt werden, werden meist durch Programmierfehler ausgelöst.</p>
+</li>
+<li>
+<p><strong>Error:</strong>
+Von <code>Error</code> abgeleitet. Signalisiert schwerwiegende, oft irreparable Fehler der JVM oder des Systems (z.B. <code>OutOfMemoryError</code>).</p>
+</li>
+<li>
+<p><strong>Eigene Exceptions:</strong>
+Ermöglichen die Definition spezifischer, für die jeweilige Anwendung passender Fehlerfälle.</p>
+</li>
+</ul>
+<hr>
+<h2 id="252-hinweis-error-ist-kein-normaler-fehlerfall">2.5.2 Hinweis: <code>Error</code> ist kein normaler Fehlerfall</h2>
+<ul>
+<li><strong><code>Error</code>-Objekte</strong> stehen für schwerwiegende Probleme, die fast immer außerhalb der Kontrolle deines Programms liegen (z.B. Speicherüberlauf, Stacküberlauf).</li>
+<li>Sie sollten <strong>nicht</strong> abgefangen werden, da das System nach so einem Fehler meist nicht mehr zuverlässig weiterarbeiten kann.</li>
+<li>Fokus bei der Fehlerbehandlung sollte ausschließlich auf Exceptions liegen, nicht auf Errors.</li>
+</ul>
+<p><strong>Merksatz:</strong></p>
+<blockquote>
+<p>Errors zeigen katastrophale Zustände an – sie sind kein Teil der normalen Fehlerbehandlung in Java-Anwendungen!</p>
+</blockquote>
+<hr>
+<h2 id="253-unterschied-checked-vs-unchecked--wann-welche-verwenden">2.5.3 Unterschied Checked vs. Unchecked – wann welche verwenden</h2>
+<h3 id="checked-exceptions">Checked Exceptions</h3>
+<ul>
+<li>
+<p><strong>Wann verwenden?</strong></p>
+<ul>
+<li>Für erwartbare und <em>wiederherstellbare</em> Fehler, die <em>außerhalb</em> des Programmflusses liegen (z.B. Datei nicht gefunden, Netzwerkfehler).</li>
+<li>Wenn der Aufrufer des Codes eine sinnvolle Möglichkeit haben soll, auf den Fehler zu reagieren.</li>
+</ul>
+</li>
+<li>
+<p><strong>Vorteil:</strong></p>
+<ul>
+<li>Der Compiler „zwingt“ dich zur Behandlung – Fehler werden seltener vergessen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Nachteil:</strong></p>
+<ul>
+<li>Führt schnell zu viel Boilerplate-Code und komplexen Methodensignaturen (<code>throws</code>-Ketten).</li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">readFile</span><span class="hljs-params">(String filename)</span> <span class="hljs-keyword">throws</span> IOException { ... }
+</code></pre>
+<h3 id="unchecked-exceptions">Unchecked Exceptions</h3>
+<ul>
+<li>
+<p><strong>Wann verwenden?</strong></p>
+<ul>
+<li>Für <em>Programmierfehler</em>, wie falsche Argumente, Nullpointer, Logikfehler.</li>
+<li>Wenn sich das Programm an dieser Stelle ohnehin nicht mehr sinnvoll „retten“ kann.</li>
+</ul>
+</li>
+<li>
+<p><strong>Vorteil:</strong></p>
+<ul>
+<li>Einfachere APIs, weniger Zwang zur Fehlerbehandlung.</li>
+</ul>
+</li>
+<li>
+<p><strong>Nachteil:</strong></p>
+<ul>
+<li>Fehler können unbemerkt bleiben, wenn nicht sorgfältig programmiert wird.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setAge</span><span class="hljs-params">(<span class="hljs-type">int</span> age)</span> {
+    <span class="hljs-keyword">if</span> (age &lt; <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Alter darf nicht negativ sein!&quot;</span>);
+    }
+}
+</code></pre>
+<h3 id="faustregel">Faustregel</h3>
+<ul>
+<li><strong>Recoverable = Checked</strong></li>
+<li><strong>Programmierfehler = Unchecked</strong></li>
+</ul>
+<hr>
+<h2 id="254-sind-checked-exceptions-sinnvoll-diskussion-in-der-java-community">2.5.4 Sind Checked Exceptions sinnvoll? Diskussion in der Java Community</h2>
+<h3 id="die-große-diskussion">Die große Diskussion</h3>
+<p>Die Einführung von Checked Exceptions war ein wesentliches Merkmal von Java – sie sollte helfen, Fehler früh zu erkennen und zu vermeiden.
+<strong>Aber:</strong> Die Java-Community ist seit Jahren gespalten, ob das Prinzip wirklich Vorteile bringt.</p>
+<h3 id="argumente-für-checked-exceptions">Argumente <strong>für</strong> Checked Exceptions</h3>
+<ul>
+<li><strong>Fehler werden nicht „vergessen“:</strong>
+Der Compiler zwingt zur bewussten Auseinandersetzung mit Fehlerquellen.</li>
+<li><strong>API-Verträge sind eindeutig:</strong>
+Methoden dokumentieren explizit, mit welchen Fehlern der Aufrufer rechnen muss.</li>
+<li><strong>Besonders nützlich in kleinen, klaren Anwendungen</strong>
+(z.B. wenn verschiedene Fehlerfälle unterschiedlich behandelt werden sollen).</li>
+</ul>
+<h3 id="argumente-gegen-checked-exceptions">Argumente <strong>gegen</strong> Checked Exceptions</h3>
+<ul>
+<li>
+<p><strong>Boilerplate und „throws“-Ketten:</strong>
+In größeren Programmen kann sich der Code durch viele <code>try-catch</code>-Blöcke oder lange <code>throws</code>-Ketten aufblähen.</p>
+</li>
+<li>
+<p><strong>Fehler werden oft weitergereicht („weitergeworfen“), statt sinnvoll behandelt.</strong></p>
+</li>
+<li>
+<p><strong>Viele moderne Frameworks (z.B. Spring, Hibernate) setzen ausschließlich auf Unchecked Exceptions.</strong></p>
+<ul>
+<li>→ Sie wandeln Checked Exceptions in Unchecked um.</li>
+</ul>
+</li>
+<li>
+<p><strong>Interoperabilität:</strong>
+Andere Sprachen wie C#, Python, JavaScript kennen keine Checked Exceptions – dadurch wird die Java-Welt manchmal als „unnötig kompliziert“ wahrgenommen.</p>
+</li>
+</ul>
+<h3 id="aktuelle-praxis">Aktuelle Praxis</h3>
+<ul>
+<li>
+<p><strong>In großen, modernen Java-Anwendungen:</strong></p>
+<ul>
+<li>Checked Exceptions werden für externe, wirklich erwartbare Fehlerquellen genutzt (I/O, Datenbanken).</li>
+<li>In vielen Schichten werden Exceptions direkt in Unchecked Exceptions „gewrappt“ und zentral behandelt.</li>
+</ul>
+</li>
+<li>
+<p><strong>Tendenz:</strong></p>
+<ul>
+<li>„Weniger ist mehr“ – nur dort Checked Exceptions, wo sie wirklich Mehrwert bringen.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Fazit der Community:</strong></p>
+<ul>
+<li>Für den Unterricht und eigene kleine Programme lohnt es sich, Checked Exceptions bewusst einzusetzen und zu verstehen.</li>
+<li>In der Praxis und bei Nutzung moderner Frameworks werden Checked Exceptions meist minimiert.</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung--ausblick">Zusammenfassung &amp; Ausblick</h2>
+<ul>
+<li>Du kennst jetzt die Exception-Hierarchie, den Unterschied zwischen Checked und Unchecked, und weißt, wie du eigene Exceptions schreibst.</li>
+<li>Die Frage nach der Sinnhaftigkeit von Checked Exceptions ist nach wie vor umstritten und hängt vom Kontext ab.</li>
+<li>In modernen Projekten dominiert die zentrale Fehlerbehandlung und die Verwendung von Unchecked Exceptions.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Wann würdest du heute in einem eigenen Projekt noch eine Checked Exception definieren?</li>
+<li>Welche Nachteile können zu viele Checked Exceptions in einem großen Projekt haben?</li>
+<li>Wie sorgt eine zentrale Fehlerbehandlung dafür, dass Checked Exceptions weniger wichtig werden?</li>
+</ol>
+
+            
+            
+        </body>
+        </html>

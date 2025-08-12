@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices &amp; typische Fehler beim Logging</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices--typische-fehler-beim-logging">Handout: Best Practices &amp; typische Fehler beim Logging</h1>
+<hr>
+<h2 id="41-dos--donts-beim-logging">4.1 Do’s &amp; Don’ts beim Logging</h2>
+<h3 id="sensible-daten-nicht-loggen"><strong>Sensible Daten nicht loggen</strong></h3>
+<ul>
+<li>
+<p><strong>Do:</strong> Achte darauf, dass in Logs keine vertraulichen oder personenbezogenen Daten landen.</p>
+</li>
+<li>
+<p><strong>Beispiele sensibler Daten:</strong></p>
+<ul>
+<li>Passwörter</li>
+<li>Kreditkartennummern</li>
+<li>Bankdaten</li>
+<li>vollständige Adressen</li>
+<li>Zugangstoken/API-Keys</li>
+</ul>
+</li>
+<li>
+<p><strong>Warum?</strong> Logs werden oft zentral gespeichert und von vielen gelesen – ein Datenleck durch zu „redselige“ Logs ist ein echtes Risiko!</p>
+</li>
+</ul>
+<p><strong>Falsch:</strong></p>
+<pre><code class="language-java">logger.info(<span class="hljs-string">&quot;User {} logged in with password {}&quot;</span>, username, password);
+</code></pre>
+<p><strong>Richtig:</strong></p>
+<pre><code class="language-java">logger.info(<span class="hljs-string">&quot;User {} logged in&quot;</span>, username);
+</code></pre>
+<hr>
+<h3 id="logger-nur-einmal-pro-klasse-initialisieren"><strong>Logger nur einmal pro Klasse initialisieren</strong></h3>
+<ul>
+<li><strong>Do:</strong> Erzeuge pro Klasse EINEN Logger als <code>private static final</code> Variable.</li>
+<li><strong>Warum?</strong> Effizient, konsistent und du bekommst im Log den richtigen Klassennamen.</li>
+<li><strong>Don’t:</strong> Logger nicht dynamisch/mehrfach erzeugen!</li>
+</ul>
+<p><strong>Richtig:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(MyClass.class);
+</code></pre>
+<p><strong>Falsch:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(...); <span class="hljs-comment">// innerhalb jeder Methode neu!</span>
+</code></pre>
+<hr>
+<h3 id="keine-aufwendigen-berechnungen-in-log-ausdrücken"><strong>Keine aufwendigen Berechnungen in Log-Ausdrücken</strong></h3>
+<ul>
+<li><strong>Problem:</strong>
+Code in einem Log-Statement wird immer ausgeführt, auch wenn das Log-Level gar nicht aktiviert ist!
+Das kann unnötig Performance kosten.</li>
+<li><strong>Best Practice:</strong>
+Nutze Platzhalter (<code>{}</code>) im Log-Statement – die Berechnung findet nur statt, wenn das Level auch wirklich geloggt wird.</li>
+</ul>
+<p><strong>Falsch:</strong></p>
+<pre><code class="language-java">logger.debug(<span class="hljs-string">&quot;List: &quot;</span> + list.stream().map(...).collect(Collectors.joining(<span class="hljs-string">&quot;,&quot;</span>)));
+</code></pre>
+<p><strong>Richtig:</strong></p>
+<pre><code class="language-java">logger.debug(<span class="hljs-string">&quot;List: {}&quot;</span>, list); <span class="hljs-comment">// oder</span>
+<span class="hljs-keyword">if</span> (logger.isDebugEnabled()) {
+    logger.debug(<span class="hljs-string">&quot;List: &quot;</span> + list.stream().map(...).collect(Collectors.joining(<span class="hljs-string">&quot;,&quot;</span>)));
+}
+</code></pre>
+<hr>
+<h2 id="42-best-practices-beim-einsatz-von-log-levels">4.2 Best Practices beim Einsatz von Log-Levels</h2>
+<h3 id="warnungen-und-fehler-nicht-für-normale-abläufe-nutzen"><strong>Warnungen und Fehler nicht für „normale“ Abläufe nutzen</strong></h3>
+<ul>
+<li><strong>ERROR</strong> und <strong>WARN</strong> sind für echte Fehler und Probleme reserviert, nicht für „normale“ Betriebszustände!</li>
+<li><strong>Sonst:</strong> Logfiles werden unübersichtlich, Monitoring schlägt ständig falschen Alarm.</li>
+</ul>
+<p><strong>Falsch:</strong></p>
+<pre><code class="language-java">logger.error(<span class="hljs-string">&quot;Benutzer hat sich erfolgreich angemeldet.&quot;</span>); <span class="hljs-comment">// KEIN Fehler!</span>
+</code></pre>
+<p><strong>Richtig:</strong></p>
+<pre><code class="language-java">logger.info(<span class="hljs-string">&quot;Benutzer {} angemeldet&quot;</span>, username);
+</code></pre>
+<hr>
+<h3 id="wann-trace-debug-info-sinnvoll-sind"><strong>Wann TRACE, DEBUG, INFO sinnvoll sind</strong></h3>
+<ul>
+<li><strong>TRACE:</strong> Nur für sehr detaillierte Ablaufverfolgung, z. B. Schleifen, Algorithmen – meist nur in Entwicklung/Test sinnvoll.</li>
+<li><strong>DEBUG:</strong> Für technische Detailinfos, die bei Fehleranalyse helfen (z. B. Variablenwerte, Entscheidungen im Code).</li>
+<li><strong>INFO:</strong> Für normale Betriebsinformationen (Start, Stopp, Status, Nutzeraktionen).</li>
+<li><strong>WARN:</strong> Für unerwartete, aber nicht kritische Situationen (z. B. Netzwerk kurz weg, Config fehlt, wird Default genommen).</li>
+<li><strong>ERROR:</strong> Für alles, was kritisch ist, nicht mehr „normal“ läuft (Exceptions, Datenverlust, Absturz).</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">logger.trace(<span class="hljs-string">&quot;Verarbeite Element {}&quot;</span>, element);
+logger.debug(<span class="hljs-string">&quot;Wert von a: {}&quot;</span>, a);
+logger.info(<span class="hljs-string">&quot;Service gestartet&quot;</span>);
+logger.warn(<span class="hljs-string">&quot;Config nicht gefunden, nutze Default&quot;</span>);
+logger.error(<span class="hljs-string">&quot;Datei konnte nicht geladen werden!&quot;</span>, e);
+</code></pre>
+<hr>
+<h2 id="43-hinweis-auf-security-log-injection">4.3 Hinweis auf Security (Log Injection)</h2>
+<h3 id="was-ist-log-injection"><strong>Was ist Log Injection?</strong></h3>
+<ul>
+<li>
+<p>Angreifer schleusen manipulierte Daten in Logs ein, z. B. mit speziellen Zeichen, Escape-Sequenzen oder sogar Schadcode.</p>
+</li>
+<li>
+<p>Ziel:</p>
+<ul>
+<li>Manipulation der Logausgabe (z. B. fälschlicher Eintrag „ERROR“ erzeugen)</li>
+<li>Im schlimmsten Fall: Ausnutzen von Schwachstellen (siehe Log4Shell 2021)</li>
+</ul>
+</li>
+</ul>
+<h3 id="fallbeispiel-log4shell"><strong>Fallbeispiel: Log4Shell</strong></h3>
+<ul>
+<li>2021 wurde eine schwere Sicherheitslücke in Log4j bekannt, bei der Angreifer beliebigen Code auf Servern ausführen konnten – <strong>allein durch speziell formatierte Log-Nachrichten!</strong></li>
+<li>Ursache: Ungeprüfte/unsichere Verarbeitung von Benutzereingaben im Logging.</li>
+</ul>
+<h3 id="schutzmaßnahmen"><strong>Schutzmaßnahmen:</strong></h3>
+<ul>
+<li><strong>Immer SLF4J/Logback aktuell halten!</strong></li>
+<li>Keine Benutzereingaben oder externe Daten ungefiltert ins Log schreiben.</li>
+<li>Keine Pattern/Lookups erlauben, die zu gefährlichem Verhalten führen könnten.</li>
+<li>Im Zweifel: Logging-Eingaben „säubern“ (Escape/Validierung).</li>
+<li><strong>Niemals Logs als „vertrauenswürdig“ ansehen!</strong></li>
+</ul>
+<p><strong>Weitere Links:</strong></p>
+<ul>
+<li><a href="https://www.heise.de/hintergrund/Log4Shell-So-gefaehrlich-ist-die-Java-Luecke-6318755.html">Heise: Was war Log4Shell?</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html">OWASP Logging Cheat Sheet</a></li>
+</ul>
+<hr>
+<h2 id="zusammenfassung--tipps"><strong>Zusammenfassung &amp; Tipps</strong></h2>
+<ul>
+<li>Schreibe Logs mit Bedacht – sie sind Werkzeug und Risiko zugleich!</li>
+<li>Halte dich an die Trennung der Log-Levels.</li>
+<li>Logger immer korrekt initialisieren.</li>
+<li>Log-Ausdrücke so effizient wie möglich halten.</li>
+<li>Sensible und externe Daten nur sehr bewusst loggen.</li>
+<li>Sicherheitsupdates bei Logging-Frameworks immer schnellstmöglich einspielen!</li>
+</ul>
+<hr>
+<p><strong>Selbststudium:</strong></p>
+<ul>
+<li>Prüfe dein Projekt: Werden sensible Daten geloggt?</li>
+<li>Welches Log-Level verwenden deine wichtigsten Statements? Gibt es Verbesserungsbedarf?</li>
+<li>Weißt du, wie du eine Schwachstelle im Logging erkennen würdest?</li>
+</ul>
+
+            
+            
+        </body>
+        </html>
