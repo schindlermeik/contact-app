@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einrichtung und Integration von JUnit ins Projekt</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einrichtung-und-integration-von-junit-ins-projekt">Handout: Einrichtung und Integration von JUnit ins Projekt</h1>
+<h2 id="1-maven-integration-von-junit">1. Maven-Integration von JUnit</h2>
+<h3 id="a-was-ist-maven">a) Was ist Maven?</h3>
+<ul>
+<li><strong>Maven</strong> ist ein weit verbreitetes Build- und Projektmanagement-Tool für Java-Projekte.</li>
+<li>Es ermöglicht das einfache Hinzufügen von Bibliotheken (wie JUnit) durch sogenannte <strong>Dependencies</strong> in der <code>pom.xml</code>.</li>
+</ul>
+<h3 id="b-junit-als-dependency-einbinden">b) JUnit als Dependency einbinden</h3>
+<ol>
+<li><strong>Öffne die Datei <code>pom.xml</code></strong> im Hauptverzeichnis deines Projekts.</li>
+<li><strong>Füge folgenden Abschnitt im <code>&lt;dependencies&gt;</code>-Block hinzu</strong> (Beispiel für JUnit 5):</li>
+</ol>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.junit.jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>junit-jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.10.2<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<ul>
+<li>Das Attribut <code>&lt;scope&gt;test&lt;/scope&gt;</code> sorgt dafür, dass JUnit nur für Tests geladen wird und nicht im fertigen Programm enthalten ist.</li>
+<li>Nach dem Hinzufügen: Speichern und ggf. das Projekt „reimportieren“ (oftmals automatisch in modernen IDEs).</li>
+</ul>
+<p><strong>Tipp:</strong>
+Immer auf die <a href="https://search.maven.org/search?q=junit%20jupiter">offizielle JUnit-Seite</a> schauen, um die aktuellste Version zu nutzen!</p>
+<hr>
+<h2 id="2-projektstruktur-mit-test-ordner">2. Projektstruktur mit Test-Ordner</h2>
+<h3 id="a-standardmäßige-maven-projektstruktur">a) Standardmäßige Maven-Projektstruktur</h3>
+<p>Ein typisches Maven-Projekt ist folgendermaßen aufgebaut:</p>
+<pre><code>projekt-root/
+ ├─ src/
+ │   ├─ main/
+ │   │   └─ java/              # Produktivcode
+ │   │       └─ ...klassen...
+ │   └─ test/
+ │       └─ java/              # Testcode (JUnit-Tests!)
+ │           └─ ...testklassen...
+ ├─ pom.xml
+</code></pre>
+<ul>
+<li><strong>Produktivcode</strong> kommt in <code>src/main/java</code>.</li>
+<li><strong>Testcode</strong> (z.B. <code>CalculatorTest.java</code>) kommt in <code>src/test/java</code>.</li>
+<li>Beide Ordner können dieselbe Package-Struktur haben.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code>src/
+ ├─ main/java/com/beispiel/Calculator.java
+ └─ test/java/com/beispiel/CalculatorTest.java
+</code></pre>
+<p><strong>Vorteil dieser Trennung:</strong>
+Produktiv- und Testcode sind sauber voneinander getrennt und werden beim Build-Prozess unterschiedlich behandelt.</p>
+<hr>
+<h2 id="3-ide-unterstützung">3. IDE-Unterstützung</h2>
+<h3 id="a-allgemeines">a) Allgemeines</h3>
+<ul>
+<li>
+<p>Moderne Java-IDEs wie <strong>IntelliJ IDEA</strong> und <strong>Eclipse</strong> bieten umfassende Unterstützung für JUnit.</p>
+</li>
+<li>
+<p>Vorteile:</p>
+<ul>
+<li>Tests lassen sich bequem direkt aus der IDE heraus starten.</li>
+<li>Testresultate werden übersichtlich angezeigt (grün/rot, Stacktraces).</li>
+<li>Fehlgeschlagene Tests lassen sich einfach debuggen.</li>
+</ul>
+</li>
+</ul>
+<h3 id="b-junit-in-intellij-idea">b) JUnit in IntelliJ IDEA</h3>
+<ul>
+<li>
+<p>Die IDE erkennt Testklassen und Testmethoden automatisch (bei korrektem Aufbau &amp; Annotationen).</p>
+</li>
+<li>
+<p>Du kannst:</p>
+<ul>
+<li>Einzelne Tests oder alle Tests einer Klasse mit Rechtsklick → &quot;Run&quot; ausführen.</li>
+<li>Mit dem Shortcut <code>Ctrl+Shift+F10</code> einen Test starten.</li>
+<li>Ergebnisse im Test-Runner-Fenster grafisch sehen.</li>
+<li>Beim Doppelklick auf einen fehlgeschlagenen Test springt die IDE direkt zur Fehlerstelle.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-junit-in-eclipse">c) JUnit in Eclipse</h3>
+<ul>
+<li>Auch Eclipse erkennt JUnit-Tests automatisch.</li>
+<li>Ausführung über Kontextmenü oder die Toolbar (<code>Rechtsklick → Run As → JUnit Test</code>).</li>
+<li>Ergebnisanzeige im JUnit-View mit Baumstruktur und Fehlerdetails.</li>
+</ul>
+<p><strong>Hinweis:</strong>
+In beiden IDEs sollte das Maven-Projekt einmal aktualisiert werden, nachdem eine neue Dependency hinzugefügt wurde (<code>Rechtsklick auf Projekt → Maven → Reload project</code> bzw. „Update Project“ in Eclipse).</p>
+<hr>
+<h2 id="4-kurzanleitung-erster-testlauf">4. Kurzanleitung: Erster Testlauf</h2>
+<ol>
+<li><strong>Maven-Dependency für JUnit eintragen</strong></li>
+<li><strong>Testklasse in <code>src/test/java</code> erstellen</strong></li>
+<li><strong>Testmethode mit <code>@Test</code> schreiben</strong></li>
+<li><strong>In der IDE rechtsklicken → Test ausführen</strong></li>
+<li><strong>Testergebnis prüfen (grün = OK, rot = Fehler)</strong></li>
+</ol>
+<hr>
+<h2 id="5-faq--tipps">5. FAQ &amp; Tipps</h2>
+<ul>
+<li>
+<p><strong>Fehlermeldung „No tests found“?</strong></p>
+<ul>
+<li>Prüfe, ob deine Testmethoden mit <code>@Test</code> annotiert sind und ob sie <code>public</code> und <code>void</code> sind.</li>
+</ul>
+</li>
+<li>
+<p><strong>IDE erkennt Tests nicht?</strong></p>
+<ul>
+<li>Maven-Projekt reloaden, evtl. IDE neu starten.</li>
+</ul>
+</li>
+<li>
+<p><strong>JUnit-Versionen mischen?</strong></p>
+<ul>
+<li>Achte darauf, in der <code>pom.xml</code> nur JUnit 5-Dependencies zu haben, wenn du die neuen Features nutzen willst.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="6-weiterführende-links">6. Weiterführende Links</h2>
+<ul>
+<li><a href="https://search.maven.org/search?q=junit%20jupiter">JUnit 5 auf Maven Central</a></li>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/">JUnit 5 User Guide</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

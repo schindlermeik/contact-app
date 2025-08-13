@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Mocking und JUnit kombinieren</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-mocking-und-junit-kombinieren">Handout: Mocking und JUnit kombinieren</h1>
+<hr>
+<h2 id="1-annotationen-für-das-zusammenspiel-von-mockito-und-junit-5">1. Annotationen für das Zusammenspiel von Mockito und JUnit 5</h2>
+<h3 id="a-extendwithmockitoextensionclass">a) <code>@ExtendWith(MockitoExtension.class)</code></h3>
+<ul>
+<li>Mit dieser Annotation wird die Mockito-Integration für JUnit 5 aktiviert.</li>
+<li>Sie sorgt dafür, dass Mockito-Annotationen wie <code>@Mock</code> und <code>@InjectMocks</code> funktionieren.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.extension.ExtendWith;
+<span class="hljs-keyword">import</span> org.mockito.junit.jupiter.MockitoExtension;
+
+<span class="hljs-meta">@ExtendWith(MockitoExtension.class)</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">MyTest</span> {
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<h3 id="b-mock">b) <code>@Mock</code></h3>
+<ul>
+<li>Mit <code>@Mock</code> werden automatisch Mock-Objekte erzeugt und initialisiert.</li>
+<li>Praktisch und übersichtlich, vor allem bei mehreren Mocks.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Mock</span>
+PaymentService paymentService;
+</code></pre>
+<h3 id="c-injectmocks">c) <code>@InjectMocks</code></h3>
+<ul>
+<li>Mit <code>@InjectMocks</code> wird ein echtes Objekt erzeugt, und alle Felder, für die es einen passenden Mock gibt, werden automatisch &quot;injiziert&quot;.</li>
+<li>Damit werden Abhängigkeiten für die zu testende Klasse automatisch gemockt.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@InjectMocks</span>
+OrderService orderService;
+</code></pre>
+<ul>
+<li>In diesem Beispiel werden z. B. ein Mock für <code>PaymentService</code> und ein Mock für <code>ShippingService</code> in den echten <code>OrderService</code> injiziert.</li>
+</ul>
+<hr>
+<h2 id="2-setup-mit-junit-5-jupiter">2. Setup mit JUnit 5 (Jupiter)</h2>
+<h3 id="a-kompletter-aufbau-einer-testklasse">a) Kompletter Aufbau einer Testklasse</h3>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+<span class="hljs-keyword">import</span> org.junit.jupiter.api.extension.ExtendWith;
+<span class="hljs-keyword">import</span> org.mockito.InjectMocks;
+<span class="hljs-keyword">import</span> org.mockito.Mock;
+<span class="hljs-keyword">import</span> org.mockito.junit.jupiter.MockitoExtension;
+
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.mockito.Mockito.*;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.junit.jupiter.api.Assertions.*;
+
+<span class="hljs-meta">@ExtendWith(MockitoExtension.class)</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderServiceTest</span> {
+
+    <span class="hljs-meta">@Mock</span>
+    PaymentService paymentService;
+
+    <span class="hljs-meta">@Mock</span>
+    ShippingService shippingService;
+
+    <span class="hljs-meta">@InjectMocks</span>
+    OrderService orderService;
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testOrderSuccess</span><span class="hljs-params">()</span> {
+        when(paymentService.pay(any())).thenReturn(<span class="hljs-literal">true</span>);
+        when(shippingService.ship(any())).thenReturn(<span class="hljs-string">&quot;Shipped!&quot;</span>);
+
+        <span class="hljs-type">String</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> orderService.placeOrder(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Order</span>());
+
+        assertEquals(<span class="hljs-string">&quot;Shipped!&quot;</span>, result);
+        verify(paymentService).pay(any());
+        verify(shippingService).ship(any());
+    }
+}
+</code></pre>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Mocks werden automatisch erzeugt.</li>
+<li>Die getestete Klasse erhält ihre Abhängigkeiten „fertig gemockt“.</li>
+<li>Kein aufwändiges Setup im Code nötig.</li>
+</ul>
+<hr>
+<h2 id="3-mocking-in-parameterisierten-tests">3. Mocking in Parameterisierten Tests</h2>
+<ul>
+<li>Auch bei parameterisierten Tests lassen sich Mocks problemlos einsetzen.</li>
+<li>Typisch ist die Kombination mit JUnit 5-Annotationen wie <code>@ParameterizedTest</code> und <code>@ValueSource</code>, <code>@CsvSource</code> etc.</li>
+</ul>
+<h3 id="beispiel-mocks-im-parameterisierten-test">Beispiel: Mocks im parameterisierten Test</h3>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.params.ParameterizedTest;
+<span class="hljs-keyword">import</span> org.junit.jupiter.params.provider.ValueSource;
+<span class="hljs-keyword">import</span> org.mockito.Mock;
+<span class="hljs-keyword">import</span> org.mockito.junit.jupiter.MockitoExtension;
+<span class="hljs-keyword">import</span> org.junit.jupiter.api.extension.ExtendWith;
+
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.mockito.Mockito.*;
+
+<span class="hljs-meta">@ExtendWith(MockitoExtension.class)</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">EmailValidatorTest</span> {
+
+    <span class="hljs-meta">@Mock</span>
+    EmailService emailService;
+
+    <span class="hljs-meta">@ParameterizedTest</span>
+    <span class="hljs-meta">@ValueSource(strings = {&quot;user@example.com&quot;, &quot;test@test.org&quot;})</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">shouldAcceptValidEmails</span><span class="hljs-params">(String email)</span> {
+        when(emailService.isValid(email)).thenReturn(<span class="hljs-literal">true</span>);
+
+        <span class="hljs-type">boolean</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> emailService.isValid(email);
+
+        assertTrue(result);
+        verify(emailService).isValid(email);
+    }
+}
+</code></pre>
+<p><strong>Hinweis:</strong></p>
+<ul>
+<li>Die Mocks werden <strong>bei jedem Testdurchlauf frisch erzeugt</strong>, also gibt es keine Nebeneffekte zwischen den Testfällen.</li>
+<li>Auch mit anderen Quellen (<code>@CsvSource</code>, <code>@MethodSource</code>) möglich.</li>
+</ul>
+<hr>
+<h2 id="4-tipps--best-practices">4. Tipps &amp; Best Practices</h2>
+<ul>
+<li><strong>Mocks und <code>@InjectMocks</code> immer zusammen mit <code>@ExtendWith(MockitoExtension.class)</code> verwenden.</strong></li>
+<li><strong>Bei vielen Mocks:</strong> Klar benennen, damit die Testfälle verständlich bleiben.</li>
+<li><strong>Mocking in parameterisierten Tests:</strong> Mocks werden pro Durchlauf sauber behandelt.</li>
+<li><strong>In komplexeren Fällen:</strong> Setup und Verifikation in eigene Hilfsmethoden auslagern, damit der Test übersichtlich bleibt.</li>
+</ul>
+<hr>
+<h2 id="5-weiterführende-links">5. Weiterführende Links</h2>
+<ul>
+<li><a href="https://javadoc.io/doc/org.mockito/mockito-junit-jupiter/latest/org/mockito/junit/jupiter/MockitoExtension.html">Mockito mit JUnit 5 – Offizielle Doku</a></li>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-parameterized-tests">JUnit 5 User Guide: Parameterized Tests</a></li>
+<li><a href="https://www.baeldung.com/mockito-annotations">Mockito Best Practices (Baeldung)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

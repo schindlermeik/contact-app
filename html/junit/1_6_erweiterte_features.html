@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Erweiterte Features von JUnit</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-erweiterte-features-von-junit">Handout: Erweiterte Features von JUnit</h1>
+<hr>
+<h2 id="1-tags-und-test-filter-tag-disabled">1. Tags und Test-Filter (<code>@Tag</code>, <code>@Disabled</code>)</h2>
+<h3 id="a-was-sind-tags">a) Was sind Tags?</h3>
+<ul>
+<li><strong>Tags</strong> ermöglichen es, Tests zu gruppieren und gezielt auszuführen.</li>
+<li>Sie sind besonders nützlich in großen Projekten oder bei der Unterscheidung zwischen schnellen, langsamen, integrativen oder experimentellen Tests.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.Tag;
+<span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+
+<span class="hljs-meta">@Tag(&quot;fast&quot;)</span>
+<span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testFastOperation</span><span class="hljs-params">()</span> {
+    <span class="hljs-comment">// Testcode</span>
+}
+
+<span class="hljs-meta">@Tag(&quot;slow&quot;)</span>
+<span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testSlowOperation</span><span class="hljs-params">()</span> {
+    <span class="hljs-comment">// Testcode für aufwändigen Test</span>
+}
+</code></pre>
+<ul>
+<li>Tests mit bestimmten Tags lassen sich über Build-Tools oder IDE-Features gezielt ausführen, z.B. nur <code>&quot;fast&quot;</code>-Tests.</li>
+</ul>
+<p><strong>Praxis-Tipp:</strong>
+Tags helfen, „Nachts nur die langen“, „im CI nur die schnellen“ Tests laufen zu lassen!</p>
+<h3 id="b-test-filter">b) Test-Filter</h3>
+<ul>
+<li>
+<p>Test-Frameworks und Build-Tools (wie Maven oder Gradle) erlauben das Filtern und Selektieren von Tests anhand von Tags.</p>
+</li>
+<li>
+<p>Beispiel (Maven):</p>
+<pre><code>mvn test -Dgroups=fast
+</code></pre>
+</li>
+</ul>
+<h3 id="c-tests-gezielt-deaktivieren-disabled">c) Tests gezielt deaktivieren (<code>@Disabled</code>)</h3>
+<ul>
+<li><strong><code>@Disabled</code></strong> markiert einen Test oder eine Testklasse als vorübergehend deaktiviert (wird übersprungen, z.B. bei noch nicht implementierten Features oder instabilen Tests).</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.Disabled;
+<span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+
+<span class="hljs-meta">@Disabled(&quot;Noch nicht implementiert&quot;)</span>
+<span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testComingSoon</span><span class="hljs-params">()</span> {
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<hr>
+<h2 id="2-test-suites">2. Test Suites</h2>
+<ul>
+<li><strong>Test Suites</strong> fassen mehrere Testklassen zusammen, sodass sie gemeinsam gestartet werden können.</li>
+<li>Besonders praktisch für Integrationstests, Regressionstests oder spezifische Testläufe.</li>
+</ul>
+<p><strong>Beispiel (JUnit 5):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.platform.suite.api.SelectClasses;
+<span class="hljs-keyword">import</span> org.junit.platform.suite.api.Suite;
+
+<span class="hljs-meta">@Suite</span>
+<span class="hljs-meta">@SelectClasses({CalculatorTest.class, UserServiceTest.class})</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">AllTestsSuite</span> {
+    <span class="hljs-comment">// Diese Klasse bleibt leer!</span>
+}
+</code></pre>
+<ul>
+<li>In der Suite werden alle angegebenen Testklassen nacheinander ausgeführt.</li>
+<li>Für größere Projekte lassen sich so eigene Test-Läufe (z.B. „Alle wichtigen Tests“) erstellen.</li>
+</ul>
+<hr>
+<h2 id="3-zeitbegrenzung-von-tests-timeout">3. Zeitbegrenzung von Tests (<code>@Timeout</code>)</h2>
+<ul>
+<li><strong>Langlaufende oder hängende Tests</strong> können Entwicklung und CI-Prozesse blockieren.</li>
+<li>Mit <code>@Timeout</code> kann man für einzelne Tests eine maximale Ausführungszeit definieren.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+<span class="hljs-keyword">import</span> org.junit.jupiter.api.Timeout;
+
+<span class="hljs-keyword">import</span> java.util.concurrent.TimeUnit;
+
+<span class="hljs-meta">@Test</span>
+<span class="hljs-meta">@Timeout(value = 500, unit = TimeUnit.MILLISECONDS)</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testMustFinishQuickly</span><span class="hljs-params">()</span> {
+    <span class="hljs-comment">// Code, der nicht länger als 500ms laufen darf</span>
+}
+</code></pre>
+<ul>
+<li>Läuft der Test länger, wird er automatisch als fehlgeschlagen markiert.</li>
+<li><strong>Praxis-Tipp:</strong> Auch auf Nebenläufigkeit (Threads) und Deadlocks achten!</li>
+</ul>
+<hr>
+<h2 id="4-testen-von-multithreading-code">4. Testen von Multithreading-Code</h2>
+<h3 id="a-warum-ist-das-besonders">a) Warum ist das besonders?</h3>
+<ul>
+<li>Tests, die Threads oder parallele Ausführung nutzen, sind schwerer vorhersehbar und oft fehleranfällig.</li>
+<li>Typische Fehler: Deadlocks, Race Conditions, nicht deterministische Ergebnisse.</li>
+</ul>
+<h3 id="b-tipps-zum-testen-von-multithreading-code">b) Tipps zum Testen von Multithreading-Code</h3>
+<ol>
+<li>
+<p><strong>Verwende <code>@Timeout</code></strong>, damit Tests nicht ewig hängen bleiben!</p>
+</li>
+<li>
+<p><strong>Synchronisiere auf Testergebnisse:</strong></p>
+<ul>
+<li>Warten, bis Threads wirklich fertig sind (z.B. mit <code>CountDownLatch</code>, <code>Future</code>, <code>ExecutorService</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Teste verschiedene Szenarien mehrfach (z.B. in Schleifen),</strong> um Race Conditions zu finden.</p>
+</li>
+<li>
+<p><strong>Nutze Assertions innerhalb von Threads,</strong> achte aber darauf, dass Fehler gemeldet werden.</p>
+</li>
+</ol>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.*;
+<span class="hljs-keyword">import</span> java.util.concurrent.*;
+
+<span class="hljs-meta">@Test</span>
+<span class="hljs-meta">@Timeout(2)</span> <span class="hljs-comment">// Sekunden</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testParallelCalculation</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception {
+    <span class="hljs-type">ExecutorService</span> <span class="hljs-variable">executor</span> <span class="hljs-operator">=</span> Executors.newFixedThreadPool(<span class="hljs-number">2</span>);
+    Future&lt;Integer&gt; f1 = executor.submit(() -&gt; longCalculation(<span class="hljs-number">5</span>));
+    Future&lt;Integer&gt; f2 = executor.submit(() -&gt; longCalculation(<span class="hljs-number">10</span>));
+    assertEquals(<span class="hljs-number">5</span>, f1.get());
+    assertEquals(<span class="hljs-number">10</span>, f2.get());
+    executor.shutdown();
+}
+</code></pre>
+<ul>
+<li>Hier werden zwei Threads gestartet und das Ergebnis später per <code>get()</code> abgefragt.</li>
+</ul>
+<p><strong>Praxis-Tipps:</strong></p>
+<ul>
+<li>Achte darauf, Ressourcen (Threads, Executor) nach dem Test zu schließen!</li>
+<li>Nicht alles lässt sich mit Unit-Tests abdecken – für komplexe Nebenläufigkeit sind zusätzliche Tools/Frameworks hilfreich (z.B. <a href="https://github.com/awaitility/awaitility">Awaitility</a> für asynchrone Tests).</li>
+</ul>
+<hr>
+<h2 id="5-zusammenfassung-und-empfehlungen">5. Zusammenfassung und Empfehlungen</h2>
+<ul>
+<li>Nutze <strong>Tags</strong> zur besseren Organisation und gezielten Ausführung von Tests.</li>
+<li>Deaktiviere Tests temporär mit <code>@Disabled</code> – aber halte die Liste kurz und dokumentiere den Grund!</li>
+<li>Mit <strong>Test Suites</strong> lassen sich mehrere Testklassen bündeln und effizient ausführen.</li>
+<li><strong>Timeouts</strong> schützen vor blockierenden Tests, besonders bei Multithreading.</li>
+<li><strong>Multithreading-Tests</strong> sind anspruchsvoll: Synchronisation, Fehlerbehandlung und Zeitmanagement sind entscheidend.</li>
+</ul>
+<hr>
+<h2 id="checkliste-für-die-praxis">Checkliste für die Praxis</h2>
+<ul>
+<li>Habe ich wichtige Tests getaggt, um sie gezielt starten zu können?</li>
+<li>Gibt es deaktivierte Tests? Wenn ja: Warum?</li>
+<li>Benutze ich Test Suites für größere Testläufe?</li>
+<li>Sind meine Tests schnell – oder brauche ich sinnvolle Timeouts?</li>
+<li>Habe ich Multithreading-Code mit ausreichend Wiederholungen und Zeitbeschränkungen geprüft?</li>
+</ul>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/#running-tests-tagging-and-filtering">JUnit 5 User Guide: Tagging and Filtering</a></li>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-suites">JUnit 5 User Guide: Test Suites</a></li>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-declarative-timeouts">JUnit 5 User Guide: Timeouts</a></li>
+<li><a href="https://github.com/awaitility/awaitility">Awaitility (Multithreading-Testing)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

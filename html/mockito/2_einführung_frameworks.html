@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in Mocking-Frameworks</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-mocking-frameworks">Handout: Einführung in Mocking-Frameworks</h1>
+<hr>
+<h2 id="1-überblick-über-gängige-frameworks">1. Überblick über gängige Frameworks</h2>
+<h3 id="a-mockito">a) Mockito</h3>
+<ul>
+<li>
+<p><strong>Mockito</strong> ist das am weitesten verbreitete Mocking-Framework für Java.</p>
+</li>
+<li>
+<p>Es ist einfach zu erlernen, integriert sich nahtlos mit JUnit und bietet eine klare, lesbare Syntax.</p>
+</li>
+<li>
+<p><strong>Kernfunktionen:</strong></p>
+<ul>
+<li>Erzeugen von Mocks für beliebige Interfaces und Klassen</li>
+<li>Konfigurieren des Verhaltens (<code>when(...).thenReturn(...)</code>)</li>
+<li>Überprüfen von Methodenaufrufen (<code>verify(...)</code>)</li>
+<li>Unterstützt Annotationen (<code>@Mock</code>, <code>@InjectMocks</code>)</li>
+<li>Erweiterbar mit <code>MockitoExtension</code> für JUnit 5</li>
+</ul>
+</li>
+<li>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">MyService</span> <span class="hljs-variable">mockService</span> <span class="hljs-operator">=</span> Mockito.mock(MyService.class);
+when(mockService.getData()).thenReturn(<span class="hljs-string">&quot;Test&quot;</span>);
+verify(mockService).getData();
+</code></pre>
+</li>
+<li>
+<p><strong>Weitere Infos:</strong> <a href="https://site.mockito.org/">Mockito Doku</a></p>
+</li>
+</ul>
+<hr>
+<h3 id="b-easymock">b) EasyMock</h3>
+<ul>
+<li>
+<p><strong>EasyMock</strong> ist ein weiteres, seit Jahren bewährtes Mocking-Framework.</p>
+</li>
+<li>
+<p>Bietet vor allem eine alternative Syntax (Aufzeichnen/Abspielen-Prinzip: &quot;record–replay&quot;).</p>
+</li>
+<li>
+<p>Kann besonders hilfreich sein, wenn bereits bestehende Projekte darauf setzen.</p>
+</li>
+<li>
+<p><strong>Kernfunktionen:</strong></p>
+<ul>
+<li>Automatisches Erzeugen von Mocks</li>
+<li>Definieren von erwarteten Methodenaufrufen vor Ausführung (&quot;expect&quot;–&quot;replay&quot;)</li>
+<li>Überprüfen, ob alle erwarteten Interaktionen stattgefunden haben</li>
+</ul>
+</li>
+<li>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">MyService</span> <span class="hljs-variable">mockService</span> <span class="hljs-operator">=</span> EasyMock.createMock(MyService.class);
+EasyMock.expect(mockService.getData()).andReturn(<span class="hljs-string">&quot;Test&quot;</span>);
+EasyMock.replay(mockService);
+<span class="hljs-comment">// ... Code ausführen ...</span>
+EasyMock.verify(mockService);
+</code></pre>
+</li>
+<li>
+<p><strong>Weitere Infos:</strong> <a href="https://easymock.org/">EasyMock Doku</a></p>
+</li>
+</ul>
+<hr>
+<h3 id="c-jmockit">c) JMockit</h3>
+<ul>
+<li>
+<p><strong>JMockit</strong> ist ein mächtiges Framework, das auch anspruchsvollere Mocking-Szenarien unterstützt.</p>
+</li>
+<li>
+<p>Kann <strong>finale, statische Methoden</strong> und sogar Konstruktoren mocken (was mit Mockito nicht ohne Weiteres geht).</p>
+</li>
+<li>
+<p>Wird vor allem in Legacy-Projekten mit schwer testbarem Code verwendet.</p>
+</li>
+<li>
+<p><strong>Kernfunktionen:</strong></p>
+<ul>
+<li>Mocken von finalen/statischen Methoden und Konstruktoren</li>
+<li>Record/Replay-API und deklarative Mocks</li>
+<li>Integration mit JUnit und TestNG</li>
+</ul>
+</li>
+<li>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">new</span> <span class="hljs-title class_">Expectations</span>(MyService.class) {{
+    MyService.staticMethod(); result = <span class="hljs-string">&quot;Mocked&quot;</span>;
+}};
+</code></pre>
+</li>
+<li>
+<p><strong>Weitere Infos:</strong> <a href="https://jmockit.github.io/">JMockit Doku</a></p>
+</li>
+</ul>
+<hr>
+<h2 id="2-auswahlkriterien-für-mocking-frameworks">2. Auswahlkriterien für Mocking-Frameworks</h2>
+<table>
+<thead>
+<tr>
+<th>Kriterium</th>
+<th>Mockito</th>
+<th>EasyMock</th>
+<th>JMockit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Einfach zu erlernen</td>
+<td>Ja</td>
+<td>Ja</td>
+<td>Mittel</td>
+</tr>
+<tr>
+<td>Gute Doku/Community</td>
+<td>Sehr gut</td>
+<td>Gut</td>
+<td>Mittel</td>
+</tr>
+<tr>
+<td>Integration mit JUnit 5</td>
+<td>Ja, nahtlos</td>
+<td>Ja</td>
+<td>Ja</td>
+</tr>
+<tr>
+<td>Unterstützung statischer/finaler Methoden</td>
+<td>Eingeschränkt *</td>
+<td>Eingeschränkt *</td>
+<td>Ja</td>
+</tr>
+<tr>
+<td>Für Legacy-Code geeignet</td>
+<td>Teilweise</td>
+<td>Teilweise</td>
+<td>Ja (sehr)</td>
+</tr>
+<tr>
+<td>Erweiterbarkeit</td>
+<td>Hoch</td>
+<td>Mittel</td>
+<td>Hoch</td>
+</tr>
+<tr>
+<td>Zukunftssicherheit</td>
+<td>Sehr gut</td>
+<td>Gut</td>
+<td>Eher gering</td>
+</tr>
+</tbody>
+</table>
+<p>* Für das Mocken von finalen/statischen Methoden mit Mockito wird z.B. das Zusatzmodul <strong>mockito-inline</strong> benötigt.</p>
+<p><strong>Fazit:</strong></p>
+<ul>
+<li><strong>Mockito</strong> ist für die meisten modernen Projekte die beste Wahl (einfach, flexibel, weit verbreitet).</li>
+<li><strong>EasyMock</strong> kann sinnvoll sein, wenn es bereits im Projekt verwendet wird oder der „record–replay“-Stil bevorzugt wird.</li>
+<li><strong>JMockit</strong> eignet sich vor allem für Legacy-Code oder sehr spezielle Anforderungen (z.B. statische Methoden, Konstruktoren).</li>
+</ul>
+<hr>
+<h2 id="3-integration-ins-projekt">3. Integration ins Projekt</h2>
+<h3 id="a-maven-abhängigkeiten">a) Maven-Abhängigkeiten</h3>
+<p><strong>Mockito (JUnit 5):</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mockito<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mockito-core<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.2.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mockito<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mockito-junit-jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.2.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<p><strong>EasyMock:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.easymock<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>easymock<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.1.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<p><strong>JMockit:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.jmockit<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>jmockit<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.49<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<h3 id="b-ide-integration">b) IDE-Integration</h3>
+<ul>
+<li>Alle drei Frameworks werden von modernen IDEs (IntelliJ IDEA, Eclipse) erkannt und unterstützt.</li>
+<li><strong>JUnit-Tests mit Mocks</strong> können per Rechtsklick in der IDE oder mit Build-Tools wie Maven/Gradle ausgeführt werden.</li>
+<li>Manche IDEs bieten Wizards oder Assistenten zum Erzeugen von Mocks (z.B. in IntelliJ).</li>
+</ul>
+<h3 id="c-best-practices">c) Best Practices</h3>
+<ul>
+<li>Framework wählen, das zur Team-Erfahrung und zum Code passt.</li>
+<li>Moderne Projekte: <strong>Mockito</strong> bevorzugen, JUnit 5 nutzen.</li>
+<li>Für Legacy-Code: Prüfe, ob JMockit oder EasyMock Vorteile bieten.</li>
+<li>Tests und Mocks immer sauber voneinander trennen – Setup/Initialisierung in <code>@BeforeEach</code>-Methoden oder per Annotation (<code>@Mock</code>).</li>
+</ul>
+<hr>
+<h2 id="4-zusammenfassung">4. Zusammenfassung</h2>
+<ul>
+<li>Es gibt verschiedene Mocking-Frameworks – das richtige hängt von den Projektanforderungen ab.</li>
+<li>Für neue Projekte ist <strong>Mockito</strong> die Standardempfehlung (einfach, flexibel, große Community).</li>
+<li><strong>Integration</strong> ist mit Maven, Gradle oder IDEs sehr unkompliziert.</li>
+<li>Gute Doku und regelmäßige Updates sind bei Mockito und EasyMock gewährleistet.</li>
+</ul>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li><a href="https://site.mockito.org/">Mockito Dokumentation</a></li>
+<li><a href="https://easymock.org/">EasyMock Dokumentation</a></li>
+<li><a href="https://jmockit.github.io/">JMockit Dokumentation</a></li>
+<li><a href="https://www.baeldung.com/mockito-vs-easymock-vs-jmockit">Vergleich: Mockito vs. EasyMock vs. JMockit (Baeldung)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

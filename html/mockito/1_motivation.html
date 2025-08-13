@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Motivation f&uuml;r Mocking</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-motivation-für-mocking">Handout: Motivation für Mocking</h1>
+<hr>
+<h2 id="1-was-sind-mocks-stubs-fakes-spies">1. Was sind Mocks, Stubs, Fakes, Spies?</h2>
+<p><strong>Test-Doubles</strong> ist der Oberbegriff für verschiedene Hilfsobjekte, die in Tests echte Abhängigkeiten ersetzen. Sie simulieren das Verhalten von echten Komponenten und helfen, isolierte Unit-Tests zu schreiben. Die wichtigsten Typen:</p>
+<h3 id="a-mock">a) <strong>Mock</strong></h3>
+<ul>
+<li>Ein <strong>Mock</strong> ist ein Objekt, das simuliert, wie sich ein echtes Objekt verhält, aber vor allem die <strong>Interaktion</strong> überprüft. Es merkt sich, welche Methoden aufgerufen wurden und mit welchen Parametern.</li>
+<li>Häufig mit Frameworks wie Mockito erstellt.</li>
+<li><em>Beispiel:</em> Prüfe, ob die Methode <code>sendEmail()</code> aufgerufen wurde.</li>
+</ul>
+<h3 id="b-stub">b) <strong>Stub</strong></h3>
+<ul>
+<li>Ein <strong>Stub</strong> gibt <strong>vordefinierte Werte</strong> zurück, unabhängig davon, was wirklich passiert.</li>
+<li>Ersetzt externe Systeme oder komplizierte Logik.</li>
+<li><em>Beispiel:</em> Eine Datenbankabfrage wird immer mit derselben Testperson beantwortet.</li>
+</ul>
+<h3 id="c-fake">c) <strong>Fake</strong></h3>
+<ul>
+<li>Ein <strong>Fake</strong> ist eine vereinfachte, lauffähige Implementierung eines Services oder einer Komponente, die für Tests ausreicht.</li>
+<li>Nutzt z. B. eine einfache In-Memory-Datenbank statt einer echten.</li>
+<li><em>Beispiel:</em> Eine „Fake-EmailService“-Klasse speichert E-Mails nur in einer Liste.</li>
+</ul>
+<h3 id="d-spy">d) <strong>Spy</strong></h3>
+<ul>
+<li>Ein <strong>Spy</strong> ist wie ein teilweise echtes Objekt, das aber die <strong>Aufrufe und Daten protokolliert</strong>.</li>
+<li>Kann verwendet werden, um Teile des echten Objekts zu testen, während andere Teile überwacht oder überschrieben werden.</li>
+<li><em>Beispiel:</em> Prüfe, wie oft eine Methode während eines Tests tatsächlich aufgerufen wurde.</li>
+</ul>
+<p><strong>Überblick (Tabelle):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Typ</th>
+<th>Hauptzweck</th>
+<th>Beispiel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mock</td>
+<td>Interaktion testen</td>
+<td>Wurde Methode X aufgerufen?</td>
+</tr>
+<tr>
+<td>Stub</td>
+<td>Werte liefern</td>
+<td>Immer Benutzer „Max“ zurückgeben</td>
+</tr>
+<tr>
+<td>Fake</td>
+<td>Einfache Logik bieten</td>
+<td>In-Memory-DB statt echter DB</td>
+</tr>
+<tr>
+<td>Spy</td>
+<td>Aufrufe mitzählen</td>
+<td>Wie oft wurde „save()“ genutzt?</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="2-warum-ist-mocking-für-unit-tests-wichtig">2. Warum ist Mocking für Unit-Tests wichtig?</h2>
+<h3 id="a-isolation-des-zu-testenden-codes">a) <strong>Isolation des zu testenden Codes</strong></h3>
+<ul>
+<li>Unit-Tests sollen immer nur EINE Komponente prüfen, nicht deren Abhängigkeiten.</li>
+<li>Mocks ersetzen teure, langsame oder komplizierte Abhängigkeiten durch vorhersehbare, schnelle Objekte.</li>
+</ul>
+<h3 id="b-verlässliche-und-wiederholbare-tests">b) <strong>Verlässliche und wiederholbare Tests</strong></h3>
+<ul>
+<li>Externe Systeme (z. B. Datenbank, Netzwerk, API) können fehlschlagen oder sich ändern.</li>
+<li>Durch Mocks/Stubs bleiben Tests unabhängig von äußeren Einflüssen und liefern immer dasselbe Ergebnis.</li>
+</ul>
+<h3 id="c-tests-werden-schneller">c) <strong>Tests werden schneller</strong></h3>
+<ul>
+<li>Echte Zugriffe auf Datenbanken, Netzwerke oder Webservices sind langsam.</li>
+<li>Mocks/Stubs reagieren sofort und machen die Testausführung effizient.</li>
+</ul>
+<h3 id="d-verhalten-und-interaktionen-testen">d) <strong>Verhalten und Interaktionen testen</strong></h3>
+<ul>
+<li>Oft geht es nicht nur um Rückgabewerte, sondern darum, ob und wie oft bestimmte Methoden aufgerufen werden.</li>
+<li>Mit Mocks lassen sich diese Interaktionen exakt prüfen.</li>
+</ul>
+<h3 id="e-edge-cases-einfach-simulieren">e) <strong>Edge Cases einfach simulieren</strong></h3>
+<ul>
+<li>Fehlermeldungen, Exceptions oder bestimmte Datenstände können gezielt simuliert werden.</li>
+<li>Kein aufwändiges Vorbereiten echter Daten nötig.</li>
+</ul>
+<hr>
+<h2 id="3-typische-anwendungsfälle-für-mocking">3. Typische Anwendungsfälle für Mocking</h2>
+<table>
+<thead>
+<tr>
+<th>Anwendungsfall</th>
+<th>Beispiel</th>
+<th>Lösung mit Mocking</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Datenbanken</strong></td>
+<td>Eine Methode soll Daten speichern, ohne echte DB-Verbindung</td>
+<td>DB-Service als Mock/Stub</td>
+</tr>
+<tr>
+<td><strong>Webservices</strong></td>
+<td>Externe API liefert Daten, die im Test nicht immer verfügbar oder langsam sind</td>
+<td>API-Client als Mock</td>
+</tr>
+<tr>
+<td><strong>Zeitabhängigkeit</strong></td>
+<td>Methoden, die das aktuelle Datum/Uhrzeit verwenden</td>
+<td>Zeitquelle als Mock/Stub</td>
+</tr>
+<tr>
+<td><strong>E-Mail-Versand</strong></td>
+<td>Prüfen, ob Mails verschickt werden, ohne wirklich E-Mails zu senden</td>
+<td>E-Mail-Service als Fake/Mock</td>
+</tr>
+<tr>
+<td><strong>Ressourcen/Dateien</strong></td>
+<td>Zugriff auf Dateisysteme oder große Datenmengen im Test vermeiden</td>
+<td>File-Service als Mock/Fake</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Beispiele:</strong></p>
+<ul>
+<li><strong>Webshop:</strong> Beim Testen der Bestellung wird der Zahlungsdienst als Mock simuliert.</li>
+<li><strong>Benutzerverwaltung:</strong> Die Authentifizierung ruft keine echte LDAP-Verbindung auf, sondern nutzt einen Stub mit festen Benutzer-Daten.</li>
+<li><strong>Logik für zeitgesteuerte Aufgaben:</strong> Die Systemzeit wird per Mock gesetzt, um verschiedene Uhrzeiten durchzuspielen.</li>
+</ul>
+<hr>
+<h2 id="4-zusammenfassung">4. Zusammenfassung</h2>
+<ul>
+<li><strong>Mocks, Stubs, Fakes und Spies</strong> sind unverzichtbare Werkzeuge für isolierte, zuverlässige und schnelle Unit-Tests.</li>
+<li>Sie helfen, Tests von externen Abhängigkeiten zu entkoppeln, Interaktionen zu prüfen und verschiedene Szenarien kontrolliert zu simulieren.</li>
+<li>Mocking ist in der modernen Softwareentwicklung Standard – Frameworks wie <strong>Mockito</strong> machen die Nutzung besonders einfach.</li>
+</ul>
+<hr>
+<h3 id="checkliste-für-mocking-im-projekt">Checkliste für Mocking im Projekt</h3>
+<ul>
+<li>Gibt es im Code externe Abhängigkeiten (DB, API, Zeit, Dateisystem)?</li>
+<li>Können diese durch Mocks/Stubs/Fakes ersetzt werden?</li>
+<li>Werden kritische Interaktionen und Fehlerfälle mit Mocks gezielt getestet?</li>
+</ul>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li><a href="https://martinfowler.com/articles/mocksArentStubs.html">Martin Fowler: Mocks Aren't Stubs</a></li>
+<li><a href="https://site.mockito.org/">Mockito Doku</a></li>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-doubles">JUnit 5 User Guide – Test Doubles</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

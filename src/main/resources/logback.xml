@@ -6,8 +6,8 @@
         </encoder>
     </appender>
 
-    <logger name="de.meida.ContactManager" level="DEBUG" />
-    <root level="WARN">
+    <logger name="de.meida.app.ContactService" level="DEBUG" />
+    <root level="INFO">
         <appender-ref ref="Console"/>
     </root>
 </configuration>

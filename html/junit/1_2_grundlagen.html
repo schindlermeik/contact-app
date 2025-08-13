@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundlegende Konzepte von JUnit</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundlegende-konzepte-von-junit">Handout: Grundlegende Konzepte von JUnit</h1>
+<h2 id="1-was-ist-junit">1. Was ist JUnit?</h2>
+<h3 id="a-historie-und-entwicklung">a) Historie und Entwicklung</h3>
+<ul>
+<li><strong>JUnit</strong> ist das bekannteste Framework für Unit-Tests in Java.</li>
+<li>Entwickelt ab 1997 von Erich Gamma und Kent Beck, Pioniere der Test-First- und Extreme Programming-Bewegung.</li>
+<li>JUnit wurde als leichtgewichtiges, einfach zu nutzendes Testframework konzipiert und hat den Siegeszug des automatisierten Testens in der Java-Welt entscheidend geprägt.</li>
+<li>Die Entwicklung von JUnit ist eng mit der Entstehung und Verbreitung von <strong>Test Driven Development (TDD)</strong> verbunden.</li>
+</ul>
+<h3 id="b-junit-versionen-ein-kurzer-überblick">b) JUnit-Versionen: Ein kurzer Überblick</h3>
+<ul>
+<li>
+<p><strong>JUnit 3</strong></p>
+<ul>
+<li>Tests wurden durch Vererbung einer Basisklasse geschrieben.</li>
+<li>Einrichtung und Ausführung noch etwas umständlich.</li>
+</ul>
+</li>
+<li>
+<p><strong>JUnit 4</strong></p>
+<ul>
+<li>Einführung von Annotationen (<code>@Test</code>, <code>@Before</code>, <code>@After</code> usw.), keine Basisklasse mehr nötig.</li>
+<li>Deutlich flexibler und moderner in der Anwendung.</li>
+</ul>
+</li>
+<li>
+<p><strong>JUnit 5 (auch „Jupiter“ genannt)</strong></p>
+<ul>
+<li>Modularer Aufbau, viele neue Features und Verbesserungen.</li>
+<li>Bessere Unterstützung für neue Java-Versionen, Lambda-Ausdrücke und Erweiterungen.</li>
+<li>Besteht aus drei Hauptkomponenten: JUnit Platform, JUnit Jupiter (neue APIs), JUnit Vintage (Abwärtskompatibilität).</li>
+<li>Aktuell der De-facto-Standard für neue Projekte.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-aufbau-eines-testfalls">2. Aufbau eines Testfalls</h2>
+<h3 id="a-testmethoden">a) Testmethoden</h3>
+<ul>
+<li>Jede Methode, die als Test dienen soll, erhält die Annotation <code>@Test</code>.</li>
+<li>Die Methode sollte möglichst <strong>keine Parameter</strong> und <strong>void</strong> als Rückgabetyp haben.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">CalculatorTest</span> {
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testAddition</span><span class="hljs-params">()</span> {
+        <span class="hljs-type">Calculator</span> <span class="hljs-variable">calc</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Calculator</span>();
+        <span class="hljs-type">int</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> calc.add(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>);
+        <span class="hljs-comment">// Assertion folgt...</span>
+    }
+}
+</code></pre>
+<h3 id="b-assertions">b) Assertions</h3>
+<ul>
+<li>
+<p><strong>Assertions</strong> überprüfen, ob das tatsächliche Ergebnis dem erwarteten Ergebnis entspricht.</p>
+</li>
+<li>
+<p>Schlägt eine Assertion fehl, wird der Test als fehlgeschlagen markiert.</p>
+</li>
+<li>
+<p>Typische Assertions (JUnit 5):</p>
+<ul>
+<li><code>assertEquals(expected, actual)</code></li>
+<li><code>assertTrue(condition)</code></li>
+<li><code>assertFalse(condition)</code></li>
+<li><code>assertThrows(Exception.class, () -&gt; { ... })</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.junit.jupiter.api.Assertions.*;
+
+<span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testAddition</span><span class="hljs-params">()</span> {
+    <span class="hljs-type">Calculator</span> <span class="hljs-variable">calc</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Calculator</span>();
+    <span class="hljs-type">int</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> calc.add(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>);
+    assertEquals(<span class="hljs-number">5</span>, result); <span class="hljs-comment">// Erwartung: 2 + 3 = 5</span>
+}
+</code></pre>
+<h3 id="c-setup-und-teardown-vorbereitung-und-aufräumen">c) Setup und Teardown (Vorbereitung und Aufräumen)</h3>
+<ul>
+<li>
+<p>Für wiederkehrende Vorbereitungen gibt es spezielle Methoden:</p>
+<ul>
+<li><code>@BeforeEach</code>: Wird <strong>vor jedem Test</strong> ausgeführt (z.B. Initialisierung).</li>
+<li><code>@AfterEach</code>: Wird <strong>nach jedem Test</strong> ausgeführt (z.B. Aufräumen).</li>
+</ul>
+</li>
+<li>
+<p>Es gibt auch <code>@BeforeAll</code> und <code>@AfterAll</code> für einmalige Aktionen pro Testklasse.</p>
+</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.*;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">CalculatorTest</span> {
+    Calculator calc;
+
+    <span class="hljs-meta">@BeforeEach</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">setUp</span><span class="hljs-params">()</span> {
+        calc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Calculator</span>(); <span class="hljs-comment">// vor jedem Test ein neues Calculator-Objekt</span>
+    }
+
+    <span class="hljs-meta">@AfterEach</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">tearDown</span><span class="hljs-params">()</span> {
+        <span class="hljs-comment">// z.B. Ressourcen freigeben, falls nötig</span>
+    }
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testAddition</span><span class="hljs-params">()</span> {
+        assertEquals(<span class="hljs-number">5</span>, calc.add(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>));
+    }
+}
+</code></pre>
+<h3 id="d-testklassen-struktur">d) Testklassen-Struktur</h3>
+<ul>
+<li>Eine Testklasse testet in der Regel eine Produktivklasse.</li>
+<li>Konvention: Name der Testklasse = Name der Produktivklasse + <code>Test</code>
+(z.B. <code>Calculator</code> → <code>CalculatorTest</code>)</li>
+<li>Testklassen liegen meist im Verzeichnis <code>src/test/java</code>.</li>
+</ul>
+<p><strong>Beispiel für die Struktur eines Projekts:</strong></p>
+<pre><code>projekt-root/
+  ├─ src/
+  │   ├─ main/
+  │   │   └─ java/
+  │   │       └─ com/beispiel/Calculator.java
+  │   └─ test/
+  │       └─ java/
+  │           └─ com/beispiel/CalculatorTest.java
+</code></pre>
+<h3 id="e-benennungskonventionen-für-tests">e) Benennungskonventionen für Tests</h3>
+<ul>
+<li>
+<p>Testmethoden sollten <strong>aussagekräftige Namen</strong> haben, die das getestete Verhalten beschreiben.</p>
+</li>
+<li>
+<p>Gängige Muster:</p>
+<ul>
+<li><code>methodName_state_expectedResult</code></li>
+<li><code>shouldDoSomething_WhenCondition</code></li>
+</ul>
+</li>
+<li>
+<p>Beispiele:</p>
+<ul>
+<li><code>add_TwoPositiveNumbers_ReturnsSum</code></li>
+<li><code>shouldThrowException_WhenInputIsNull</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>Vorteil:</strong> Gute Namen erleichtern das Verständnis und die Wartung der Tests.</p>
+<hr>
+<h2 id="3-zusammenfassung">3. Zusammenfassung</h2>
+<ul>
+<li>JUnit ist das Standard-Framework für Unit-Testing in Java und mittlerweile in Version 5 (Jupiter) weit verbreitet.</li>
+<li>Testfälle bestehen aus Testmethoden mit Assertions, werden klar benannt und sauber strukturiert.</li>
+<li>Mit Setup- und Teardown-Methoden kann man Tests noch übersichtlicher und wartbarer gestalten.</li>
+</ul>
+<hr>
+<h3 id="checkliste-für-eigene-junit-tests"><strong>Checkliste für eigene JUnit-Tests:</strong></h3>
+<ul>
+<li>Habe ich für jede wichtige Methode mindestens einen Test?</li>
+<li>Sind meine Testnamen selbsterklärend?</li>
+<li>Nutze ich Assertions, um Erwartungen klar zu prüfen?</li>
+<li>Ist mein Setup einfach und verständlich?</li>
+</ul>
+<hr>
+<p><strong>Tipp:</strong>
+Nutze die umfangreiche Dokumentation von JUnit (<a href="https://junit.org/junit5/docs/current/user-guide/">JUnit 5 User Guide</a>) und experimentiere mit einfachen Testklassen, um ein Gefühl für das Framework zu bekommen!</p>
+
+            
+            
+        </body>
+        </html>

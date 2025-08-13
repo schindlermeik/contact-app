@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Schreiben von Unit-Tests mit JUnit</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-schreiben-von-unit-tests-mit-junit">Handout: Schreiben von Unit-Tests mit JUnit</h1>
+<h2 id="1-grundlegende-assertions-assertequals-asserttrue-etc">1. Grundlegende Assertions (<code>assertEquals</code>, <code>assertTrue</code>, etc.)</h2>
+<h3 id="was-sind-assertions">Was sind Assertions?</h3>
+<ul>
+<li><strong>Assertions</strong> (deutsch: „Behauptungen“) sind Methoden, mit denen überprüft wird, ob ein tatsächliches Ergebnis mit einem erwarteten Wert übereinstimmt.</li>
+<li>Wenn eine Assertion fehlschlägt, markiert JUnit den Test als fehlgeschlagen.</li>
+</ul>
+<h3 id="die-wichtigsten-assertions-in-junit-5">Die wichtigsten Assertions in JUnit 5</h3>
+<table>
+<thead>
+<tr>
+<th>Assertion</th>
+<th>Beschreibung</th>
+<th>Beispiel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>assertEquals(expected, actual)</code></td>
+<td>Prüft auf Gleichheit</td>
+<td><code>assertEquals(5, calc.add(2, 3));</code></td>
+</tr>
+<tr>
+<td><code>assertNotEquals(expected, actual)</code></td>
+<td>Prüft auf Ungleichheit</td>
+<td><code>assertNotEquals(0, calc.add(2, 3));</code></td>
+</tr>
+<tr>
+<td><code>assertTrue(condition)</code></td>
+<td>Erwartet, dass die Bedingung wahr ist</td>
+<td><code>assertTrue(list.isEmpty());</code></td>
+</tr>
+<tr>
+<td><code>assertFalse(condition)</code></td>
+<td>Erwartet, dass die Bedingung falsch ist</td>
+<td><code>assertFalse(str.isEmpty());</code></td>
+</tr>
+<tr>
+<td><code>assertNull(value)</code></td>
+<td>Erwartet, dass der Wert <code>null</code> ist</td>
+<td><code>assertNull(obj.getSomething());</code></td>
+</tr>
+<tr>
+<td><code>assertNotNull(value)</code></td>
+<td>Erwartet, dass der Wert <strong>nicht</strong> <code>null</code> ist</td>
+<td><code>assertNotNull(user.getId());</code></td>
+</tr>
+<tr>
+<td><code>assertArrayEquals(exp, act)</code></td>
+<td>Prüft, ob zwei Arrays gleich sind</td>
+<td><code>assertArrayEquals(new int[]{1,2}, arr);</code></td>
+</tr>
+<tr>
+<td><code>assertSame(expected, actual)</code></td>
+<td>Prüft, ob zwei Objekte identisch (selbes Objekt) sind</td>
+<td><code>assertSame(obj1, obj2);</code></td>
+</tr>
+<tr>
+<td><code>assertNotSame(expected, actual)</code></td>
+<td>Prüft, ob zwei Objekte <strong>nicht</strong> identisch sind</td>
+<td><code>assertNotSame(obj1, obj2);</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tipp:</strong>
+Man kann jeder Assertion einen eigenen Fehlermeldungs-String hinzufügen, z.B.
+<code>assertEquals(5, calc.add(2,3), &quot;Addition sollte 5 ergeben&quot;);</code></p>
+<hr>
+<h2 id="2-tests-für-verschiedene-datentypen">2. Tests für verschiedene Datentypen</h2>
+<ul>
+<li>
+<p><strong>Primitives:</strong> Zahlen, Booleans, Zeichen
+z.B. <code>assertEquals(7, multiply(2,3)+1);</code></p>
+</li>
+<li>
+<p><strong>Strings:</strong>
+z.B. <code>assertEquals(&quot;Hallo&quot;, greeter.greet(&quot;Hallo&quot;));</code></p>
+</li>
+<li>
+<p><strong>Arrays:</strong>
+z.B. <code>assertArrayEquals(new int[]{1,2,3}, list.toArray());</code></p>
+</li>
+<li>
+<p><strong>Listen/Sets/Maps:</strong>
+Mit Hilfsmethoden (<code>contains</code>, <code>size</code>, etc.) prüfen:</p>
+<pre><code class="language-java">assertEquals(<span class="hljs-number">3</span>, myList.size());
+assertTrue(mySet.contains(<span class="hljs-string">&quot;Java&quot;</span>));
+</code></pre>
+</li>
+<li>
+<p><strong>Eigene Objekte:</strong>
+Prüfe auf relevante Felder oder implementiere <code>equals()</code> für deine Klasse:</p>
+<pre><code class="language-java">assertEquals(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>(<span class="hljs-string">&quot;Max&quot;</span>, <span class="hljs-number">22</span>), myService.getPerson(<span class="hljs-number">0</span>));
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="3-testing-von-exceptions-assertthrows">3. Testing von Exceptions (<code>assertThrows</code>)</h2>
+<h3 id="warum-exceptions-testen">Warum Exceptions testen?</h3>
+<ul>
+<li>Es ist wichtig zu prüfen, ob Methoden bei ungültigen Eingaben oder unerwarteten Situationen korrekt eine Exception werfen.</li>
+</ul>
+<h3 id="beispiel-für-das-testen-von-exceptions">Beispiel für das Testen von Exceptions:</h3>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.junit.jupiter.api.Assertions.*;
+
+<span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testException</span><span class="hljs-params">()</span> {
+    assertThrows(IllegalArgumentException.class, () -&gt; {
+        myService.divide(<span class="hljs-number">10</span>, <span class="hljs-number">0</span>);
+    }, <span class="hljs-string">&quot;Division durch 0 sollte IllegalArgumentException werfen&quot;</span>);
+}
+</code></pre>
+<ul>
+<li>Der Test besteht, <strong>nur wenn</strong> tatsächlich die erwartete Exception auftritt.</li>
+</ul>
+<hr>
+<h2 id="4-parameterisierte-tests">4. Parameterisierte Tests</h2>
+<h3 id="motivation">Motivation</h3>
+<ul>
+<li>Erlaubt, einen Test mit mehreren Werten auszuführen – ideal, um viele Fälle kompakt zu prüfen.</li>
+</ul>
+<h3 id="beispiel-mit-junit-5">Beispiel mit JUnit 5:</h3>
+<ol>
+<li>Abhängigkeit für JUnit Jupiter Params (<code>junit-jupiter-params</code>) in <code>pom.xml</code> hinzufügen:</li>
+</ol>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.junit.jupiter<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>junit-jupiter-params<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.10.2<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<ol start="2">
+<li>Parameterisierten Test schreiben:</li>
+</ol>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.params.ParameterizedTest;
+<span class="hljs-keyword">import</span> org.junit.jupiter.params.provider.ValueSource;
+
+<span class="hljs-meta">@ParameterizedTest</span>
+<span class="hljs-meta">@ValueSource(strings = {&quot;&quot;, &quot; &quot;, &quot;\t&quot;})</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testIsBlank</span><span class="hljs-params">(String input)</span> {
+    assertTrue(myUtil.isBlank(input));
+}
+</code></pre>
+<ul>
+<li>Der Test wird dreimal ausgeführt, einmal pro Wert in <code>ValueSource</code>.</li>
+</ul>
+<p><strong>Weitere Varianten:</strong></p>
+<ul>
+<li><code>@CsvSource</code> (mehrere Parameter pro Testdurchlauf)</li>
+<li><code>@MethodSource</code> (liefert beliebige Werte)</li>
+</ul>
+<hr>
+<h2 id="5-wiederverwendung-von-setup-code-beforeeach-aftereach">5. Wiederverwendung von Setup-Code (<code>@BeforeEach</code>, <code>@AfterEach</code>)</h2>
+<ul>
+<li>Verhindert Duplikate und sorgt für „frische“ Objekte bei jedem Testlauf.</li>
+</ul>
+<h3 id="beispiel">Beispiel:</h3>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.*;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">MyServiceTest</span> {
+    MyService service;
+
+    <span class="hljs-meta">@BeforeEach</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">setUp</span><span class="hljs-params">()</span> {
+        service = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyService</span>();
+    }
+
+    <span class="hljs-meta">@AfterEach</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">tearDown</span><span class="hljs-params">()</span> {
+        <span class="hljs-comment">// Aufräumarbeiten, z.B. Datenbank schließen</span>
+    }
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testSomething</span><span class="hljs-params">()</span> {
+        assertNotNull(service);
+    }
+}
+</code></pre>
+<h3 id="erklärung">Erklärung:</h3>
+<ul>
+<li><code>@BeforeEach</code>: Wird <strong>vor jedem Test</strong> ausgeführt, ideal für Initialisierung.</li>
+<li><code>@AfterEach</code>: Wird <strong>nach jedem Test</strong> ausgeführt, z.B. um Ressourcen wieder freizugeben.</li>
+</ul>
+<hr>
+<h2 id="6-gute-praxis-beispiel-für-eine-vollständige-testklasse">6. Gute Praxis: Beispiel für eine vollständige Testklasse</h2>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.*;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.junit.jupiter.api.Assertions.*;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">CalculatorTest</span> {
+    Calculator calc;
+
+    <span class="hljs-meta">@BeforeEach</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">setUp</span><span class="hljs-params">()</span> {
+        calc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Calculator</span>();
+    }
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testAddition</span><span class="hljs-params">()</span> {
+        assertEquals(<span class="hljs-number">7</span>, calc.add(<span class="hljs-number">3</span>,<span class="hljs-number">4</span>));
+    }
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testDivisionByZeroThrowsException</span><span class="hljs-params">()</span> {
+        assertThrows(ArithmeticException.class, () -&gt; calc.divide(<span class="hljs-number">5</span>,<span class="hljs-number">0</span>));
+    }
+
+    <span class="hljs-meta">@ParameterizedTest</span>
+    <span class="hljs-meta">@ValueSource(ints = {0, 1, 42})</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testIsEven</span><span class="hljs-params">(<span class="hljs-type">int</span> number)</span> {
+        assertEquals(number % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>, calc.isEven(number));
+    }
+}
+</code></pre>
+<hr>
+<h2 id="7-zusammenfassung-und-tipps">7. Zusammenfassung und Tipps</h2>
+<ul>
+<li><strong>Assertions</strong> prüfen, ob Ergebnisse wie erwartet sind.</li>
+<li>Teste verschiedene Datentypen und Szenarien (auch Fehlerfälle!).</li>
+<li>Nutze <strong>parameterisierte Tests</strong> für verschiedene Werte.</li>
+<li>Wiederverwendbarer Setup-Code macht Tests sauber und wartbar.</li>
+<li>Benenne Tests klar und aussagekräftig.</li>
+</ul>
+<hr>
+<h3 id="empfohlene-übung"><strong>Empfohlene Übung:</strong></h3>
+<ul>
+<li>
+<p>Schreibe für eine eigene kleine Klasse (z.B. <code>Rechner</code>, <code>Konto</code>, <code>StringHelper</code>)</p>
+<ul>
+<li>mindestens 3 normale Tests,</li>
+<li>einen Test für eine Exception,</li>
+<li>einen parameterisierten Test.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-assertions">JUnit 5 Assertions Übersicht</a></li>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-parameterized-tests">JUnit 5 Parameterized Tests</a></li>
+<li>Online-Tutorial: <a href="https://www.baeldung.com/junit-5">JUnit Tutorial (Baeldung)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

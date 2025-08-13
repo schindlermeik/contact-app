@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in Unit-Testing</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-unit-testing">Handout: Einführung in Unit-Testing</h1>
+<h2 id="1-was-sind-unit-tests">1. Was sind Unit-Tests?</h2>
+<p><strong>Unit-Tests</strong> (auf Deutsch: Modultests oder Komponententests) sind automatisierte Tests, die einzelne, klar abgegrenzte Einheiten eines Programms – meistens Methoden oder Funktionen – auf ihre Korrektheit prüfen. Ziel ist es, möglichst unabhängig vom Rest des Systems zu überprüfen, ob der Code wie erwartet funktioniert.</p>
+<hr>
+<h2 id="2-motivation-und-ziele-von-unit-tests">2. Motivation und Ziele von Unit-Tests</h2>
+<h3 id="a-fehler-frühzeitig-erkennen">a) Fehler frühzeitig erkennen</h3>
+<ul>
+<li><strong>Vorteil:</strong> Fehler werden oft schon während der Entwicklung entdeckt, nicht erst beim Testen der Gesamtanwendung.</li>
+<li><strong>Beispiel:</strong> Eine Methode, die Zahlen addieren soll, gibt plötzlich bei bestimmten Eingaben ein falsches Ergebnis zurück. Ein Unit-Test schlägt dann sofort fehl und zeigt, dass etwas nicht stimmt.</li>
+</ul>
+<h3 id="b-dokumentation-und-verständlichkeit-des-codes">b) Dokumentation und Verständlichkeit des Codes</h3>
+<ul>
+<li><strong>Unit-Tests dokumentieren das Verhalten von Methoden.</strong></li>
+<li><strong>Andere Entwickler können durch das Lesen der Tests schnell verstehen, wie eine Methode zu verwenden ist und was sie leisten soll.</strong></li>
+<li><strong>Beispiel:</strong> Ein Test prüft, dass eine Funktion beim Aufruf mit einer negativen Zahl eine Ausnahme (Exception) wirft. Daraus kann man schließen, dass negative Zahlen nicht erlaubt sind.</li>
+</ul>
+<h3 id="c-grundlage-für-refactoring">c) Grundlage für Refactoring</h3>
+<ul>
+<li><strong>Refactoring:</strong> Das Überarbeiten von Code, um ihn zu verbessern, ohne seine Funktionalität zu verändern.</li>
+<li><strong>Mit vorhandenen Unit-Tests kann man sicherstellen, dass der Code nach dem Umbau immer noch korrekt funktioniert.</strong></li>
+<li><strong>Vorteil:</strong> Entwickler trauen sich, Verbesserungen vorzunehmen, weil sie sofort sehen, wenn unbeabsichtigte Fehler entstehen.</li>
+</ul>
+<hr>
+<h2 id="3-abgrenzung-unit-test-vs-integrationstest-vs-systemtest">3. Abgrenzung: Unit-Test vs. Integrationstest vs. Systemtest</h2>
+<p>Es gibt verschiedene Arten automatisierter Tests. Sie unterscheiden sich durch ihren Umfang und das, was sie testen.</p>
+<h3 id="a-unit-test-modultest-komponententest">a) Unit-Test (Modultest, Komponententest)</h3>
+<ul>
+<li><strong>Testet:</strong> Einzelne Einheiten (meist Methoden/Funktionen/Klassen)</li>
+<li><strong>Ziel:</strong> Isoliert prüfen, ob eine Komponente korrekt funktioniert</li>
+<li><strong>Hilfsmittel:</strong> Oft werden Abhängigkeiten durch Mocks/Fakes ersetzt, damit wirklich nur die Methode selbst getestet wird.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testSum</span><span class="hljs-params">()</span> {
+    <span class="hljs-type">Calculator</span> <span class="hljs-variable">calc</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Calculator</span>();
+    assertEquals(<span class="hljs-number">4</span>, calc.sum(<span class="hljs-number">2</span>, <span class="hljs-number">2</span>));
+}
+</code></pre>
+<h3 id="b-integrationstest">b) Integrationstest</h3>
+<ul>
+<li><strong>Testet:</strong> Das Zusammenspiel mehrerer Komponenten oder Module</li>
+<li><strong>Ziel:</strong> Überprüfen, ob Schnittstellen und das Zusammenspiel verschiedener Teile funktionieren</li>
+<li><strong>Beispiel:</strong> Eine Klasse ruft einen Service auf, der wiederum mit einer Datenbank kommuniziert – im Integrationstest wird das Gesamtergebnis überprüft.</li>
+</ul>
+<p><strong>Skizze (Text):</strong></p>
+<blockquote>
+<p>[Komponente A] → [Service B] → [Datenbank]
+Der Integrationstest prüft, ob Daten von A über B korrekt in die Datenbank gelangen und gelesen werden können.</p>
+</blockquote>
+<h3 id="c-systemtest">c) Systemtest</h3>
+<ul>
+<li><strong>Testet:</strong> Das gesamte Anwendungssystem als Ganzes</li>
+<li><strong>Ziel:</strong> Prüfen, ob die gesamte Anwendung aus Sicht des Benutzers wie gewünscht funktioniert</li>
+<li><strong>Beispiel:</strong> Ein automatisierter Test prüft, ob eine Webanwendung nach dem Login die Startseite korrekt anzeigt und Daten darstellt.</li>
+</ul>
+<hr>
+<h2 id="4-warum-sind-unit-tests-in-der-modernen-softwareentwicklung-wichtig">4. Warum sind Unit-Tests in der modernen Softwareentwicklung wichtig?</h2>
+<ul>
+<li>Sie ermöglichen <strong>kontinuierliche Weiterentwicklung</strong> und helfen, technische Schulden zu vermeiden.</li>
+<li>Sie fördern die <strong>Modularisierung des Codes</strong>, weil testbarer Code meist besser strukturiert ist.</li>
+<li>Sie sind ein <strong>zentraler Baustein moderner Entwicklungsprozesse</strong> (Stichwort: Continuous Integration, DevOps, agile Methoden).</li>
+<li>Gut getestete Software ist <strong>robuster, zuverlässiger und langlebiger</strong>.</li>
+</ul>
+<hr>
+<h2 id="5-tipps-für-die-praxis">5. Tipps für die Praxis</h2>
+<ul>
+<li>Schreibe Unit-Tests möglichst <strong>zeitnah</strong> zum Code (am besten direkt beim Entwickeln).</li>
+<li>Teste sowohl <strong>typische als auch außergewöhnliche Fälle</strong> (z.B. auch ungültige Eingaben).</li>
+<li>Halte Unit-Tests <strong>einfach, kurz und unabhängig</strong> voneinander.</li>
+<li><strong>Dokumentiere</strong> mit sprechenden Testnamen, was genau geprüft wird.</li>
+</ul>
+<hr>
+<h2 id="6-zusammenfassung-kurzfassung-zum-mitnehmen">6. Zusammenfassung (Kurzfassung zum Mitnehmen)</h2>
+<ul>
+<li><strong>Unit-Tests</strong> prüfen einzelne Code-Einheiten automatisch auf Korrektheit.</li>
+<li>Sie helfen, Fehler früh zu erkennen, dienen als Dokumentation und unterstützen beim Refactoring.</li>
+<li>Sie unterscheiden sich von <strong>Integrationstests</strong> (Zusammenspiel) und <strong>Systemtests</strong> (Gesamtsystem).</li>
+<li>Sie sind eine wichtige Grundlage für moderne, nachhaltige Softwareentwicklung.</li>
+</ul>
+<hr>
+<p><strong>Fragen, die du dir nach diesem Kapitel stellen solltest:</strong></p>
+<ul>
+<li>Was ist eine „Einheit“, die ich testen kann?</li>
+<li>Wie erkenne ich, ob mein Code gut testbar ist?</li>
+<li>Wo sollte ich mit Unit-Tests beginnen?</li>
+</ul>
+<hr>
+<p><strong>Weiterführende Ressourcen:</strong></p>
+<ul>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/">JUnit 5 User Guide</a></li>
+<li>Buch: „Pragmatic Unit Testing in Java with JUnit“</li>
+<li>Blogartikel: <a href="https://martinfowler.com/bliki/UnitTest.html">Testmethoden benennen und strukturieren</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

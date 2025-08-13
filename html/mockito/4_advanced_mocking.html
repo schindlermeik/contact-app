@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Advanced Mocking-Techniken mit Mockito</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-advanced-mocking-techniken-mit-mockito">Handout: Advanced Mocking-Techniken mit Mockito</h1>
+<hr>
+<h2 id="1-mocking-von-void-methoden">1. Mocking von void-Methoden</h2>
+<ul>
+<li>Methoden ohne Rückgabewert („void“) können in Mockito trotzdem beobachtet und gesteuert werden.</li>
+<li>Nützlich, wenn die Methode z.B. etwas speichert, loggt oder weiterleitet.</li>
+</ul>
+<p><strong>a) Verifikation</strong></p>
+<pre><code class="language-java">mockService.doSomething();
+verify(mockService).doSomething(); <span class="hljs-comment">// Prüft, ob Methode aufgerufen wurde</span>
+</code></pre>
+<p><strong>b) Verhalten ändern mit <code>doNothing()</code>, <code>doThrow()</code>, <code>doAnswer()</code></strong></p>
+<ul>
+<li><code>doNothing()</code> ist Standard, aber man kann auch Exceptions werfen oder eigenes Verhalten definieren:</li>
+</ul>
+<pre><code class="language-java">doNothing().when(mockService).logEvent();
+mockService.logEvent(); <span class="hljs-comment">// Nichts passiert</span>
+
+doThrow(<span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(<span class="hljs-string">&quot;Fehler&quot;</span>)).when(mockService).deleteFile();
+assertThrows(RuntimeException.class, () -&gt; mockService.deleteFile());
+</code></pre>
+<hr>
+<h2 id="2-mocking-von-exceptions">2. Mocking von Exceptions</h2>
+<ul>
+<li>
+<p><strong>Methoden mit Rückgabewert:</strong></p>
+<pre><code class="language-java">when(mockService.loadData()).thenThrow(<span class="hljs-keyword">new</span> <span class="hljs-title class_">IOException</span>(<span class="hljs-string">&quot;Fehler beim Laden&quot;</span>));
+</code></pre>
+</li>
+<li>
+<p><strong>Void-Methoden:</strong>
+Mit <code>doThrow()</code> – siehe oben.</p>
+</li>
+<li>
+<p><strong>Praxis-Tipp:</strong>
+So kann gezielt das Verhalten von Fehlerfällen getestet werden, ohne echte Fehler herbeizuführen.</p>
+</li>
+</ul>
+<hr>
+<h2 id="3-teil-mocking-spy">3. Teil-Mocking (<code>spy</code>)</h2>
+<ul>
+<li><strong>Spies</strong> sind „halbe“ Mocks: Sie überwachen echte Objekte, können aber gezielt Methoden überschreiben.</li>
+<li>Praktisch, wenn ein Teil des Objekts normal arbeitet, andere Methoden aber gemockt werden sollen.</li>
+</ul>
+<p><strong>a) Erstellen eines Spies</strong></p>
+<pre><code class="language-java">List&lt;String&gt; realList = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+List&lt;String&gt; spyList = spy(realList);
+
+spyList.add(<span class="hljs-string">&quot;Hallo&quot;</span>);
+verify(spyList).add(<span class="hljs-string">&quot;Hallo&quot;</span>); <span class="hljs-comment">// Aufruf wird überwacht</span>
+
+<span class="hljs-comment">// Optional: Verhalten überschreiben</span>
+doReturn(<span class="hljs-number">42</span>).when(spyList).size();
+assertEquals(<span class="hljs-number">42</span>, spyList.size());
+</code></pre>
+<p><strong>b) Einsatzfälle</strong></p>
+<ul>
+<li>Echte Logik nutzen, aber bestimmte Nebenwirkungen verhindern oder das Verhalten gezielt beeinflussen.</li>
+<li>Nützlich für Legacy-Code oder komplexe Klassen.</li>
+</ul>
+<p><strong>Achtung:</strong>
+Bei Spies wird das echte Objekt verwendet! Fehler im Konstruktionscode wirken sich also weiterhin aus.</p>
+<hr>
+<h2 id="4-mocking-von-finalen-klassen-und-statischen-methoden">4. Mocking von finalen Klassen und statischen Methoden</h2>
+<ul>
+<li>
+<p><strong>Standard-Mockito (bis Version 2.x):</strong>
+Konnte nur Interfaces und nicht-finale Klassen mocken.</p>
+</li>
+<li>
+<p><strong>Seit Mockito 3.x (mit mockito-inline oder mockito-extended):</strong></p>
+<ul>
+<li>Auch <strong>finale Klassen und Methoden</strong> können gemockt werden.</li>
+<li><strong>Statische Methoden</strong> erfordern noch spezielle Unterstützung.</li>
+</ul>
+</li>
+</ul>
+<h3 id="a-setup-für-finalesstatisches-mocking">a) Setup für finales/statisches Mocking</h3>
+<p><strong>In der Maven <code>pom.xml</code>:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mockito<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mockito-inline<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.2.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<h3 id="b-mocking-von-finalen-klassen">b) Mocking von finalen Klassen</h3>
+<pre><code class="language-java"><span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FinalClass</span> {
+    String <span class="hljs-title function_">getValue</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;real&quot;</span>; }
+}
+
+<span class="hljs-type">FinalClass</span> <span class="hljs-variable">mockFinal</span> <span class="hljs-operator">=</span> Mockito.mock(FinalClass.class);
+when(mockFinal.getValue()).thenReturn(<span class="hljs-string">&quot;mocked&quot;</span>);
+assertEquals(<span class="hljs-string">&quot;mocked&quot;</span>, mockFinal.getValue());
+</code></pre>
+<h3 id="c-mocking-von-statischen-methoden-ab-mockito-34-mit-mockito-inline">c) Mocking von statischen Methoden (ab Mockito 3.4 mit <code>mockito-inline</code>)</h3>
+<ul>
+<li>Statische Methoden werden mit dem neuen <code>MockedStatic</code>-Feature gemockt:</li>
+</ul>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.mockito.Mockito.*;
+
+<span class="hljs-keyword">try</span> (MockedStatic&lt;Math&gt; mathMock = mockStatic(Math.class)) {
+    mathMock.when(() -&gt; Math.max(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>)).thenReturn(<span class="hljs-number">42</span>);
+    assertEquals(<span class="hljs-number">42</span>, Math.max(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>));
+}
+</code></pre>
+<ul>
+<li>Das Mocking gilt <strong>nur im Kontext</strong> des Try-Blocks!</li>
+</ul>
+<h3 id="d-grenzen-und-hinweise">d) Grenzen und Hinweise</h3>
+<ul>
+<li>Statisches/finales Mocking sollte <strong>sparsam</strong> eingesetzt werden.</li>
+<li>Besser ist es, Code möglichst testbar und lose gekoppelt zu schreiben.</li>
+<li>Für Legacy-Code kann diese Technik sehr nützlich sein.</li>
+</ul>
+<hr>
+<h2 id="5-zusammenfassung--praxistipps">5. Zusammenfassung &amp; Praxistipps</h2>
+<ul>
+<li>Void-Methoden lassen sich mit <code>doNothing()</code>, <code>doThrow()</code> und Verifikation kontrollieren.</li>
+<li>Exceptions können gezielt für Rückgabewerte und void-Methoden gemockt werden.</li>
+<li>Mit <code>spy</code> kann man echtes Verhalten und gezieltes Mocking kombinieren.</li>
+<li>Finale Klassen und statische Methoden lassen sich mit zusätzlichem Setup mocken (ab Mockito 3.x).</li>
+<li>Nutze Advanced Mocking-Techniken gezielt – sie machen viele Tests möglich, die sonst schwierig wären, aber sollten nicht zum Standard werden.</li>
+</ul>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li><a href="https://site.mockito.org/">Mockito – Advanced Features</a></li>
+<li><a href="https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#static_mocks">Mocking Static Methods (Mockito Docs)</a></li>
+<li><a href="https://www.baeldung.com/mockito-spy">Mockito – Spies</a></li>
+<li><a href="https://www.baeldung.com/mockito-mock-static-methods">Baeldung: Mocking Final &amp; Static</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

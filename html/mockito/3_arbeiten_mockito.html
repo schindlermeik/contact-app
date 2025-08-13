@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Arbeiten mit Mockito &lpar;als Standard-Framework&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-arbeiten-mit-mockito-als-standard-framework">Handout: Arbeiten mit Mockito (als Standard-Framework)</h1>
+<hr>
+<h2 id="1-grundlegende-konzepte-von-mockito">1. Grundlegende Konzepte von Mockito</h2>
+<ul>
+<li><strong>Mockito</strong> ist ein populäres Java-Framework, mit dem sich sogenannte <strong>Mocks</strong> für Unit-Tests einfach und flexibel erstellen und verwenden lassen.</li>
+<li>Ziel: <strong>Abhängigkeiten ersetzen</strong>, Verhalten kontrollieren und Interaktionen testen, ohne echten Code auszuführen.</li>
+<li>Mockito lässt sich am besten mit <strong>JUnit 5</strong> verwenden.</li>
+</ul>
+<hr>
+<h2 id="2-erstellung-von-mocks">2. Erstellung von Mocks</h2>
+<h3 id="a-manuelle-erstellung-mit-mockitomock">a) Manuelle Erstellung mit <code>Mockito.mock()</code></h3>
+<ul>
+<li>
+<p>Direkt im Test eine Mock-Instanz erzeugen:</p>
+<pre><code class="language-java"><span class="hljs-type">MyService</span> <span class="hljs-variable">mockService</span> <span class="hljs-operator">=</span> Mockito.mock(MyService.class);
+</code></pre>
+</li>
+</ul>
+<h3 id="b-nutzung-der-annotation-mock-mit-junit-5">b) Nutzung der Annotation <code>@Mock</code> (mit JUnit 5)</h3>
+<ul>
+<li>
+<p>Eleganter und übersichtlicher, besonders bei mehreren Mocks.</p>
+</li>
+<li>
+<p>Benötigt das Hinzufügen der Mockito-Erweiterung zur Testklasse:</p>
+<pre><code class="language-java"><span class="hljs-meta">@ExtendWith(MockitoExtension.class)</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">MyTest</span> {
+    <span class="hljs-meta">@Mock</span>
+    MyService mockService;
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testSomething</span><span class="hljs-params">()</span> {
+        <span class="hljs-comment">// mockService ist schon ein Mock!</span>
+    }
+}
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="3-verhalten-von-mocks-definieren">3. Verhalten von Mocks definieren</h2>
+<h3 id="a-rückgabewerte-festlegen-whenthenreturn">a) Rückgabewerte festlegen: <code>when(...).thenReturn(...)</code></h3>
+<ul>
+<li>
+<p>So gibst du vor, was der Mock auf bestimmte Aufrufe zurückgeben soll:</p>
+<pre><code class="language-java">when(mockService.getData()).thenReturn(<span class="hljs-string">&quot;Hello World&quot;</span>);
+</code></pre>
+</li>
+</ul>
+<h3 id="b-mehrere-rückgabewerte">b) Mehrere Rückgabewerte:</h3>
+<ul>
+<li>
+<p>Unterschiedliche Werte bei mehreren Aufrufen:</p>
+<pre><code class="language-java">when(mockService.getData())
+    .thenReturn(<span class="hljs-string">&quot;A&quot;</span>)
+    .thenReturn(<span class="hljs-string">&quot;B&quot;</span>);
+<span class="hljs-comment">// 1. Aufruf: &quot;A&quot;, 2. Aufruf: &quot;B&quot;</span>
+</code></pre>
+</li>
+</ul>
+<h3 id="c-exceptions-simulieren-dothrow-oder-thenthrow">c) Exceptions simulieren: <code>doThrow()</code> oder <code>thenThrow()</code></h3>
+<ul>
+<li>
+<p>Wenn eine Methode eine Exception werfen soll:</p>
+<pre><code class="language-java">when(mockService.getData()).thenThrow(<span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(<span class="hljs-string">&quot;Fehler&quot;</span>));
+<span class="hljs-comment">// oder</span>
+doThrow(<span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>()).when(mockService).save(any());
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="4-verifikation-von-methodenaufrufen">4. Verifikation von Methodenaufrufen</h2>
+<ul>
+<li>
+<p>Prüfe, ob und wie oft eine Methode tatsächlich aufgerufen wurde:</p>
+<pre><code class="language-java">mockService.getData();
+verify(mockService).getData();             <span class="hljs-comment">// wurde aufgerufen?</span>
+verify(mockService, times(<span class="hljs-number">1</span>)).getData();   <span class="hljs-comment">// exakt 1x aufgerufen?</span>
+verify(mockService, never()).delete();     <span class="hljs-comment">// wurde NIE aufgerufen?</span>
+verify(mockService, atLeastOnce()).getData(); <span class="hljs-comment">// mind. 1x?</span>
+</code></pre>
+</li>
+<li>
+<p>Überprüfen von Aufrufen mit bestimmten Parametern:</p>
+<pre><code class="language-java">mockService.save(<span class="hljs-string">&quot;Hallo&quot;</span>);
+verify(mockService).save(<span class="hljs-string">&quot;Hallo&quot;</span>);
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="5-nutzung-von-argument-matchern-any-eq-etc">5. Nutzung von Argument Matchern (<code>any()</code>, <code>eq()</code>, etc.)</h2>
+<ul>
+<li>
+<p><strong>Argument Matcher</strong> erlauben flexiblere Verifikation und Verhalten:</p>
+<pre><code class="language-java">when(mockService.save(any())).thenReturn(<span class="hljs-literal">true</span>);
+when(mockService.find(eq(<span class="hljs-string">&quot;X&quot;</span>))).thenReturn(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Data</span>(<span class="hljs-string">&quot;X&quot;</span>));
+verify(mockService).save(anyString());
+verify(mockService).find(eq(<span class="hljs-string">&quot;Hallo&quot;</span>));
+</code></pre>
+</li>
+<li>
+<p>Wichtige Matcher:</p>
+<ul>
+<li><code>any()</code>, <code>anyString()</code>, <code>anyInt()</code>, etc. (beliebiger Wert)</li>
+<li><code>eq(value)</code> (genau dieser Wert)</li>
+<li><code>isNull()</code>, <code>notNull()</code></li>
+<li>Eigene Matcher sind möglich mit <code>argThat(...)</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel für eigene Bedingungen:</strong></p>
+<pre><code class="language-java">verify(mockService).save(argThat(str -&gt; str.startsWith(<span class="hljs-string">&quot;Test&quot;</span>)));
+</code></pre>
+<hr>
+<h2 id="6-praxisbeispiel-einfacher-mockito-test">6. Praxisbeispiel: Einfacher Mockito-Test</h2>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.mockito.Mockito.*;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.junit.jupiter.api.Assertions.*;
+<span class="hljs-keyword">import</span> org.junit.jupiter.api.*;
+<span class="hljs-keyword">import</span> org.mockito.*;
+
+<span class="hljs-meta">@ExtendWith(MockitoExtension.class)</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">UserServiceTest</span> {
+    <span class="hljs-meta">@Mock</span>
+    EmailService emailService;
+
+    <span class="hljs-meta">@InjectMocks</span>
+    UserService userService;
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">shouldSendWelcomeMail</span><span class="hljs-params">()</span> {
+        <span class="hljs-comment">// Verhalten definieren</span>
+        when(emailService.sendWelcomeMail(anyString())).thenReturn(<span class="hljs-literal">true</span>);
+
+        <span class="hljs-comment">// Methode testen</span>
+        <span class="hljs-type">boolean</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> userService.registerUser(<span class="hljs-string">&quot;test@mail.com&quot;</span>);
+
+        <span class="hljs-comment">// Ergebnis prüfen</span>
+        assertTrue(result);
+
+        <span class="hljs-comment">// Verifizieren, dass E-Mail-Service wirklich aufgerufen wurde</span>
+        verify(emailService).sendWelcomeMail(eq(<span class="hljs-string">&quot;test@mail.com&quot;</span>));
+    }
+}
+</code></pre>
+<hr>
+<h2 id="7-zusammenfassung--tipps">7. Zusammenfassung &amp; Tipps</h2>
+<ul>
+<li><strong>Mocks</strong> ersetzen Abhängigkeiten im Test und machen das Verhalten kontrollierbar.</li>
+<li>Erzeuge Mocks per <code>Mockito.mock()</code> oder Annotationen (<code>@Mock</code>).</li>
+<li>Definiere Rückgabewerte, Exceptions und prüfe Interaktionen.</li>
+<li>Nutze <strong>Argument Matcher</strong>, um flexibel zu bleiben.</li>
+<li>Verifiziere, ob Methoden wirklich und korrekt aufgerufen wurden.</li>
+<li>Halte deine Tests <strong>einfach, klar und unabhängig</strong> von echter Infrastruktur.</li>
+</ul>
+<hr>
+<h3 id="weiterführende-links">Weiterführende Links</h3>
+<ul>
+<li><a href="https://site.mockito.org/">Mockito Dokumentation</a></li>
+<li><a href="https://www.baeldung.com/mockito-junit-5-extension">Mockito mit JUnit 5 – Baeldung Guide</a></li>
+<li><a href="https://github.com/mockito/mockito/blob/main/doc/cheat-sheet.md">Mockito Cheat Sheet (PDF)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,4 +1,4 @@
-package de.meida;
+package de.meida.app;
 
 import org.junit.jupiter.api.Test;
 

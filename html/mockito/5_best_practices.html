@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices und typische Fallstricke beim Mocking</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-und-typische-fallstricke-beim-mocking">Handout: Best Practices und typische Fallstricke beim Mocking</h1>
+<hr>
+<h2 id="1-übermäßiges-mocking-vermeiden">1. Übermäßiges Mocking vermeiden</h2>
+<h3 id="was-ist-übermäßiges-mocking">Was ist „übermäßiges Mocking“?</h3>
+<ul>
+<li><strong>Zu viele Mocks im Test</strong> machen die Tests schwer lesbar und pflegbar.</li>
+<li>Wenn für jede kleine Abhängigkeit ein Mock erstellt wird, ist oft das Design der getesteten Komponente zu komplex oder zu stark gekoppelt.</li>
+</ul>
+<h3 id="warum-ist-das-problematisch">Warum ist das problematisch?</h3>
+<ul>
+<li>Tests werden <strong>kompliziert</strong> und fehleranfällig.</li>
+<li>Änderungen an der Implementierung führen schnell zu fehlschlagenden Tests („fragile Tests“).</li>
+<li>Man testet am Ende nicht mehr das gewünschte Verhalten, sondern nur das eigene Mocking-Setup.</li>
+</ul>
+<h3 id="wie-viel-mocking-ist-richtig">Wie viel Mocking ist richtig?</h3>
+<ul>
+<li><strong>Mocke nur das, was notwendig ist</strong>: Externe Systeme, langsame oder schwer kontrollierbare Abhängigkeiten (z. B. Datenbank, Netzwerk, Zeit).</li>
+<li><strong>Nicht mocken</strong>: Einfache Datenobjekte (POJOs), einfache Utility-Methoden, eigene Logik, die nicht schwer zu kontrollieren ist.</li>
+<li><strong>Faustregel:</strong>
+<em>Mocks für Außenwelt, echte Instanzen für Eigenlogik.</em></li>
+</ul>
+<hr>
+<h2 id="2-mocks-als-helfer-für-bessere-isolation">2. Mocks als Helfer für bessere Isolation</h2>
+<h3 id="wofür-sind-mocks-wirklich-gedacht">Wofür sind Mocks wirklich gedacht?</h3>
+<ul>
+<li>
+<p>Mocks sollen <strong>Isolation</strong> schaffen:</p>
+<ul>
+<li>Ein Unit-Test prüft EINE Komponente, alle Abhängigkeiten werden durch Mocks ersetzt.</li>
+<li>So lässt sich das Verhalten <strong>gezielt und reproduzierbar</strong> testen, unabhängig vom Rest des Systems.</li>
+</ul>
+</li>
+<li>
+<p>Mocks ermöglichen das Testen von <strong>Edge Cases</strong>, z. B. wenn eine Methode eine bestimmte Exception werfen oder ein Service nicht erreichbar sein soll.</p>
+</li>
+</ul>
+<h3 id="beispiel-isolierter-test-mit-mock">Beispiel: Isolierter Test mit Mock</h3>
+<pre><code class="language-java"><span class="hljs-meta">@Mock</span>
+PaymentService paymentService;
+
+<span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testOrderFailsOnPaymentError</span><span class="hljs-params">()</span> {
+    when(paymentService.pay(any())).thenThrow(<span class="hljs-keyword">new</span> <span class="hljs-title class_">PaymentException</span>());
+    assertThrows(PaymentException.class, () -&gt; orderService.placeOrder(order));
+}
+</code></pre>
+<ul>
+<li>Hier wird <strong>nur</strong> die externe Zahlung gemockt – das Order-Verhalten bleibt echt.</li>
+</ul>
+<hr>
+<h2 id="3-verständliche-und-wartbare-testfälle">3. Verständliche und wartbare Testfälle</h2>
+<h3 id="gute-eigenschaften-verständlicher-tests">Gute Eigenschaften verständlicher Tests</h3>
+<ul>
+<li><strong>Klarer, sprechender Testname:</strong> Was wird getestet, welches Verhalten?</li>
+<li><strong>Kompaktes Setup:</strong> So wenig Vorbereitung wie möglich, aber so viel wie nötig.</li>
+<li><strong>Keine unnötigen Mocks oder Testdaten:</strong> Nur das mocken, was nötig ist.</li>
+<li><strong>Testdaten und Erwartungen sichtbar:</strong> Werte sind direkt im Test erkennbar, keine versteckten Konstruktionen.</li>
+<li><strong>Kommentiere komplexe Stellen</strong> und fasse im Testnamen das Ziel des Tests zusammen.</li>
+</ul>
+<h3 id="beispiel-klarer-test-mit-mock">Beispiel: Klarer Test mit Mock</h3>
+<pre><code class="language-java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">shouldSendWelcomeMailWhenUserRegisters</span><span class="hljs-params">()</span> {
+    when(emailService.sendWelcomeMail(<span class="hljs-string">&quot;max@mail.de&quot;</span>)).thenReturn(<span class="hljs-literal">true</span>);
+    <span class="hljs-type">boolean</span> <span class="hljs-variable">success</span> <span class="hljs-operator">=</span> userService.register(<span class="hljs-string">&quot;max@mail.de&quot;</span>);
+    assertTrue(success);
+    verify(emailService).sendWelcomeMail(<span class="hljs-string">&quot;max@mail.de&quot;</span>);
+}
+</code></pre>
+<hr>
+<h2 id="4-typische-fehler-beim-mocking">4. Typische Fehler beim Mocking</h2>
+<h3 id="a-zu-viel-interaktionsverifikation">a) <strong>Zu viel Interaktionsverifikation</strong></h3>
+<ul>
+<li>Jede einzelne Methode wird mit <code>verify()</code> geprüft, auch wenn es nicht relevant ist.</li>
+<li><strong>Besser:</strong> Prüfe nur kritische Interaktionen.</li>
+</ul>
+<h3 id="b-mocking-von-eigenlogik">b) <strong>Mocking von Eigenlogik</strong></h3>
+<ul>
+<li>Methoden aus der zu testenden Klasse selbst werden gemockt (z. B. über Spies).</li>
+<li><strong>Problem:</strong> Man testet nicht mehr den echten Code.</li>
+<li><strong>Besser:</strong> Nur externe Abhängigkeiten mocken.</li>
+</ul>
+<h3 id="c-statische-methoden-und-konstruktoren-unreflektiert-mocken">c) <strong>Statische Methoden und Konstruktoren unreflektiert mocken</strong></h3>
+<ul>
+<li>Mit modernem Mockito zwar möglich, aber kann auf Designfehler hinweisen (zu enge Kopplung, schwer testbar).</li>
+<li><strong>Besser:</strong> Design anpassen, um statische Methoden/Singletons zu vermeiden.</li>
+</ul>
+<h3 id="d-vergessen-verhalten-von-mocks-zu-definieren">d) <strong>Vergessen, Verhalten von Mocks zu definieren</strong></h3>
+<ul>
+<li>Mock gibt standardmäßig <code>null</code>/<code>0</code>/leere Werte zurück – Tests laufen „grün“, obwohl eigentlich Fehlerfälle nicht geprüft werden.</li>
+</ul>
+<h3 id="e-mocks-werden-nicht-korrekt-resetet">e) <strong>Mocks werden nicht korrekt „resetet“</strong></h3>
+<ul>
+<li>In Setup-Methoden (<code>@BeforeEach</code>) immer neue Mocks erzeugen, nicht von Test zu Test wiederverwenden.</li>
+</ul>
+<h3 id="f-testdaten-im-mocking-setup-verstecken">f) <strong>Testdaten im Mocking-Setup verstecken</strong></h3>
+<ul>
+<li>Testdaten sind nur im Setup sichtbar, nicht im eigentlichen Test – erschwert das Verständnis.</li>
+</ul>
+<hr>
+<h2 id="5-zusammenfassung-best-practices-auf-einen-blick">5. Zusammenfassung (Best Practices auf einen Blick)</h2>
+<ul>
+<li>Mocke <strong>nur das, was notwendig ist</strong> – meist externe Systeme.</li>
+<li>Halte Tests <strong>verständlich, kompakt und wartbar</strong>.</li>
+<li>Benutze sprechende Testnamen und klare Testdaten.</li>
+<li>Verifiziere nur die wichtigsten Interaktionen.</li>
+<li>Vermeide Design-Probleme, die umfangreiches Mocking nötig machen.</li>
+<li>Wenn ein Test viel Mocking braucht, prüfe das Design der Komponente.</li>
+</ul>
+<hr>
+<h3 id="checkliste-ist-mein-mocking-sinnvoll">Checkliste: Ist mein Mocking sinnvoll?</h3>
+<ul>
+<li><strong>Mocke ich nur externe Abhängigkeiten?</strong></li>
+<li><strong>Sind die Tests auch für Kollegen schnell verständlich?</strong></li>
+<li><strong>Sind alle verwendeten Mocks und Testdaten im Test sichtbar?</strong></li>
+<li><strong>Vermeide ich statisches/finales Mocking, wenn es nicht zwingend nötig ist?</strong></li>
+<li><strong>Werden Mocks frisch für jeden Test erzeugt?</strong></li>
+</ul>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li><a href="https://site.mockito.org/">Mockito Best Practices (Mockito-Doku)</a></li>
+<li><a href="https://www.baeldung.com/java-junit-test-smells">Test Smells and Anti-Patterns (Baeldung)</a></li>
+<li><a href="https://martinfowler.com/articles/mocksArentStubs.html">Martin Fowler: Mocks Aren’t Stubs</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

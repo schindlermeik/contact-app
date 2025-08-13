@@ -1,4 +1,4 @@
-package de.meida;
+package de.meida.app;
 
 public class ContactNotSaveException extends RuntimeException {
     public ContactNotSaveException(String message) {

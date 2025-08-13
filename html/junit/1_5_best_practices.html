@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices f&uuml;r Unit-Testing</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-für-unit-testing">Handout: Best Practices für Unit-Testing</h1>
+<hr>
+<h2 id="1-isolierte-tests">1. Isolierte Tests</h2>
+<h3 id="was-bedeutet-isolation-im-unit-testing">Was bedeutet „isolation“ im Unit-Testing?</h3>
+<ul>
+<li><strong>Isolierte Tests</strong> prüfen immer nur eine einzige Code-Einheit (Methode, Funktion oder Klasse) – <strong>ohne</strong> externe Abhängigkeiten (z.B. Datenbanken, Netzwerke, Dateisystem, andere Module).</li>
+<li>Sie sorgen dafür, dass Fehlerursachen schnell und eindeutig gefunden werden können.</li>
+</ul>
+<h3 id="wie-erreicht-man-isolation">Wie erreicht man Isolation?</h3>
+<ul>
+<li><strong>Test-Doubles</strong> wie Mocks, Stubs, Fakes oder Spies verwenden.</li>
+<li>Keine echten Datenbankverbindungen, keine HTTP-Requests, keine Zeit- oder Zufallsabhängigkeiten im Unit-Test!</li>
+<li>Möglichst keine Seiteneffekte (z.B. keine globalen Variablen verändern).</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Statt in einem Test wirklich Daten in eine Datenbank zu speichern, wird der Datenbankzugriff gemockt, sodass der Test nur prüft, ob die Methode aufgerufen wird.</p>
+<hr>
+<h2 id="2-testabdeckung-coverage-und-ihre-aussagekraft">2. Testabdeckung (Coverage) und ihre Aussagekraft</h2>
+<h3 id="was-ist-testabdeckung">Was ist Testabdeckung?</h3>
+<ul>
+<li><strong>Testabdeckung</strong> ist ein Maß dafür, wie viel Prozent des Codes durch Tests ausgeführt werden.</li>
+<li>Meist gemessen als „Line Coverage“ (wie viele Zeilen werden beim Testen durchlaufen?) oder „Branch Coverage“ (wie viele Verzweigungen werden abgedeckt?).</li>
+</ul>
+<h3 id="aussagekraft-und-grenzen">Aussagekraft und Grenzen</h3>
+<ul>
+<li><strong>Hohe Testabdeckung</strong> ist grundsätzlich gut, garantiert aber <strong>keine Fehlerfreiheit</strong>!</li>
+<li>Auch 100 % Coverage sagt <strong>nichts</strong> über die Qualität der Tests aus – evtl. sind sie nur „leere“ Tests, die kaum etwas prüfen.</li>
+<li><strong>Wichtiger als die Zahl</strong> ist, dass die wichtigsten und kritischsten Anwendungsfälle durch sinnvolle Tests abgedeckt werden.</li>
+</ul>
+<p><strong>Praxis-Tipp:</strong>
+Setze Coverage-Tools wie JaCoCo ein, aber verlasse dich nicht blind auf die Zahlen. Überprüfe regelmäßig, ob die getesteten Szenarien wirklich aussagekräftig sind.</p>
+<hr>
+<h2 id="3-was-sollte-nicht-getestet-werden">3. Was sollte (nicht) getestet werden?</h2>
+<h3 id="was-sollte-getestet-werden">Was sollte getestet werden?</h3>
+<ul>
+<li><strong>Alle Logik, die Fehler verursachen kann</strong>
+(z.B. Berechnungen, Validierungen, Bedingungen)</li>
+<li><strong>Edge Cases / Sonderfälle</strong>
+(z.B. leere Listen, Null-Werte, negative Zahlen)</li>
+<li><strong>Fehlerbehandlung</strong>
+(z.B. Exceptions bei ungültigen Eingaben)</li>
+<li><strong>Öffentliche Methoden</strong> einer Klasse (Public API)</li>
+</ul>
+<h3 id="was-sollte-man-nicht-testen">Was sollte man NICHT testen?</h3>
+<ul>
+<li><strong>Framework-Code und Standardbibliotheken</strong>
+(z.B. „Testet nicht, ob <code>ArrayList.add()</code> funktioniert!“)</li>
+<li><strong>Private Methoden</strong>
+(Sie sollten über öffentliche Methoden abgedeckt werden)</li>
+<li><strong>Dinge, die sich häufig ändern, aber keinen Wert bringen</strong>
+(z.B. triviale Getter/Setter)</li>
+<li><strong>Zufällige Daten oder Zeit</strong> ohne Kontrolle/Mocking</li>
+</ul>
+<hr>
+<h2 id="4-typische-fehler-und-anti-patterns-beim-testen">4. Typische Fehler und Anti-Patterns beim Testen</h2>
+<table>
+<thead>
+<tr>
+<th>Anti-Pattern</th>
+<th>Beschreibung</th>
+<th>Besser so:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Zu große Tests</strong></td>
+<td>Test prüft mehrere Methoden auf einmal</td>
+<td>Pro Testfall nur EIN Verhalten prüfen</td>
+</tr>
+<tr>
+<td><strong>Nicht-deterministische Tests</strong></td>
+<td>Ergebnisse hängen von Zufall/Zeit/System ab</td>
+<td>Werte mocken oder kontrolliert setzen</td>
+</tr>
+<tr>
+<td><strong>Copy-Paste-Tests</strong></td>
+<td>Viel doppelter Code, schwer wartbar</td>
+<td>Setup-Code wiederverwenden (<code>@BeforeEach</code>)</td>
+</tr>
+<tr>
+<td><strong>Schwammige Testnamen</strong></td>
+<td>Test „irgendwas“ – Name sagt nichts aus</td>
+<td>Aussagekräftige Namen mit Verhalten &amp; Fall</td>
+</tr>
+<tr>
+<td><strong>Ungetestete Randfälle</strong></td>
+<td>Test nur Standardfälle, nicht Edge Cases</td>
+<td>Immer auch Fehlerfälle, Grenzfälle testen</td>
+</tr>
+<tr>
+<td><strong>Zu viel oder zu wenig Mocking</strong></td>
+<td>Alles wird gemockt, auch Unnötiges</td>
+<td>Nur das mocken, was nötig ist</td>
+</tr>
+<tr>
+<td><strong>Testdaten im Test versteckt</strong></td>
+<td>Testdaten schwer verständlich/hart codiert</td>
+<td>Testdaten sprechend und sichtbar wählen</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tipp:</strong>
+Halte Tests <strong>klein, eindeutig und unabhängig</strong>. Jeder Test sollte genau einen Aspekt des Verhaltens prüfen.</p>
+<hr>
+<h2 id="5-test-driven-development-tdd--kurze-einführung">5. Test Driven Development (TDD) – Kurze Einführung</h2>
+<h3 id="was-ist-tdd">Was ist TDD?</h3>
+<ul>
+<li>
+<p><strong>TDD (Test Driven Development)</strong> ist eine Methode der agilen Softwareentwicklung:</p>
+<ul>
+<li><strong>1. Schreibe zuerst einen (fehlenden) Test.</strong></li>
+<li><strong>2. Schreibe dann nur so viel Code, dass der Test gerade so besteht.</strong></li>
+<li><strong>3. Refaktoriere den Code und die Tests bei Bedarf.</strong></li>
+<li>Dann: Wiederhole von vorne.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Kernidee:</strong>
+Man entwickelt iterativ und in sehr kleinen Schritten. Jeder neue Code wird sofort durch einen Test abgesichert.</p>
+<h3 id="vorteile-von-tdd">Vorteile von TDD</h3>
+<ul>
+<li>Hilft, die Anforderungen und das gewünschte Verhalten zu klären.</li>
+<li>Führt zu besser testbarem und oft besser strukturiertem Code.</li>
+<li>Minimiert die Fehlerquote, weil jeder Schritt sofort geprüft wird.</li>
+</ul>
+<h3 id="beispiel-mini-tdd-zyklus">Beispiel: Mini-TDD-Zyklus</h3>
+<ol>
+<li>
+<p><strong>Test schreiben</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testAdd</span><span class="hljs-params">()</span> {
+    <span class="hljs-type">Calculator</span> <span class="hljs-variable">calc</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Calculator</span>();
+    assertEquals(<span class="hljs-number">5</span>, calc.add(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>));
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Code schreiben</strong></p>
+<pre><code class="language-java"><span class="hljs-type">int</span> <span class="hljs-title function_">add</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span> { <span class="hljs-keyword">return</span> a + b; }
+</code></pre>
+</li>
+<li>
+<p><strong>Refaktorieren</strong> (z.B. Code sauberer machen, doppelte Logik entfernen)</p>
+</li>
+</ol>
+<hr>
+<h2 id="6-zusammenfassung-best-practices-auf-einen-blick">6. Zusammenfassung (Best Practices auf einen Blick)</h2>
+<ul>
+<li>Schreibe <strong>isolierte, unabhängige Tests</strong>.</li>
+<li>Strebe sinnvolle <strong>Testabdeckung</strong> an, nicht nur hohe Zahlen.</li>
+<li>Teste Logik, Fehlerfälle und Sonderfälle – nicht triviale Frameworksachen.</li>
+<li>Vermeide typische Test-Anti-Patterns.</li>
+<li>TDD ist eine wertvolle Technik für nachhaltige Entwicklung, aber nicht Pflicht für jeden.</li>
+</ul>
+<hr>
+<h3 id="checkliste-für-bessere-unit-tests">Checkliste für bessere Unit-Tests</h3>
+<ul>
+<li>Ist mein Test wirklich unabhängig und isoliert?</li>
+<li>Teste ich kritische Logik und Fehlerfälle?</li>
+<li>Ist der Testname klar und verständlich?</li>
+<li>Könnte ein neuer Entwickler die Testfälle schnell erfassen?</li>
+<li>Nutze ich sinnvolle Testdaten und überprüfe ich wichtige Szenarien?</li>
+</ul>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-best-practices">JUnit 5 Best Practices</a></li>
+<li><a href="https://martinfowler.com/bliki/TestPyramid.html">Martin Fowler: Test Pyramid</a></li>
+<li><a href="https://www.goodreads.com/book/show/387190.Test_Driven_Development">Test Driven Development by Example (Kent Beck, Buch)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

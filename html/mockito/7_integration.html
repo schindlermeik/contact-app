@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Integration von Mocking in den Entwicklungsprozess</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-integration-von-mocking-in-den-entwicklungsprozess">Handout: Integration von Mocking in den Entwicklungsprozess</h1>
+<hr>
+<h2 id="1-mocking-im-rahmen-von-tdd-test-driven-development">1. Mocking im Rahmen von TDD (Test Driven Development)</h2>
+<h3 id="a-was-ist-tdd">a) Was ist TDD?</h3>
+<ul>
+<li>
+<p><strong>Test Driven Development (TDD)</strong> ist eine Entwicklungsstrategie, bei der man zuerst einen Test schreibt, der fehlschlägt, dann den Code implementiert, sodass der Test besteht, und schließlich den Code verbessert (refaktoriert).</p>
+</li>
+<li>
+<p>Die <strong>TDD-Schritte:</strong></p>
+<ol>
+<li><strong>Red:</strong> Schreibe einen Test, der fehlschlägt</li>
+<li><strong>Green:</strong> Schreibe den minimalen Code, damit der Test besteht</li>
+<li><strong>Refactor:</strong> Optimiere den Code und die Tests</li>
+</ol>
+</li>
+</ul>
+<h3 id="b-rolle-von-mocking-in-tdd">b) Rolle von Mocking in TDD</h3>
+<ul>
+<li>
+<p><strong>Mocks ermöglichen Isolierung:</strong>
+Mit Mocks können Abhängigkeiten schon im allerersten Test simuliert werden, auch wenn sie noch nicht existieren.</p>
+</li>
+<li>
+<p><strong>Entwicklung gegen Schnittstellen:</strong>
+Entwickler können gegen geplante Schnittstellen testen und entwickeln, bevor die tatsächliche Implementierung da ist.</p>
+</li>
+<li>
+<p><strong>Beispiel:</strong>
+Angenommen, eine Methode ruft einen (noch nicht existierenden) Zahlungsservice auf:</p>
+<pre><code class="language-java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">testOrderTriggersPayment</span><span class="hljs-params">()</span> {
+    <span class="hljs-type">PaymentService</span> <span class="hljs-variable">paymentService</span> <span class="hljs-operator">=</span> mock(PaymentService.class);
+    <span class="hljs-type">OrderService</span> <span class="hljs-variable">orderService</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OrderService</span>(paymentService);
+    orderService.placeOrder(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Order</span>());
+    verify(paymentService).pay(any(Order.class));
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Tipp:</strong>
+Durch Mocking bleibt der Fokus auf der zu testenden Logik, nicht auf den Abhängigkeiten.</p>
+</li>
+</ul>
+<hr>
+<h2 id="2-mock-basierte-tests-in-cicd-pipelines">2. Mock-basierte Tests in CI/CD-Pipelines</h2>
+<h3 id="a-warum-mock-basierte-tests-automatisieren">a) Warum Mock-basierte Tests automatisieren?</h3>
+<ul>
+<li>Mock-basierte Unit-Tests sind schnell, robust und liefern direktes Feedback.</li>
+<li>Sie sind perfekt geeignet für die Integration in automatisierte Build- und Deployment-Prozesse (<strong>CI/CD</strong>).</li>
+</ul>
+<h3 id="b-wie-funktioniert-das-in-der-praxis">b) Wie funktioniert das in der Praxis?</h3>
+<ul>
+<li>
+<p>Jeder Commit oder Pull-Request löst eine Pipeline aus (z. B. mit Jenkins, GitHub Actions, GitLab CI).</p>
+</li>
+<li>
+<p>Die Pipeline führt alle Unit-Tests (inkl. Mock-Tests) automatisch aus:</p>
+<ul>
+<li>Maven/Gradle-Task (<code>mvn test</code>, <code>gradle test</code>)</li>
+</ul>
+</li>
+<li>
+<p><strong>Fehlgeschlagene Tests</strong> blockieren den Merge oder das Deployment.</p>
+</li>
+<li>
+<p>Testberichte (und ggf. Coverage-Berichte) werden automatisch erstellt und dem Team angezeigt.</p>
+</li>
+</ul>
+<p><strong>Beispiel: GitHub Actions YAML für ein Java-Projekt</strong></p>
+<pre><code class="language-yaml"><span class="hljs-attr">name:</span> <span class="hljs-string">Java</span> <span class="hljs-string">CI</span>
+
+<span class="hljs-attr">on:</span> [<span class="hljs-string">push</span>, <span class="hljs-string">pull_request</span>]
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">build:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Set</span> <span class="hljs-string">up</span> <span class="hljs-string">JDK</span> <span class="hljs-number">21</span>
+      <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-java@v4</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-attr">java-version:</span> <span class="hljs-string">&#x27;21&#x27;</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Build</span> <span class="hljs-string">and</span> <span class="hljs-string">Test</span> <span class="hljs-string">with</span> <span class="hljs-string">Maven</span>
+      <span class="hljs-attr">run:</span> <span class="hljs-string">mvn</span> <span class="hljs-string">clean</span> <span class="hljs-string">test</span>
+</code></pre>
+<ul>
+<li>In solchen automatischen Abläufen werden auch alle mit Mocks arbeitenden Tests ausgeführt und geprüft.</li>
+</ul>
+<hr>
+<h2 id="3-code-coverage-mit-gemockten-komponenten">3. Code Coverage mit gemockten Komponenten</h2>
+<h3 id="a-was-ist-code-coverage">a) Was ist Code Coverage?</h3>
+<ul>
+<li><strong>Code Coverage</strong> misst, wie viel Prozent des Anwendungscodes beim Testen tatsächlich ausgeführt werden.</li>
+<li>Tools: <strong>JaCoCo</strong> (Java Code Coverage Library), <strong>Cobertura</strong> u. a.</li>
+</ul>
+<h3 id="b-was-ist-beim-mocking-zu-beachten">b) Was ist beim Mocking zu beachten?</h3>
+<ul>
+<li>
+<p><strong>Mocking hilft, eigene Logik gezielt zu testen</strong>, ohne von echten Abhängigkeiten beeinflusst zu werden.</p>
+</li>
+<li>
+<p><strong>Code Coverage zeigt dann an,</strong> wie gut die Logik der eigenen Klasse getestet ist – nicht die der gemockten Abhängigkeiten!</p>
+</li>
+<li>
+<p><strong>Wichtig:</strong></p>
+<ul>
+<li>Die Testabdeckung ist nur sinnvoll für den selbst geschriebenen Code, nicht für das Verhalten von Mocks!</li>
+<li>Zu viele Mocks können zu „künstlich hoher“ Coverage führen, wenn kritische Pfade durch Abhängigkeiten nicht getestet werden.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Praxis-Tipps:</strong></p>
+<ul>
+<li>Nutze Coverage-Berichte, um Lücken im eigenen Code zu finden.</li>
+<li>Falsches Vertrauen in hohe Coverage vermeiden – prüfe auch Testqualität!</li>
+<li>Überlege, ob Integrationstests für das Zusammenspiel mit echten Abhängigkeiten nötig sind.</li>
+</ul>
+<hr>
+<h2 id="4-zusammenfassung-und-empfehlungen">4. Zusammenfassung und Empfehlungen</h2>
+<ul>
+<li><strong>Mocking ist ein Schlüsselelement in TDD</strong> und beschleunigt die Entwicklung durch frühe, isolierte Tests.</li>
+<li><strong>Automatisiere alle Mock-Tests</strong> in deiner CI/CD-Pipeline, damit Fehler schnell gefunden werden.</li>
+<li><strong>Nutze Code Coverage-Tools</strong>, aber interpretiere die Ergebnisse mit Bedacht: Gute Coverage heißt nicht automatisch gute Tests!</li>
+<li>Denke immer auch an Integrationstests, um das Zusammenspiel mit echten Komponenten zu prüfen.</li>
+</ul>
+<hr>
+<h2 id="checkliste-für-den-entwicklungsprozess">Checkliste für den Entwicklungsprozess</h2>
+<ul>
+<li>Werden Mock-basierte Tests automatisch bei jedem Commit ausgeführt?</li>
+<li>Sind die Coverage-Berichte regelmäßig verfügbar und werden sie vom Team geprüft?</li>
+<li>Wird Mocking als Werkzeug zur Isolierung und für frühzeitiges Testen genutzt?</li>
+<li>Gibt es auch (wo nötig) Integrationstests mit echten Abhängigkeiten?</li>
+</ul>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li><a href="https://site.mockito.org/">Mockito Doku</a></li>
+<li><a href="https://junit.org/junit5/docs/current/user-guide/#running-tests">JUnit 5 User Guide: Integration</a></li>
+<li><a href="https://www.eclemma.org/jacoco/">JaCoCo Coverage Tool</a></li>
+<li><a href="https://martinfowler.com/articles/continuousIntegration.html">Continuous Integration (Martin Fowler)</a></li>
+<li><a href="https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven">GitHub Actions für Java</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

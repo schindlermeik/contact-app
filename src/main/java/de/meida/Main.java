@@ -1,33 +1,18 @@
 package de.meida;
 
 
-import java.io.IOException;
+import de.meida.app.ContactClient;
+import de.meida.app.ContactRepository;
+import de.meida.app.ContactRepositoryImpl;
+import de.meida.app.ContactService;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("INFO: --- Anwendung gestartet ---");
 
-        ContactManager contactManager = new ContactManager();
+        ContactRepository contactRepository = new ContactRepositoryImpl();
+        ContactService contactService = new ContactService(contactRepository);
+        ContactClient contactClient = new ContactClient(contactService);
 
-        try {
-            System.out.println("INFO: --- Zwei neue Kontakte erstellen ---");
-            contactManager.createContact(new Contact("Max Mustermann", "max@example.com", "123-456-789"));
-            contactManager.createContact(new Contact("Erika Musterfrau", "erika@example.com", "987-654-321"));
-
-            System.out.println("INFO: Suche nach Kontakten");
-            System.out.println(contactManager.findById(1L));
-            System.out.println(contactManager.findById(3L));
-            Contact byId = contactManager.findById(5l);
-            if (byId != null) {
-                byId.getId();
-            }
-        } catch (ContactNotSaveException | ContactNotFoundException e) {
-            e.printStackTrace();
-            System.out.println("Error: es ist was schief gelaufen");
-        } catch (Exception e) {
-            System.out.println("Error: irgendwas ist aufgetren");
-        }
-        System.out.println("INFO: --- Anwendung beendet ---");
-
+        contactClient.run();
     }
 }

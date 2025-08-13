@@ -1,4 +1,4 @@
-package de.meida;
+package de.meida.app;
 
 public class Contact {
     private Long id;
