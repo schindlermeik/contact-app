@@ -1,5 +1,6 @@
 package de.meida.themes.streams;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -19,5 +20,30 @@ public class StreamsGrundlagen {
         // der stream ist tod;
 
         long count = str.count();
+
+        int[] a = {1,2,3};
+    }
+
+    public static int summiereUndMulitpliziereAlleGeradenZahlen(List<Integer> list ){
+        int sum = 0;
+        for (Integer i : list) {
+            if(i % 2 == 0){
+              sum  +=  i * i;
+            }
+        }
+        return sum;
+    }
+
+    public static int summiereUndMulitpliziereAlleGeradenZahlenWithStreams(List<Integer> list ){
+
+        return list.stream()
+                .mapToInt(Integer::intValue)
+                .filter( x -> x % 2 == 0 )
+                .map( x -> x * x)
+                .sum();
+               // .reduce(0, Integer::sum);
+
+        // List(1,2,3)
+        //3, 2, 1
     }
 }

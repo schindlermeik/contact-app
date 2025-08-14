@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class ImperativeVsFunctional {
 
@@ -50,7 +51,10 @@ public class ImperativeVsFunctional {
 
         createContact(() -> new Contact("Susi", null, null));
         createContact(new Contact("Susi", null, null));*/
-
+        Comparator<Contact> comp = (v1, v2) -> v1.getName().compareTo(v2.getName());
+      /*  System.out.println(comp.
+                compare(new Contact(null, "Susi", null, null),
+                        new Contact(null, "Susi", null, null)));*/
         exampleSort();
     }
 
@@ -81,6 +85,8 @@ public class ImperativeVsFunctional {
         contacts.sort(((v1, v2) -> v1.getName().compareTo(v2.getName())));
         //contacts.sort(Comparator.comparing(Contact::getName)); //thenComparingInt(Person::age));
         contacts.forEach(System.out::println);
+
+        System.out.println(contacts.get(1));;
     }
 
 
