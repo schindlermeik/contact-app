@@ -1,9 +1,4 @@
 package de.meida.themes.generics;
-
-import de.meida.app.Contact;
-
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 public interface GenericReposity<T, ID>{

@@ -8,10 +8,10 @@ public class ContactService {
 
     private static final Logger logger = LoggerFactory.getLogger(ContactService.class);
 
-    private final ContactRepository contactRepository;
+    private final Repository<Contact, Long> repository;
 
-    public ContactService(ContactRepository contactRepository) {
-        this.contactRepository = contactRepository;
+    public ContactService(Repository<Contact, Long> repository) {
+        this.repository = repository;
         logger.info("Contact Service wurde initialisiert");
     }
 
@@ -25,7 +25,7 @@ public class ContactService {
         if (email != null && (!email.contains("@") || !email.contains("."))) {
             throw new IllegalArgumentException("Email ist ungültig " + email);
         }
-        contactRepository.create(contact);
+        repository.create(contact);
         logger.info("INFO: Neuer Kontakt hinzugefügt {} {}", contact.getName(), contact.getEmail());
     }
 
@@ -35,8 +35,8 @@ public class ContactService {
             throw new IllegalArgumentException("Id darf nicht null sein");
         }
         logger.info(" Suche nach kontakt mit ID: {}", id);
-        if (contactRepository.findById(id) != null) {
-            return contactRepository.findById(id);
+        if (repository.findById(id) != null) {
+            return repository.findById(id);
         }
         logger.warn("Contact mit Id: {} wurde nicht gefunden", id);
         throw new ContactNotFoundException(String.format("Contact mit Id: %s wurde nicht gefunden", id)); //ContactNotFound

@@ -1,0 +1,59 @@
+version: '3.8' # Empfohlene Docker Compose Version
+
+services:
+  # ----------------------------------------------------------------------
+  # Service: PostgreSQL-Datenbank
+  # ----------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine # Spezifische, schlanke Version für Konsistenz und Effizienz
+    container_name: dev_postgres_db # Eindeutiger Name für den Container
+
+    environment:
+      # Essentielle Umgebungsvariablen für die PostgreSQL-Initialisierung
+      POSTGRES_DB: contact_db         # Dein gewünschter Datenbankname (für Anwendungen)
+      POSTGRES_USER: devuser           # Dein Datenbank-Benutzername
+      POSTGRES_PASSWORD: devpassword   # Dein Datenbank-Passwort (nur für Entwicklungsumgebung!)
+
+    ports:
+      - "5432:5432" # Mappt den Standard-DB-Port auf deinen Host.
+
+    volumes:
+      # WICHTIG: Persistente Speicherung der Datenbankdaten.
+      # "postgres_data" ist ein benanntes Volume, das von Docker verwaltet wird.
+      - postgres_data:/var/lib/postgresql/data
+
+    shm_size: 256mb # Erhöht das Shared Memory für bessere PostgreSQL-Performance (z.B. 256MB ist ein guter Startwert)
+
+    healthcheck: # Optional, aber sehr nützlich: Prüft, ob die DB wirklich bereit ist
+      test: ["CMD-SHELL", "pg_isready -U devuser -d mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------
+  # Service: CloudBeaver (Web-Oberfläche zur Datenbankverwaltung)
+  # ----------------------------------------------------------------------
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:25.1.3 # Neueste Version von Cloudbeaver
+    container_name: dev_cloudbeaver # Eindeutiger Name für den Container
+
+    ports:
+      - "8978:8978" # Host-Port 8090 wird auf Container-Port 8080 gemappt.
+
+
+    # Optional: Stellt sicher, dass dbeaver erst startet, wenn die DB verfügbar ist.
+    # Abhängig vom Healthcheck des 'postgres'-Services.
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    volumes:
+      # WICHTIG: Persistente Speicherung der Connections und Workspaces.
+      - cloudbeaver_data:/opt/lib/cloudbeaver/workspace
+
+# ----------------------------------------------------------------------
+# Definition der benannten Volumes
+# ----------------------------------------------------------------------
+volumes:
+  postgres_data: # Dieses Volume wird die Daten für den PostgreSQL-Container speichern
+  cloudbeaver_data: # Dieses Volume wird die Daten für den CloudBeaver-Container speichern

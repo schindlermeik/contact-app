@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -16,17 +17,17 @@ class ContactServiceTest {
     private ContactService sut;
 
     @Mock
-    private ContactRepository contactRepository;
+    private Repository<Contact, Long> repository;
 
     @Test
     void createContact_shouldCreateNewContact() {
         //given
         Contact contact = new Contact("Max", "max@email.de", "1234");
         //when
-        doNothing().when(contactRepository).create(contact);
+        doNothing().when(repository).create(contact);
         sut.createContact(contact);
         //then
-        verify(contactRepository, times(1)).create(contact);
+        verify(repository, times(1)).create(contact);
 
     }
 
@@ -35,11 +36,10 @@ class ContactServiceTest {
         //given
         Contact contact = new Contact(1L,"Max", "max@email.de", "1234");
         //when
-        doThrow(ConstraintViolationException.class).when(contactRepository).create(contact);
-        sut.createContact(contact);
+        doThrow(ConstraintViolationException.class).when(repository).create(contact);
         //then
-        //assertThrows(ConstraintViolationException.class, () -> sut.createContact(contact));
-        verify(contactRepository).create(contact);
+        assertThrows(ConstraintViolationException.class, () -> sut.createContact(contact));
+        verify(repository).create(contact);
 
     }
 
@@ -49,10 +49,10 @@ class ContactServiceTest {
         Long id = 1L;
         Contact contactToFind = new Contact(1L, "Max", null, "1234");
         // when
-        when(contactRepository.findById(1L)).thenReturn(contactToFind);
+        when(repository.findById(1L)).thenReturn(contactToFind);
         Contact result = sut.getById(id);
         // then
         assertEquals(contactToFind.getName(), result.getName());
-        verify(contactRepository, times(2)).findById(id);
+        verify(repository, times(2)).findById(id);
     }
 }

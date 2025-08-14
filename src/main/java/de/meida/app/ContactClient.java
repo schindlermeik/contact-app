@@ -9,6 +9,7 @@ public class ContactClient {
 
     private final ContactService contactService;
 
+
     public ContactClient(ContactService contactService) {
         this.contactService = contactService;
     }

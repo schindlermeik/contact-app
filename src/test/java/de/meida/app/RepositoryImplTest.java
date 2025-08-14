@@ -11,15 +11,15 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ContactRepositoryImplTest {
+class RepositoryImplTest {
 
-    private ContactRepositoryImpl repository;
-    public static final String FileName = "contacts.csv";
+    private RepositoryImpl repository;
+    public static final String FileName = "entities.csv";
 
     @BeforeEach
     void setUp(){
-        ContactRepositoryImpl.nextId = 1L;
-        repository = new ContactRepositoryImpl();
+        RepositoryImpl.nextId = 1L;
+        repository = new RepositoryImpl();
     }
     @AfterEach
     void tearDown(){

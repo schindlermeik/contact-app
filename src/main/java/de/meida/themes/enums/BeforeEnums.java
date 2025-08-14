@@ -28,6 +28,6 @@ class EnumIntroDemo {
     }
     public static void main(String[] args) {
         login(Role.USER);
-        // login(999); // Compilerfehler – guter Schutz
+
     }
 }
