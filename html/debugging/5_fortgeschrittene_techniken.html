@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Fortgeschrittene Debugging-Techniken in IntelliJ</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-fortgeschrittene-debugging-techniken-in-intellij">Handout: Fortgeschrittene Debugging-Techniken in IntelliJ</h1>
+<hr>
+<h2 id="1-conditional-breakpoints-mit-bedingungen-und-hit-counts">1. Conditional Breakpoints (mit Bedingungen und Hit Counts)</h2>
+<h3 id="a-was-sind-conditional-breakpoints">a) Was sind Conditional Breakpoints?</h3>
+<ul>
+<li><strong>Conditional Breakpoints</strong> stoppen den Programmlauf <strong>nur</strong>, wenn eine bestimmte Bedingung erfüllt ist – z. B. eine Variable hat einen bestimmten Wert.</li>
+<li>Sehr hilfreich bei Schleifen oder bei Fehlern, die nur bei speziellen Daten auftreten.</li>
+</ul>
+<h3 id="b-wie-setzt-man-sie">b) Wie setzt man sie?</h3>
+<ol>
+<li>Breakpoint normal setzen (Klick auf den Rand).</li>
+<li>Rechtsklick auf den roten Punkt → „More…“ oder „Breakpoint Properties“.</li>
+<li><strong>Im Feld „Condition“</strong> einen Java-Ausdruck eingeben, z. B. <code>i == 42 || user != null &amp;&amp; user.getName().equals(&quot;Alice&quot;)</code>.</li>
+<li>Nur wenn die Bedingung „true“ ist, hält das Programm an.</li>
+</ol>
+<h3 id="c-hit-count-nutzen">c) Hit Count nutzen</h3>
+<ul>
+<li>Du kannst einstellen, dass das Programm <strong>erst nach x Treffern</strong> anhält.</li>
+<li>Z. B. „Stopp erst beim 100. Durchlauf einer Schleife“.</li>
+<li>Feld „Hit Count“ setzen (z. B. 100).</li>
+</ul>
+<hr>
+<h2 id="2-log-breakpoints-ohne-anhalten-nur-protokollieren">2. Log Breakpoints (ohne Anhalten, nur Protokollieren)</h2>
+<ul>
+<li>Statt den Ablauf zu stoppen, kann ein Breakpoint <strong>nur eine Nachricht ins Debug-Fenster loggen</strong> – das Programm läuft weiter.</li>
+<li>Besonders nützlich, wenn du wissen willst, wie oft und mit welchen Werten eine bestimmte Zeile ausgeführt wird, <strong>ohne</strong> das Programm zu unterbrechen.</li>
+</ul>
+<p><strong>So geht’s:</strong></p>
+<ol>
+<li>Breakpoint normal setzen, dann rechtsklicken.</li>
+<li>Haken bei „Log message to console“ setzen.</li>
+<li>Optional: Variablen im Log ausgeben, z. B. <code>&quot;i = &quot; + i</code></li>
+<li>Das Programm schreibt bei jedem Erreichen die Nachricht ins Debug-Fenster, läuft aber normal weiter.</li>
+</ol>
+<hr>
+<h2 id="3-exception-breakpoints-gezielt-einsetzen">3. Exception Breakpoints gezielt einsetzen</h2>
+<ul>
+<li>Exception Breakpoints stoppen das Programm <strong>genau dann</strong>, wenn eine bestimmte Exception auftritt – unabhängig davon, wo im Code das passiert.</li>
+<li>Besonders praktisch bei schwer auffindbaren Fehlern.</li>
+</ul>
+<p><strong>So geht’s:</strong></p>
+<ol>
+<li>Öffne das Breakpoints-Fenster (<code>Ctrl + Shift + F8</code>).</li>
+<li>Klicke auf das Plus-Symbol und wähle „Java Exception Breakpoint“.</li>
+<li>Suche z. B. nach <code>NullPointerException</code> oder einer eigenen Exception.</li>
+<li>Das Programm hält immer dann an, wenn diese Exception ausgelöst wird – du siehst sofort den fehlerhaften Zustand.</li>
+</ol>
+<hr>
+<h2 id="4-multithreaded-debugging">4. Multithreaded Debugging</h2>
+<h3 id="a-thread-wechsel-im-debugger">a) Thread-Wechsel im Debugger</h3>
+<ul>
+<li>Programme mit mehreren Threads (z. B. in Webanwendungen oder parallelen Prozessen) können <strong>gleichzeitig an verschiedenen Stellen</strong> laufen.</li>
+<li>Im Debugger siehst du unter „Threads“ alle laufenden Threads.</li>
+<li><strong>Wechsle zwischen Threads</strong>, um den Zustand und den Call Stack je Thread zu untersuchen.</li>
+</ul>
+<h3 id="b-deadlocks-und-race-conditions-analysieren">b) Deadlocks und Race Conditions analysieren</h3>
+<ul>
+<li><strong>Deadlock:</strong> Zwei oder mehr Threads warten gegenseitig auf Ressourcen – das Programm „hängt“.</li>
+<li><strong>Race Condition:</strong> Ergebnis hängt davon ab, wie schnell/bestimmte Threads laufen – führt zu schwer vorhersagbaren Fehlern.</li>
+</ul>
+<p><strong>Debugging-Tipps:</strong></p>
+<ul>
+<li>Beobachte, ob Threads im „WAITING“- oder „BLOCKED“-Status sind (erscheint im Thread-Fenster).</li>
+<li>Analysiere, an welcher Stelle sich Threads gegenseitig blockieren.</li>
+<li>Lasse dir im Debugger die Thread States anzeigen und prüfe Synchronisationsobjekte.</li>
+</ul>
+<h3 id="c-thread-states-und-synchronisation-überwachen">c) Thread States und Synchronisation überwachen</h3>
+<ul>
+<li>
+<p><strong>Thread State:</strong></p>
+<ul>
+<li>„RUNNABLE“ (läuft), „WAITING“, „BLOCKED“, „TERMINATED“</li>
+</ul>
+</li>
+<li>
+<p>Im Debug-Fenster werden alle States live angezeigt.</p>
+</li>
+<li>
+<p>Überprüfe bei Synchronisation (z. B. mit <code>synchronized</code>, Locks), wo Threads aufeinander warten.</p>
+</li>
+</ul>
+<hr>
+<h2 id="5-debugging-von-lambdas-und-streams">5. Debugging von Lambdas und Streams</h2>
+<ul>
+<li>
+<p><strong>Lambdas/Streams</strong> machen das Debuggen schwieriger, weil sie oft anonymer und weniger sichtbar sind.</p>
+</li>
+<li>
+<p>IntelliJ kann dennoch:</p>
+<ul>
+<li>Breakpoints innerhalb von Lambdas/Streams setzen (z. B. in <code>.forEach(x -&gt; …)</code>).</li>
+<li>Variablen und Zwischenwerte anzeigen – probiere das im Debuggerfenster bei laufender Session.</li>
+</ul>
+</li>
+<li>
+<p><strong>Tipp:</strong> Nutze Conditional oder Log Breakpoints, um zu sehen, wie oft die Lambda wirklich aufgerufen wird und mit welchen Werten.</p>
+</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; list = Arrays.asList(<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;C&quot;</span>);
+list.stream().map(s -&gt; s.toLowerCase()) <span class="hljs-comment">// Setze Breakpoint auf die Lambda-Zeile!</span>
+    .forEach(System.out::println);
+</code></pre>
+<hr>
+<h2 id="6-hotswap-code-während-der-debugging-session-verändern">6. HotSwap: Code während der Debugging-Session verändern</h2>
+<ul>
+<li><strong>HotSwap</strong> ermöglicht, kleine Code-Änderungen vorzunehmen, während das Debugging läuft – ohne Neustart.</li>
+<li>Funktioniert für einfache Änderungen (z. B. Methoden-Body ändern, aber keine Methoden hinzufügen/entfernen).</li>
+<li>Sehr nützlich, um direkt eine kleine Korrektur zu testen, ohne den kompletten Prozess neu zu starten.</li>
+</ul>
+<p><strong>So geht’s:</strong></p>
+<ol>
+<li>Debugging läuft.</li>
+<li>Ändere den Code (z. B. return-Wert oder Print-Ausgabe).</li>
+<li>IntelliJ erkennt die Änderung und bietet an, den Code zu „Reload“/HotSwap (oft per Popup oder über das Blitz-Symbol in der Debug-Leiste).</li>
+<li>Die Änderung wird sofort übernommen, der Debugger bleibt aktiv.</li>
+</ol>
+<hr>
+<h2 id="7-tipps--zusammenfassung">7. Tipps &amp; Zusammenfassung</h2>
+<ul>
+<li>Conditional und Log Breakpoints helfen, bei großen Datenmengen und Schleifen gezielt zu debuggen.</li>
+<li>Exception Breakpoints sind ideal für die Fehlersuche bei Ausnahmen.</li>
+<li>Im Multithread-Debugging immer den Thread-State und den Call Stack beachten.</li>
+<li>Lambdas und Streams lassen sich mit modernen IDEs ebenfalls effektiv debuggen.</li>
+<li>Mit HotSwap sparst du Zeit bei kleinen Änderungen – nutze es, wo möglich!</li>
+</ul>
+<hr>
+<h2 id="8-weiterführende-ressourcen">8. Weiterführende Ressourcen</h2>
+<ul>
+<li><a href="https://www.jetbrains.com/help/idea/debugging-code.html">IntelliJ IDEA: Advanced Debugging</a></li>
+<li><a href="https://www.youtube.com/watch?v=IsAJIT8a6rs">YouTube: Multi-threaded Debugging in IntelliJ</a></li>
+<li><a href="https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf">IntelliJ IDEA Keymap PDF</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

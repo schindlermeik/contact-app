@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Motivation und Problemstellung &ndash; NullPointerException &lpar;NPE&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-motivation-und-problemstellung--nullpointerexception-npe">Handout: Motivation und Problemstellung – NullPointerException (NPE)</h1>
+<hr>
+<h2 id="1-was-ist-eine-nullpointerexception-npe">1. Was ist eine NullPointerException (NPE)?</h2>
+<p>Die <strong>NullPointerException (NPE)</strong> ist eine der häufigsten und berüchtigtsten Laufzeitfehler in Java.
+Sie tritt auf, wenn versucht wird, eine Methode oder ein Feld auf einer <strong>null-Referenz</strong> aufzurufen oder zu verwenden.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;
+<span class="hljs-type">int</span> <span class="hljs-variable">laenge</span> <span class="hljs-operator">=</span> name.length(); <span class="hljs-comment">// Hier wird eine NPE ausgelöst!</span>
+</code></pre>
+<p>Hier ist die Variable <code>name</code> nicht auf ein Objekt, sondern auf <code>null</code> gesetzt.
+Ein Methodenaufruf wie <code>name.length()</code> ist daher <strong>nicht möglich</strong> und führt zum Programmabbruch mit einer NPE.</p>
+<hr>
+<h2 id="2-typische-ursachen-und-beispiele-für-npes-in-java">2. Typische Ursachen und Beispiele für NPEs in Java</h2>
+<h3 id="a-nicht-initialisierte-objekte">a) <strong>Nicht initialisierte Objekte</strong></h3>
+<pre><code class="language-java">Person person;
+person.getName(); <span class="hljs-comment">// person ist nicht initialisiert – NPE!</span>
+</code></pre>
+<h3 id="b-rückgabewert-einer-methode-ist-null">b) <strong>Rückgabewert einer Methode ist null</strong></h3>
+<pre><code class="language-java"><span class="hljs-type">Person</span> <span class="hljs-variable">person</span> <span class="hljs-operator">=</span> datenbank.findUserById(<span class="hljs-number">42</span>); <span class="hljs-comment">// Liefert null, wenn User nicht gefunden!</span>
+System.out.println(person.getName()); <span class="hljs-comment">// NPE, wenn person null ist</span>
+</code></pre>
+<h3 id="c-elemente-in-arrays-oder-collections-sind-null">c) <strong>Elemente in Arrays oder Collections sind null</strong></h3>
+<pre><code class="language-java">String[] namen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>[<span class="hljs-number">3</span>]; <span class="hljs-comment">// Standardmäßig: [null, null, null]</span>
+System.out.println(namen[<span class="hljs-number">0</span>].length()); <span class="hljs-comment">// NPE!</span>
+</code></pre>
+<h3 id="d-verschachtelte-zugriffe-auf-feldermethoden">d) <strong>Verschachtelte Zugriffe auf Felder/Methoden</strong></h3>
+<pre><code class="language-java"><span class="hljs-type">Person</span> <span class="hljs-variable">person</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>();
+<span class="hljs-comment">// person.getAdresse() könnte null sein!</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">stadt</span> <span class="hljs-operator">=</span> person.getAdresse().getStadt(); <span class="hljs-comment">// NPE, wenn Adresse null ist</span>
+</code></pre>
+<h3 id="e-automatisches-unboxing-von-null">e) <strong>Automatisches Unboxing von null</strong></h3>
+<pre><code class="language-java"><span class="hljs-type">Integer</span> <span class="hljs-variable">wert</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;
+<span class="hljs-type">int</span> <span class="hljs-variable">x</span> <span class="hljs-operator">=</span> wert; <span class="hljs-comment">// Unboxing null → NPE!</span>
+</code></pre>
+<hr>
+<h2 id="3-warum-ist-das-thema-heute-noch-relevant">3. Warum ist das Thema heute noch relevant?</h2>
+<ul>
+<li><strong>Sehr häufige Fehlerursache:</strong>
+Die NPE ist einer der <strong>meistgeworfenen Exceptions</strong> in Java-Programmen aller Art.</li>
+<li><strong>Schwer zu debuggen:</strong>
+Oft fällt der Fehler erst zur Laufzeit und an schwer nachvollziehbarer Stelle auf.</li>
+<li><strong>Hohe Fehlerkosten:</strong>
+NPEs können Programme abstürzen lassen, zu Datenverlust oder unerwartetem Verhalten führen.</li>
+<li><strong>Komplexere Codebasis = mehr Risiko:</strong>
+In modernen Anwendungen mit vielen Klassen, Abhängigkeiten, Datenbankzugriffen usw. ist die Gefahr besonders groß.</li>
+<li><strong>Entwickleralltag:</strong>
+Jeder Java-Entwickler wird mit NPEs konfrontiert und sollte sie <strong>frühzeitig erkennen und vermeiden</strong>.</li>
+</ul>
+<hr>
+<h2 id="4-reflexionsfragen-selbststudium">4. Reflexionsfragen (Selbststudium)</h2>
+<ol>
+<li>Hattest du in deinen bisherigen Projekten schon einmal eine NullPointerException? Wie hast du sie gefunden?</li>
+<li>Welche Methoden oder Codestellen sind in deinem Code besonders anfällig für NPEs?</li>
+<li>Wie gehst du bislang mit potenziellen Null-Werten um? (Null-Checks, Fehlerbehandlung, …)</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li>Eine <strong>NullPointerException</strong> entsteht immer dann, wenn auf eine Referenz zugegriffen wird, die <code>null</code> ist.</li>
+<li>Sie gehört zu den häufigsten und am schwierigsten zu findenden Fehlern in Java.</li>
+<li>Das Ziel moderner Java-Programmierung ist es, <strong>NullPointerExceptions möglichst zu vermeiden</strong> und mit Alternativen wie <code>Optional</code> sicherer zu arbeiten.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

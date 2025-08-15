@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Isolationsebenen und Nebenl&auml;ufigkeit in Datenbank-Transaktionen</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <p>Sehr gerne! Hier ist ein <strong>ausführliches Handout</strong> zu
+<strong>5. Isolationsebenen und Nebenläufigkeit</strong>
+– mit allen nötigen Grundlagen, Beispielen und praxisnahen Tipps fürs Selbststudium.</p>
+<hr>
+<h1 id="handout-isolationsebenen-und-nebenläufigkeit-in-datenbank-transaktionen">Handout: Isolationsebenen und Nebenläufigkeit in Datenbank-Transaktionen</h1>
+<hr>
+<h2 id="51-was-sind-isolationsebenen">5.1 Was sind Isolationsebenen?</h2>
+<p><strong>Isolationsebenen</strong> steuern, wie stark gleichzeitig ablaufende Transaktionen sich gegenseitig beeinflussen dürfen – und wie „frisch“ oder konsistent die gelesenen Daten sind.</p>
+<p>Die meisten relationalen Datenbanken (z. B. PostgreSQL, MySQL, Oracle) bieten vier Standard-Isolationsebenen gemäß SQL-Standard:</p>
+<h3 id="1-read-uncommitted"><strong>1. READ UNCOMMITTED</strong></h3>
+<ul>
+<li><strong>Geringste Isolation</strong> – Transaktionen können Änderungen sehen, die andere Transaktionen noch nicht bestätigt (committed) haben.</li>
+<li>Ermöglicht sogenannte <strong>Dirty Reads</strong> (s. 5.2).</li>
+<li>Kommt in der Praxis selten zum Einsatz.</li>
+</ul>
+<h3 id="2-read-committed-standard-in-postgresql"><strong>2. READ COMMITTED (Standard in PostgreSQL)</strong></h3>
+<ul>
+<li>Transaktionen sehen <strong>nur die Daten, die von anderen Transaktionen schon committet</strong> wurden.</li>
+<li><strong>Dirty Reads sind ausgeschlossen</strong>, aber <strong>Non-repeatable Reads</strong> sind möglich.</li>
+<li>Sehr guter Kompromiss zwischen Konsistenz und Performance – oft Default.</li>
+</ul>
+<h3 id="3-repeatable-read"><strong>3. REPEATABLE READ</strong></h3>
+<ul>
+<li>Stellt sicher, dass <strong>wiederholte Lesezugriffe auf dieselbe Zeile innerhalb einer Transaktion immer das gleiche Ergebnis liefern</strong>.</li>
+<li>Verhindert <strong>Non-repeatable Reads</strong>.</li>
+<li><strong>Phantom Reads</strong> (siehe 5.2) können aber noch auftreten.</li>
+</ul>
+<h3 id="4-serializable"><strong>4. SERIALIZABLE</strong></h3>
+<ul>
+<li><strong>Höchste Isolation:</strong>
+Transaktionen werden so ausgeführt, als liefen sie <strong>nacheinander</strong> (seriell) ab – keine gegenseitige Beeinflussung.</li>
+<li>Verhindert alle genannten Nebeneffekte (Dirty Reads, Non-repeatable Reads, Phantom Reads).</li>
+<li><strong>Aufwändigste Isolation:</strong> Führt häufig zu Sperren und damit zu geringerer Parallelität.</li>
+</ul>
+<hr>
+<h2 id="52-dirty-reads-non-repeatable-reads-phantom-reads--begriffe--beispiele">5.2 Dirty Reads, Non-repeatable Reads, Phantom Reads – Begriffe &amp; Beispiele</h2>
+<h3 id="a-dirty-read-schmutziges-lesen"><strong>A) Dirty Read („Schmutziges Lesen“)</strong></h3>
+<ul>
+<li>Eine Transaktion liest Daten, die von einer anderen Transaktion geändert, aber noch <strong>nicht committet</strong> wurden.</li>
+<li><strong>Problem:</strong> Wird die ändernde Transaktion später zurückgerollt (Rollback), hat die erste Transaktion „falsche“ Daten verarbeitet.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<ol>
+<li>T1: Update Kontostand, aber noch kein Commit</li>
+<li>T2: Liest neuen Kontostand – obwohl T1 vielleicht zurückrollt</li>
+</ol>
+<h3 id="b-non-repeatable-read-nicht-wiederholbares-lesen"><strong>B) Non-repeatable Read („Nicht wiederholbares Lesen“)</strong></h3>
+<ul>
+<li>Eine Transaktion liest denselben Datensatz zweimal – aber zwischen den Lesevorgängen hat eine andere Transaktion den Wert geändert und committed.</li>
+<li>Beim zweiten Lesen sieht man einen <strong>anderen Wert als beim ersten</strong>.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<ol>
+<li>T1: Liest Kontostand (100 €)</li>
+<li>T2: Ändert und committet Kontostand (jetzt 150 €)</li>
+<li>T1: Liest nochmal – sieht jetzt 150 €</li>
+</ol>
+<h3 id="c-phantom-read"><strong>C) Phantom Read</strong></h3>
+<ul>
+<li>Eine Transaktion führt eine <strong>Query mit einer Bedingung</strong> mehrfach aus und bekommt <strong>unterschiedlich viele Ergebnisse</strong>, weil eine andere Transaktion zwischenzeitlich Daten eingefügt/löscht.</li>
+<li><strong>Phantomeinträge</strong> erscheinen oder verschwinden.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<ol>
+<li>T1: <code>SELECT * FROM orders WHERE status = 'offen'</code> (ergibt 3 Zeilen)</li>
+<li>T2: Fügt einen neuen „offen“-Datensatz ein und committet</li>
+<li>T1: Führt das gleiche SELECT erneut aus – jetzt sind es 4 Zeilen</li>
+</ol>
+<hr>
+<h3 id="übersicht-isolationsebenen-und-nebeneffekte"><strong>Übersicht: Isolationsebenen und Nebeneffekte</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Isolationsebene</th>
+<th>Dirty Reads</th>
+<th>Non-repeatable Reads</th>
+<th>Phantom Reads</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>READ UNCOMMITTED</td>
+<td>möglich</td>
+<td>möglich</td>
+<td>möglich</td>
+</tr>
+<tr>
+<td>READ COMMITTED</td>
+<td>nicht mögl.</td>
+<td>möglich</td>
+<td>möglich</td>
+</tr>
+<tr>
+<td>REPEATABLE READ</td>
+<td>nicht mögl.</td>
+<td>nicht möglich</td>
+<td>möglich</td>
+</tr>
+<tr>
+<td>SERIALIZABLE</td>
+<td>nicht mögl.</td>
+<td>nicht möglich</td>
+<td>nicht mögl.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="53-isolation-einstellen-jdbc-jpa-quarkus">5.3 Isolation einstellen (JDBC, JPA, Quarkus)</h2>
+<h3 id="a-isolation-in-jdbc"><strong>A) Isolation in JDBC</strong></h3>
+<p>Du kannst die Isolationsebene direkt beim Connection-Objekt setzen:</p>
+<pre><code class="language-java"><span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> DriverManager.getConnection(...);
+conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+</code></pre>
+<p>Mögliche Werte:</p>
+<ul>
+<li><code>TRANSACTION_READ_UNCOMMITTED</code></li>
+<li><code>TRANSACTION_READ_COMMITTED</code></li>
+<li><code>TRANSACTION_REPEATABLE_READ</code></li>
+<li><code>TRANSACTION_SERIALIZABLE</code></li>
+</ul>
+<p><strong>Hinweis:</strong>
+Immer <em>vor</em> dem Start der Transaktion setzen!</p>
+<hr>
+<h3 id="b-isolation-in-jpahibernate"><strong>B) Isolation in JPA/Hibernate</strong></h3>
+<p>JPA selbst definiert keine direkte Isolationsebenen-API, aber du kannst sie oft über Datenbank- oder Hibernate-Konfiguration festlegen.</p>
+<p><strong>Beispiel mit Hibernate (persistence.xml oder application.properties):</strong></p>
+<pre><code class="language-properties"><span class="hljs-attr">hibernate.connection.isolation</span>=<span class="hljs-string">4   # 4 = TRANSACTION_REPEATABLE_READ</span>
+</code></pre>
+<p>Oder via EntityManager in speziellen Fällen (vendor-spezifisch):</p>
+<pre><code class="language-java">Map&lt;String, Object&gt; props = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+props.put(<span class="hljs-string">&quot;javax.persistence.lock.timeout&quot;</span>, <span class="hljs-number">5000</span>); <span class="hljs-comment">// Beispiel: Lock Timeout</span>
+<span class="hljs-type">EntityManager</span> <span class="hljs-variable">em</span> <span class="hljs-operator">=</span> emf.createEntityManager(props);
+</code></pre>
+<hr>
+<h3 id="c-isolation-in-quarkus"><strong>C) Isolation in Quarkus</strong></h3>
+<p>Auch in Quarkus bestimmst du die Isolation über die <strong>Datenbank-Konfiguration</strong> (z. B. in <code>application.properties</code>) oder durch Weiterreichen an den JDBC-Treiber.</p>
+<p><strong>Beispiel für PostgreSQL in <code>application.properties</code>:</strong></p>
+<pre><code class="language-properties"><span class="hljs-attr">quarkus.datasource.jdbc.transactions</span>=<span class="hljs-string">repeatable-read</span>
+</code></pre>
+<p><em>(Stand Quarkus 3.x: Siehe Doku zur Extension oder nutze ggf. die native JDBC-Konfiguration.)</em></p>
+<p><strong>Oder direkt im Code (JDBC-Style):</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@ApplicationScoped</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">doWork</span><span class="hljs-params">()</span> {
+        <span class="hljs-type">Session</span> <span class="hljs-variable">session</span> <span class="hljs-operator">=</span> entityManager.unwrap(Session.class);
+        session.doWork(connection -&gt; {
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        });
+        <span class="hljs-comment">// ... Operationen</span>
+    }
+}
+</code></pre>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li>
+<p><strong>Isolationsebenen</strong> bestimmen, wie stark parallele Transaktionen sich gegenseitig beeinflussen können.</p>
+</li>
+<li>
+<p>Wähle die Isolation nach Anwendungsfall:</p>
+<ul>
+<li><strong>READ COMMITTED</strong> für gute Performance bei gängigen Business-Anwendungen</li>
+<li><strong>SERIALIZABLE</strong> für maximale Sicherheit und Integrität (z. B. bei kritischen Finanzprozessen)</li>
+</ul>
+</li>
+<li>
+<p><strong>Beachte Nebeneffekte</strong> wie Dirty Reads, Non-repeatable Reads und Phantom Reads – und wähle die Isolation entsprechend!</p>
+</li>
+<li>
+<p>In <strong>JDBC</strong>, <strong>JPA/Hibernate</strong> und <strong>Quarkus</strong> kannst du die Isolationsebene passend zu deinen Anforderungen einstellen.</p>
+</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

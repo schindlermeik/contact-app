@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; CRUD-Operationen mit JPA</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-crud-operationen-mit-jpa">Handout: CRUD-Operationen mit JPA</h3>
+<p>Nachdem du gelernt hast, wie du deine Java-Klassen mit der Datenbank verknüpfst, geht es jetzt um die praktischen Schritte: wie du Entitäten erstellst, liest, aktualisierst und löschst. All das machst du über den <strong><code>EntityManager</code></strong>.</p>
+<h4 id="51-erstellen-persistieren-von-entities">5.1 Erstellen (Persistieren) von Entities</h4>
+<p>Um eine neue Entität in der Datenbank zu speichern, erstellst du zuerst ein normales Java-Objekt und rufst dann die Methode <code>persist()</code> des <code>EntityManager</code> auf.</p>
+<p><strong>Ablauf:</strong></p>
+<ol>
+<li><strong>Transaktion starten</strong>: Jede Operation, die die Datenbank ändert (Schreiben, Aktualisieren, Löschen), muss innerhalb einer Transaktion stattfinden. Das ist wichtig, um die Datenintegrität zu gewährleisten.</li>
+<li><strong>Entität erstellen</strong>: Instanziiere deine Entitätsklasse mit <code>new</code>.</li>
+<li><strong>Entität persistieren</strong>: Rufe <code>entityManager.persist(entity)</code> auf. Dadurch wird das Objekt in den <strong>Persistenzkontext</strong> verschoben und als &quot;neu&quot; markiert. Die tatsächliche <code>INSERT</code>-Anweisung wird erst beim <strong>Commit</strong> der Transaktion ausgeführt.</li>
+<li><strong>Transaktion abschließen</strong>: Committe die Transaktion.</li>
+</ol>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Annahme: entityManager ist bereits initialisiert</span>
+<span class="hljs-type">EntityTransaction</span> <span class="hljs-variable">transaction</span> <span class="hljs-operator">=</span> entityManager.getTransaction();
+transaction.begin();
+
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-type">Kunde</span> <span class="hljs-variable">neuerKunde</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Kunde</span>();
+    neuerKunde.setName(<span class="hljs-string">&quot;Max Mustermann&quot;</span>);
+    neuerKunde.setEmail(<span class="hljs-string">&quot;max.mustermann@example.com&quot;</span>);
+
+    entityManager.persist(neuerKunde);
+
+    transaction.commit();
+} <span class="hljs-keyword">catch</span> (Exception e) {
+    <span class="hljs-keyword">if</span> (transaction.isActive()) {
+        transaction.rollback();
+    }
+    e.printStackTrace();
+}
+</code></pre>
+<hr>
+<h4 id="52-lesen-abfragen-von-entities">5.2 Lesen (Abfragen) von Entities</h4>
+<p>Das Auslesen von Daten ist eine der häufigsten Aufgaben. JPA bietet dafür verschiedene Möglichkeiten.</p>
+<p><strong>1. Suchen nach Primärschlüssel:</strong></p>
+<p>Die einfachste Methode ist, eine Entität anhand ihrer Primärschlüssel-ID zu suchen. Die <code>find()</code>-Methode ist dafür ideal.</p>
+<pre><code class="language-java"><span class="hljs-comment">// Suchen eines Kunden mit der ID 1</span>
+<span class="hljs-type">Kunde</span> <span class="hljs-variable">kunde</span> <span class="hljs-operator">=</span> entityManager.find(Kunde.class, <span class="hljs-number">1L</span>);
+
+<span class="hljs-keyword">if</span> (kunde != <span class="hljs-literal">null</span>) {
+    System.out.println(<span class="hljs-string">&quot;Gefundener Kunde: &quot;</span> + kunde.getName());
+}
+</code></pre>
+<p>Wenn die Entität bereits im Persistenzkontext liegt, gibt <code>find()</code> die bestehende Instanz zurück, ohne die Datenbank erneut abzufragen.</p>
+<p><strong>2. Abfragen mit JPQL (Java Persistence Query Language):</strong></p>
+<p>JPQL ist die standardisierte Abfragesprache von JPA. Sie ähnelt SQL, operiert aber auf den Entitätsobjekten und ihren Attributen, nicht auf Datenbanktabellen und Spalten. Dadurch ist dein Code unabhängiger von der zugrunde liegenden Datenbank.</p>
+<p><strong>Beispiel für eine einfache Abfrage:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Alle Kunden abfragen</span>
+TypedQuery&lt;Kunde&gt; query = entityManager.createQuery(<span class="hljs-string">&quot;SELECT k FROM Kunde k&quot;</span>, Kunde.class);
+List&lt;Kunde&gt; alleKunden = query.getResultList();
+</code></pre>
+<p><strong>Beispiel für eine Abfrage mit Bedingungen (WHERE-Klausel):</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Kunden mit einem bestimmten Namen abfragen</span>
+TypedQuery&lt;Kunde&gt; query = entityManager.createQuery(
+    <span class="hljs-string">&quot;SELECT k FROM Kunde k WHERE k.name = :kundenName&quot;</span>, Kunde.class);
+query.setParameter(<span class="hljs-string">&quot;kundenName&quot;</span>, <span class="hljs-string">&quot;Max Mustermann&quot;</span>);
+
+<span class="hljs-type">Kunde</span> <span class="hljs-variable">kunde</span> <span class="hljs-operator">=</span> query.getSingleResult();
+</code></pre>
+<ul>
+<li><strong><code>SELECT k FROM Kunde k</code></strong>: Wähle alle <code>Kunde</code>-Entitäten aus. <code>k</code> ist der Alias für die Entität.</li>
+<li><strong><code>WHERE k.name = :kundenName</code></strong>: Die Bedingung. <code>:kundenName</code> ist ein benannter Parameter.</li>
+<li><strong><code>query.setParameter()</code></strong>: Setzt den Wert für den Parameter.</li>
+</ul>
+<p><strong>3. Abfragen mit der Criteria API:</strong></p>
+<p>Die Criteria API ist eine typsichere, objektorientierte Alternative zu JPQL, die sich besonders für dynamisch aufgebaute Abfragen eignet. Sie ist komplexer, aber ideal, wenn du die Abfrage zur Laufzeit zusammenbauen musst.</p>
+<hr>
+<h4 id="53-aktualisieren-von-entities">5.3 Aktualisieren von Entities</h4>
+<p>Das Aktualisieren von Entitäten ist dank des Persistenzkontextes besonders einfach. Du musst keine explizite <code>update</code>-Methode aufrufen.</p>
+<p><strong>Ablauf:</strong></p>
+<ol>
+<li><strong>Transaktion starten</strong>.</li>
+<li><strong>Entität laden</strong>: Lade die Entität, die du aktualisieren möchtest, aus der Datenbank (z. B. mit <code>find()</code>). Die Entität befindet sich jetzt im <strong>managed</strong>-Zustand.</li>
+<li><strong>Entität ändern</strong>: Ändere die Attribute der geladenen Entität in deinem Code. Der <code>EntityManager</code> erkennt diese Änderungen automatisch.</li>
+<li><strong>Transaktion abschließen</strong>: Committe die Transaktion. Der <code>EntityManager</code> führt dann automatisch eine <code>UPDATE</code>-Anweisung aus, um die Änderungen in der Datenbank zu speichern.</li>
+</ol>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">EntityTransaction</span> <span class="hljs-variable">transaction</span> <span class="hljs-operator">=</span> entityManager.getTransaction();
+transaction.begin();
+
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-comment">// Kunde mit ID 10 laden (jetzt managed)</span>
+    <span class="hljs-type">Kunde</span> <span class="hljs-variable">kunde</span> <span class="hljs-operator">=</span> entityManager.find(Kunde.class, <span class="hljs-number">10L</span>);
+    <span class="hljs-keyword">if</span> (kunde != <span class="hljs-literal">null</span>) {
+        <span class="hljs-comment">// Attribut ändern – wird automatisch erkannt</span>
+        kunde.setEmail(<span class="hljs-string">&quot;neue.adresse@example.com&quot;</span>);
+    }
+
+    transaction.commit();
+} <span class="hljs-keyword">catch</span> (Exception e) {
+    <span class="hljs-keyword">if</span> (transaction.isActive()) {
+        transaction.rollback();
+    }
+    e.printStackTrace();
+}
+</code></pre>
+<hr>
+<h4 id="54-löschen-von-entities">5.4 Löschen von Entities</h4>
+<p>Das Löschen einer Entität ist ebenfalls eine Operation, die innerhalb einer Transaktion stattfinden muss.</p>
+<p><strong>Ablauf:</strong></p>
+<ol>
+<li><strong>Transaktion starten</strong>.</li>
+<li><strong>Entität laden</strong>: Lade die zu löschende Entität.</li>
+<li><strong>Entität entfernen</strong>: Rufe <code>entityManager.remove(entity)</code> auf. Die Entität wird in den <code>removed</code>-Zustand versetzt.</li>
+<li><strong>Transaktion abschließen</strong>: Committe die Transaktion. Der <code>EntityManager</code> führt dann die <code>DELETE</code>-Anweisung in der Datenbank aus.</li>
+</ol>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">EntityTransaction</span> <span class="hljs-variable">transaction</span> <span class="hljs-operator">=</span> entityManager.getTransaction();
+transaction.begin();
+
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-comment">// Kunde mit ID 10 laden</span>
+    <span class="hljs-type">Kunde</span> <span class="hljs-variable">kunde</span> <span class="hljs-operator">=</span> entityManager.find(Kunde.class, <span class="hljs-number">10L</span>);
+    <span class="hljs-keyword">if</span> (kunde != <span class="hljs-literal">null</span>) {
+        <span class="hljs-comment">// Kunde zum Löschen vormerken</span>
+        entityManager.remove(kunde);
+    }
+
+    transaction.commit();
+} <span class="hljs-keyword">catch</span> (Exception e) {
+    <span class="hljs-keyword">if</span> (transaction.isActive()) {
+        transaction.rollback();
+    }
+    e.printStackTrace();
+}
+</code></pre>
+<p>Durch das Verständnis dieser grundlegenden CRUD-Operationen kannst du deine JPA-Anwendung nun voll funktionsfähig machen.</p>
+
+            
+            
+        </body>
+        </html>

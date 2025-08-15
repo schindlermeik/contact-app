@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices beim Einsatz von Generics</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-beim-einsatz-von-generics">Handout: Best Practices beim Einsatz von Generics</h1>
+<hr>
+<h2 id="1-lesbarkeit-und-verständlichkeit-verbessern">1. Lesbarkeit und Verständlichkeit verbessern</h2>
+<p><strong>Generics erhöhen die Flexibilität deines Codes, können aber bei unüberlegtem Einsatz auch schnell unübersichtlich werden.</strong>
+Beachte daher:</p>
+<ul>
+<li>
+<p><strong>Kurze Methoden und Klassen:</strong>
+Halte generische Methoden möglichst kurz und verständlich. Lange Methoden mit vielen Typ-Parametern sind schwer zu überblicken.</p>
+</li>
+<li>
+<p><strong>Aussagekräftige Kommentare:</strong>
+Erkläre, wofür Typ-Parameter stehen und wie sie verwendet werden sollen.
+Beispiel:</p>
+<pre><code class="language-java"><span class="hljs-comment">// T steht für den Element-Typ der Box</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span>&lt;T&gt; { ... }
+</code></pre>
+</li>
+<li>
+<p><strong>Klare Schnittstellen:</strong>
+Verwende Generics vor allem dort, wo sie den Code wirklich flexibler und sicherer machen – z. B. bei Datenstrukturen, Bibliotheken, Utility-Klassen.</p>
+</li>
+<li>
+<p><strong>Vermeide übermäßige Verschachtelung:</strong>
+Typen wie <code>Map&lt;String, List&lt;Pair&lt;Integer, Set&lt;User&gt;&gt;&gt;&gt;</code> sind schwer lesbar und sollten ggf. über Hilfsklassen/Typaliases vereinfacht werden.</p>
+</li>
+</ul>
+<hr>
+<h2 id="2-sinnvolle-namensgebung-für-typ-parameter">2. Sinnvolle Namensgebung für Typ-Parameter</h2>
+<p>Typ-Parameter werden üblicherweise mit <strong>einem Großbuchstaben</strong> bezeichnet. Es gibt für bestimmte Fälle Konventionen:</p>
+<table>
+<thead>
+<tr>
+<th>Typ-Parameter</th>
+<th>Bedeutung / Verwendungszweck</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T</td>
+<td>Type (beliebiger Typ)</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Element (Element einer Collection)</td>
+</tr>
+<tr>
+<td>K</td>
+<td>Key (Schlüssel in einer Map)</td>
+</tr>
+<tr>
+<td>V</td>
+<td>Value (Wert in einer Map)</td>
+</tr>
+<tr>
+<td>N</td>
+<td>Number (häufig für Zahlenklassen)</td>
+</tr>
+<tr>
+<td>S, U, V</td>
+<td>Weitere Typ-Parameter (Secondary, usw.)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Beispiele:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span>&lt;T&gt; { ... }
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">List</span>&lt;E&gt; { ... }
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">Map</span>&lt;K, V&gt; { ... }
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Pair</span>&lt;T, U&gt; { ... }
+</code></pre>
+<ul>
+<li><strong>Merke:</strong>
+Typ-Parameter sollen <em>kurz</em> sein, aber ihre Funktion ausdrücken.
+In seltenen Fällen sind auch längere Bezeichner erlaubt (<code>&lt;ElementType&gt;</code>), aber das ist unüblich.</li>
+</ul>
+<hr>
+<h2 id="3-wann-wildcards-verwenden--und-wann-nicht">3. Wann Wildcards verwenden – und wann nicht?</h2>
+<p>Wildcards (<code>?</code>, <code>? extends T</code>, <code>? super T</code>) machen Methoden noch flexibler, erhöhen aber auch die Komplexität. Hier einige Faustregeln:</p>
+<h3 id="wann-solltest-du-wildcards-verwenden"><strong>Wann solltest du Wildcards verwenden?</strong></h3>
+<ul>
+<li>
+<p>Wenn deine Methode <strong>mit beliebigen Subtypen eines Typs arbeiten soll</strong>, ohne sich für den genauen Typ zu interessieren.</p>
+<ul>
+<li>
+<p>Beispiel:</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printAll</span><span class="hljs-params">(List&lt;?&gt; list)</span> { ... }
+<span class="hljs-keyword">public</span> <span class="hljs-type">double</span> <span class="hljs-title function_">sum</span><span class="hljs-params">(List&lt;? extends Number&gt; numbers)</span> { ... }
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>Wenn du eine <strong>API</strong> oder <strong>Library</strong> schreibst, die möglichst generisch und flexibel sein soll.</p>
+</li>
+</ul>
+<h3 id="wann-solltest-du-wildcards-nicht-verwenden"><strong>Wann solltest du Wildcards NICHT verwenden?</strong></h3>
+<ul>
+<li>
+<p>Wenn der Typ der Collection oder des Arguments bekannt und einheitlich ist.
+Beispiel:</p>
+<pre><code class="language-java">List&lt;String&gt; namen = ...;
+<span class="hljs-comment">// Verwende Methoden mit List&lt;String&gt; statt List&lt;?&gt;</span>
+</code></pre>
+</li>
+<li>
+<p>Wenn du Elemente <strong>aus einer Collection herausschreiben</strong> möchtest und sicher sein musst, welchen Typ du verwendest. (→ Lieber festen Typ-Parameter verwenden.)</p>
+</li>
+</ul>
+<h3 id="die-pecs-regel-merksatz"><strong>Die PECS-Regel (Merksatz):</strong></h3>
+<ul>
+<li>
+<p><strong>Producer Extends, Consumer Super</strong></p>
+<ul>
+<li>Wenn du aus einer Collection <strong>liest</strong> (sie ist Datenproduzent), verwende <code>&lt;? extends T&gt;</code>.</li>
+<li>Wenn du in eine Collection <strong>schreibst</strong> (sie ist Datenkonsument), verwende <code>&lt;? super T&gt;</code>.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiele:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Producer: List&lt;? extends Fruit&gt;</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printFruits</span><span class="hljs-params">(List&lt;? extends Fruit&gt; fruits)</span> { ... }
+
+<span class="hljs-comment">// Consumer: List&lt;? super Apple&gt;</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">addApple</span><span class="hljs-params">(List&lt;? <span class="hljs-built_in">super</span> Apple&gt; apples)</span> { apples.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Apple</span>()); }
+</code></pre>
+<h3 id="achtung-vor-übertreibung"><strong>Achtung vor Übertreibung!</strong></h3>
+<ul>
+<li>Zu viele Wildcards machen Code schwer verständlich und können zu Missverständnissen führen.</li>
+<li>Für den „normalen“ Gebrauch reichen oft einfache Typ-Parameter.</li>
+</ul>
+<hr>
+<h2 id="4-zusammenfassung--best-practices-im-überblick">4. Zusammenfassung – Best Practices im Überblick</h2>
+<ul>
+<li>Nutze Generics <strong>da, wo sie wirklich gebraucht werden</strong> (Flexibilität, Typsicherheit).</li>
+<li>Halte <strong>Namen der Typ-Parameter kurz und nach Konvention</strong>.</li>
+<li><strong>Kommentiere</strong> den Zweck von Typ-Parametern, wenn er nicht offensichtlich ist.</li>
+<li>Verwende <strong>Wildcards bewusst</strong> – und nach der <strong>PECS-Regel</strong>.</li>
+<li>Vermeide <strong>tiefe Verschachtelung</strong> bei generischen Typen – lieber strukturieren oder aufteilen.</li>
+</ul>
+<hr>
+<p><strong>Tipp:</strong>
+Am Anfang lieber weniger Typ-Parameter/Wildcards und dafür den Code nachvollziehbar halten.
+Mit wachsender Erfahrung kannst du die Mächtigkeit von Generics gezielt ausreizen!</p>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in Nebenl&auml;ufigkeit in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-nebenläufigkeit-in-java">Handout: Einführung in Nebenläufigkeit in Java</h1>
+<hr>
+<h2 id="11-was-bedeutet-nebenläufigkeit-in-java">1.1 Was bedeutet Nebenläufigkeit in Java?</h2>
+<p><strong>Nebenläufigkeit</strong> (engl. <em>Concurrency</em>) bezeichnet die Fähigkeit eines Programms, mehrere Aufgaben (Threads) so auszuführen, dass sie sich überschneiden oder gleichzeitig erscheinen – auch wenn nicht unbedingt echte Parallelität vorliegt.</p>
+<p>In Java bedeutet Nebenläufigkeit:</p>
+<ul>
+<li>Mehrere Aufgaben (Threads) können innerhalb eines Programms unabhängig voneinander laufen.</li>
+<li>Das Java-Runtime-System (JVM) verwaltet die Ausführung und den Wechsel zwischen den Threads (sog. <em>Scheduling</em>).</li>
+<li>Nebenläufigkeit kann auf einer einzelnen CPU (durch schnelles Umschalten – <em>Multitasking</em>) oder auf mehreren CPUs/Kernen (echte Parallelität) stattfinden.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Ein Webserver in Java kann mehrere Anfragen von Benutzern gleichzeitig bearbeiten. Für jede Anfrage wird ein eigener Thread erzeugt.</p>
+<hr>
+<h2 id="12-abgrenzung-nebenläufigkeit-concurrency-vs-parallelität-parallelism-in-java">1.2 Abgrenzung: Nebenläufigkeit (Concurrency) vs. Parallelität (Parallelism) in Java</h2>
+<h3 id="nebenläufigkeit-concurrency">Nebenläufigkeit (Concurrency)</h3>
+<ul>
+<li>Bedeutet, dass mehrere Aufgaben logisch „gleichzeitig“ ablaufen.</li>
+<li>Die JVM teilt der CPU mit, wann welcher Thread an der Reihe ist (häufig durch schnelles Umschalten, sog. <em>Interleaving</em>).</li>
+<li>Kann auf einem Einzelkern-Prozessor realisiert werden.</li>
+<li>Beispiel: Mehrere Nutzer bearbeiten in einer Java-Desktopanwendung gleichzeitig unterschiedliche Dokumente. Der Wechsel zwischen Aufgaben ist so schnell, dass alle Nutzer das Gefühl haben, ihre Aufgabe läuft „gleichzeitig“.</li>
+</ul>
+<h3 id="parallelität-parallelism">Parallelität (Parallelism)</h3>
+<ul>
+<li>Mehrere Aufgaben werden tatsächlich <em>zur gleichen Zeit</em> auf verschiedenen Prozessorkernen ausgeführt.</li>
+<li>Seit Java 1.5 unterstützt die JVM echte Parallelverarbeitung, wenn das Betriebssystem und die Hardware mehrere Kerne bereitstellen.</li>
+<li>Beispiel: In einer Datenanalyse-Anwendung werden große Datenmengen auf verschiedene Kerne verteilt und parallel berechnet.</li>
+</ul>
+<p><strong>Kurz gesagt:</strong></p>
+<ul>
+<li><em>Nebenläufigkeit</em> = Gleichzeitigkeit in der Programmstruktur, nicht zwingend in der Hardware.</li>
+<li><em>Parallelität</em> = Tatsächliche Gleichzeitigkeit durch parallele Ausführung auf mehreren Kernen.</li>
+</ul>
+<hr>
+<h2 id="13-typische-anwendungsfälle-für-multithreading-in-java">1.3 Typische Anwendungsfälle für Multithreading in Java</h2>
+<h3 id="a-benutzeroberflächen-gui">a) Benutzeroberflächen (GUI)</h3>
+<ul>
+<li>Reaktionsfähigkeit sichern: Während ein Java-Programm (z. B. mit Swing oder JavaFX) rechnet, soll die Benutzeroberfläche nicht „einfrieren“.</li>
+<li>Lösung: Hintergrund-Threads für lange Berechnungen.</li>
+</ul>
+<h3 id="b-serveranwendungen">b) Serveranwendungen</h3>
+<ul>
+<li>Ein Server (z. B. Webserver, Chatserver) muss viele Anfragen gleichzeitig verarbeiten.</li>
+<li>Lösung: Für jede eingehende Verbindung wird ein neuer Thread (oder ein Thread aus einem Pool) verwendet.</li>
+</ul>
+<h3 id="c-datenverarbeitung-und-berechnungen">c) Datenverarbeitung und Berechnungen</h3>
+<ul>
+<li>Große Datenmengen oder komplexe Berechnungen können auf mehrere Threads aufgeteilt und parallel ausgeführt werden (z. B. Bildverarbeitung, Simulationen).</li>
+</ul>
+<h3 id="d-asynchrone-aufgaben">d) Asynchrone Aufgaben</h3>
+<ul>
+<li>Netzwerkkommunikation, Dateioperationen, zeitgesteuerte Abläufe – Threads ermöglichen, dass das Hauptprogramm weiterläuft, während andere Aufgaben im Hintergrund erledigt werden.</li>
+</ul>
+<hr>
+<h2 id="14-herausforderungen-race-conditions-deadlocks-visibility-probleme-in-java">1.4 Herausforderungen: Race Conditions, Deadlocks, Visibility-Probleme in Java</h2>
+<h3 id="a-race-conditions-wettlaufsituationen">a) Race Conditions (Wettlaufsituationen)</h3>
+<ul>
+<li>
+<p>Tritt auf, wenn zwei oder mehr Threads gleichzeitig auf dieselbe Ressource zugreifen und mindestens einer sie verändert.</p>
+</li>
+<li>
+<p>Kann zu unerwarteten und schwer zu findenden Fehlern führen.</p>
+</li>
+<li>
+<p>Beispiel:</p>
+<pre><code class="language-java"><span class="hljs-comment">// Zwei Threads inkrementieren denselben Wert:</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Counter</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+        count = count + <span class="hljs-number">1</span>; <span class="hljs-comment">// Nicht thread-sicher!</span>
+    }
+}
+</code></pre>
+</li>
+<li>
+<p>Lösung: Synchronisation (späteres Thema).</p>
+</li>
+</ul>
+<h3 id="b-deadlocks-verklemmungen">b) Deadlocks (Verklemmungen)</h3>
+<ul>
+<li>Entstehen, wenn zwei oder mehr Threads sich gegenseitig blockieren, indem sie jeweils auf eine Ressource warten, die vom anderen gehalten wird.</li>
+<li>Beispiel: Thread A hält Lock 1 und wartet auf Lock 2, Thread B hält Lock 2 und wartet auf Lock 1 – keiner kann weiterarbeiten.</li>
+<li>Sehr schwer zu debuggen und zu vermeiden ohne gute Architektur.</li>
+</ul>
+<h3 id="c-visibility-probleme-sichtbarkeitsprobleme">c) Visibility-Probleme (Sichtbarkeitsprobleme)</h3>
+<ul>
+<li>Änderungen eines Threads an gemeinsamen Variablen werden von anderen Threads eventuell nicht oder verspätet gesehen.</li>
+<li>Ursache: Caches, CPU-Optimierungen oder JVM können verhindern, dass Werte sofort für alle Threads sichtbar sind.</li>
+<li>Lösung: Verwendung von <code>volatile</code>, Synchronisation oder speziellen Datenstrukturen (<code>AtomicInteger</code>, <code>ConcurrentHashMap</code> etc.).</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Was ist der Unterschied zwischen Nebenläufigkeit und Parallelität in Java?</li>
+<li>Nenne zwei typische Anwendungsfälle, in denen Multithreading in Java sinnvoll ist.</li>
+<li>Was versteht man unter einem „Race Condition“-Problem, und warum ist es gefährlich?</li>
+<li>Warum sind Deadlocks besonders schwer zu finden und zu vermeiden?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Nebenläufigkeit ist ein zentraler Bestandteil moderner Java-Anwendungen.</li>
+<li>Sie ermöglicht reaktionsfähige Programme und effiziente Ausnutzung von Mehrkern-Prozessoren.</li>
+<li>Sie bringt jedoch neue Herausforderungen, wie Race Conditions, Deadlocks und Visibility-Probleme, die eine gute Planung und den Einsatz geeigneter Java-Techniken erfordern.</li>
+</ul>
+<hr>
+<p><strong>Für das Selbststudium:</strong></p>
+<ul>
+<li>Experimentiere mit einfachen Thread-Beispielen in Java.</li>
+<li>Beobachte, wie Race Conditions auftreten können, und recherchiere erste Synchronisationsmöglichkeiten (z. B. <code>synchronized</code>).</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

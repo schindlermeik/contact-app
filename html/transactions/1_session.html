@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundlagen von Transaktionen</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundlagen-von-transaktionen">Handout: Grundlagen von Transaktionen</h1>
+<hr>
+<h2 id="11-was-ist-eine-transaktion">1.1 Was ist eine Transaktion?</h2>
+<p><strong>Definition:</strong>
+Eine Transaktion ist eine <em>abgeschlossene Folge von Datenbankoperationen</em>, die als eine einzige, unteilbare Einheit behandelt wird.
+Sie sorgt dafür, dass alle darin enthaltenen Operationen entweder <strong>vollständig durchgeführt</strong> werden oder <strong>gar nicht</strong> (sog. „Alles oder nichts“-Prinzip).</p>
+<p><strong>Typische Operationen innerhalb einer Transaktion:</strong></p>
+<ul>
+<li>Einfügen, Ändern oder Löschen von Datensätzen</li>
+<li>Kombination mehrerer SQL-Befehle (z. B. Überweisung zwischen Konten)</li>
+</ul>
+<p><strong>Beispiel (Banküberweisung):</strong></p>
+<ol>
+<li>Betrag vom Konto A abziehen</li>
+<li>Betrag zu Konto B hinzufügen
+Beide Schritte müssen zusammen ausgeführt werden – schlägt einer fehl, dürfen <strong>keine</strong> Änderungen in der Datenbank bleiben.</li>
+</ol>
+<h3 id="technische-sicht">Technische Sicht</h3>
+<ul>
+<li>Transaktionen werden meist explizit gestartet und abgeschlossen, z. B. mit <code>BEGIN</code>, <code>COMMIT</code> oder <code>ROLLBACK</code> (bei Fehlern).</li>
+<li>In modernen Java-Anwendungen (JDBC, JPA, Quarkus, Spring) gibt es API-Methoden oder Annotationen für die Transaktionssteuerung.</li>
+</ul>
+<hr>
+<h2 id="12-acid-prinzipien-atomicity-consistency-isolation-durability">1.2 ACID-Prinzipien (Atomicity, Consistency, Isolation, Durability)</h2>
+<p>Das ACID-Modell definiert die vier wichtigsten Eigenschaften, die eine Transaktion erfüllen muss:</p>
+<h3 id="a--atomicity-atomarität"><strong>A – Atomicity (Atomarität):</strong></h3>
+<ul>
+<li>Alle Operationen innerhalb einer Transaktion werden als eine untrennbare Einheit behandelt.</li>
+<li><strong>Ganz oder gar nicht:</strong>
+Wird ein Schritt fehlerhaft, werden alle bisherigen Änderungen zurückgenommen (Rollback).</li>
+</ul>
+<h3 id="c--consistency-konsistenz"><strong>C – Consistency (Konsistenz):</strong></h3>
+<ul>
+<li>Eine Transaktion führt die Datenbank von einem <strong>konsistenten Zustand</strong> in einen <strong>anderen konsistenten Zustand</strong>.</li>
+<li>Integritätsregeln, Constraints (z. B. „Kontostände dürfen nicht negativ werden“) werden niemals verletzt.</li>
+</ul>
+<h3 id="i--isolation-isolierung"><strong>I – Isolation (Isolierung):</strong></h3>
+<ul>
+<li>Gleichzeitige Transaktionen beeinflussen sich nicht gegenseitig.</li>
+<li>Das Ergebnis einer laufenden Transaktion ist für andere Transaktionen nicht sichtbar, bevor sie abgeschlossen ist.</li>
+<li>Unterschiedliche <strong>Isolationsebenen</strong> steuern, wie strikt diese Trennung erfolgt (z. B. Read Committed, Serializable).</li>
+</ul>
+<h3 id="d--durability-dauerhaftigkeit"><strong>D – Durability (Dauerhaftigkeit):</strong></h3>
+<ul>
+<li>Nach erfolgreichem Abschluss (Commit) sind die Daten dauerhaft gespeichert – auch bei Systemabsturz.</li>
+<li>Änderungen werden auf die Festplatte geschrieben und gehen nicht verloren.</li>
+</ul>
+<hr>
+<p><strong>Beispiel: Anwendung der ACID-Prinzipien</strong></p>
+<table>
+<thead>
+<tr>
+<th>Prinzip</th>
+<th>Beispiel aus der Praxis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atomicity</td>
+<td>Überweisung zwischen zwei Konten: Beide Konten werden aktualisiert – oder keins, falls ein Fehler passiert.</td>
+</tr>
+<tr>
+<td>Consistency</td>
+<td>Nach einer Überweisung stimmt die Gesamtsumme aller Konten wieder.</td>
+</tr>
+<tr>
+<td>Isolation</td>
+<td>Zwei gleichzeitige Überweisungen dürfen sich nicht gegenseitig beeinflussen.</td>
+</tr>
+<tr>
+<td>Durability</td>
+<td>Auch bei Stromausfall bleibt der neue Kontostand erhalten.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="13-warum-sind-transaktionen-wichtig-für-datenkonsistenz">1.3 Warum sind Transaktionen wichtig für Datenkonsistenz?</h2>
+<p><strong>Ziel:</strong>
+Transaktionen schützen die Integrität der Datenbank vor Fehlern, Systemabstürzen und konkurrierenden Zugriffen.</p>
+<h3 id="konkrete-gründe"><strong>Konkrete Gründe:</strong></h3>
+<ul>
+<li>
+<p><strong>Fehlerfall:</strong>
+Tritt während einer Folge von Datenbankoperationen ein Fehler auf (z. B. Netzwerkunterbrechung, unerwartete Ausnahme), werden alle bis dahin gemachten Änderungen wieder zurückgenommen – es bleibt kein inkonsistenter Zustand zurück.</p>
+</li>
+<li>
+<p><strong>Nebenläufigkeit (Concurrency):</strong>
+Mehrere Benutzer oder Systeme können gleichzeitig auf die Datenbank zugreifen. Ohne Transaktionen könnten sie sich gegenseitig überschreiben oder unvollständige Daten sehen.</p>
+</li>
+<li>
+<p><strong>Mehrstufige Abläufe:</strong>
+Viele Geschäftsprozesse bestehen aus mehreren abhängigen Schritten (z. B. Bestellung, Rechnung, Lagerabbuchung). Transaktionen sorgen dafür, dass der Prozess nur dann gültig ist, wenn <strong>alle</strong> Teilschritte erfolgreich sind.</p>
+</li>
+<li>
+<p><strong>Integritätsregeln:</strong>
+Datenbank-Constraints (z. B. Fremdschlüssel, eindeutige Werte) werden von Transaktionen automatisch eingehalten.</p>
+</li>
+</ul>
+<hr>
+<h3 id="was-passiert-ohne-transaktionen"><strong>Was passiert ohne Transaktionen?</strong></h3>
+<ul>
+<li>Teilweise gespeicherte oder fehlerhafte Daten</li>
+<li>„Lost Updates“ bei parallelen Zugriffen</li>
+<li>Verletzte Integritätsbedingungen (z. B. negatives Guthaben auf Konten)</li>
+<li>Unzuverlässige Applikationen und Datenverluste</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li><strong>Transaktionen</strong> sind essenziell, um Datenbankoperationen sicher, zuverlässig und konsistent durchzuführen.</li>
+<li>Das <strong>ACID-Modell</strong> stellt sicher, dass Transaktionen atomar, konsistent, isoliert und dauerhaft sind.</li>
+<li><strong>Datenkonsistenz</strong> und Integrität werden nur durch saubere Transaktionsführung garantiert – besonders wichtig bei kritischen Geschäftsprozessen oder Mehrbenutzer-Systemen.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Typ-Parameter und Wildcards in Java Generics</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-typ-parameter-und-wildcards-in-java-generics">Handout: Typ-Parameter und Wildcards in Java Generics</h1>
+<hr>
+<h2 id="1-typ-parameter">1. Typ-Parameter</h2>
+<p>Generics machen deinen Code flexibel und typsicher – das gilt nicht nur für einen, sondern für <strong>mehrere Typen gleichzeitig</strong>. Mit sogenannten <strong>Typ-Parametern</strong> kannst du beim Definieren von Klassen, Interfaces und Methoden flexibel angeben, für welche Typen sie arbeiten sollen.</p>
+<hr>
+<h3 id="a-mehrere-typ-parameter">a) Mehrere Typ-Parameter</h3>
+<p>Oft willst du eine Klasse für zwei oder mehr verschiedene Typen verwenden. Dafür gibst du in spitzen Klammern mehrere Typ-Parameter an, getrennt durch Kommas.</p>
+<p><strong>Syntax-Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Pair</span>&lt;T, U&gt; {
+    <span class="hljs-keyword">private</span> T first;
+    <span class="hljs-keyword">private</span> U second;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Pair</span><span class="hljs-params">(T first, U second)</span> {
+        <span class="hljs-built_in">this</span>.first = first;
+        <span class="hljs-built_in">this</span>.second = second;
+    }
+
+    <span class="hljs-keyword">public</span> T <span class="hljs-title function_">getFirst</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> first; }
+    <span class="hljs-keyword">public</span> U <span class="hljs-title function_">getSecond</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> second; }
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java">Pair&lt;String, Integer&gt; person = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;Alice&quot;</span>, <span class="hljs-number">25</span>);
+<span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> person.getFirst();    <span class="hljs-comment">// &quot;Alice&quot;</span>
+<span class="hljs-type">Integer</span> <span class="hljs-variable">alter</span> <span class="hljs-operator">=</span> person.getSecond(); <span class="hljs-comment">// 25</span>
+
+Pair&lt;Double, Double&gt; punkt = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-number">1.2</span>, <span class="hljs-number">3.4</span>);
+</code></pre>
+<p>Auch Java-Standardklassen wie <code>Map&lt;K, V&gt;</code> nutzen mehrere Typ-Parameter:</p>
+<pre><code class="language-java">Map&lt;Integer, String&gt; idToName = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+</code></pre>
+<ul>
+<li><code>K</code> steht für den Typ der Schlüssel</li>
+<li><code>V</code> für den Typ der Werte</li>
+</ul>
+<hr>
+<h3 id="b-beschränkte-typ-parameter-bounds">b) Beschränkte Typ-Parameter (Bounds)</h3>
+<p>Manchmal soll ein Typ-Parameter <strong>nur für bestimmte Typen</strong> zulässig sein – z. B. nur für Zahlen oder nur für Unterklassen einer bestimmten Klasse. Das nennt man <strong>Bounded Type Parameters</strong>.</p>
+<p><strong>Syntax:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span>&lt;T <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Number</span>&gt; {
+    <span class="hljs-keyword">private</span> T value;
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<ul>
+<li><code>T extends Number</code> heißt: Nur Klassen, die von <code>Number</code> erben (z. B. <code>Integer</code>, <code>Double</code>), sind erlaubt.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Box&lt;Integer&gt; intBox = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;();   <span class="hljs-comment">// OK</span>
+Box&lt;Double&gt; doubleBox = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;(); <span class="hljs-comment">// OK</span>
+<span class="hljs-comment">// Box&lt;String&gt; stringBox = new Box&lt;&gt;(); // Fehler! String ist keine Zahl</span>
+</code></pre>
+<p>Du kannst auch mehrere Bounds angeben, z. B.</p>
+<pre><code class="language-java">&lt;T <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Number</span> &amp; Comparable&lt;T&gt;&gt;
+</code></pre>
+<p>Das bedeutet: Der Typ muss von <code>Number</code> erben <strong>und</strong> das Interface <code>Comparable</code> implementieren.</p>
+<hr>
+<h2 id="2-wildcards">2. Wildcards</h2>
+<p><strong>Wildcards</strong> machen Generics flexibler – besonders beim Arbeiten mit Methoden, die generische Typen entgegennehmen. Sie werden durch ein Fragezeichen <code>?</code> dargestellt und erlauben es, Typen variabel oder „unscharf“ zu halten.</p>
+<hr>
+<h3 id="a-ungebundene-wildcard-">a) Ungebundene Wildcard: <code>&lt;?&gt;</code></h3>
+<p>Mit <code>&lt;?&gt;</code> kannst du angeben, dass ein Wert <strong>irgendeinen</strong> Typ hat, aber nicht genauer spezifiziert werden muss.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;?&gt; beliebigeListe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;String&gt;();
+beliebigeListe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Integer&gt;();
+</code></pre>
+<ul>
+<li>Die Liste kann Elemente beliebigen Typs enthalten – der exakte Typ ist egal.</li>
+<li>Du kannst aus so einer Liste nur als <code>Object</code> lesen (nicht schreiben, außer <code>null</code>).</li>
+</ul>
+<p><strong>Anwendungsfall:</strong>
+Wenn du eine Methode schreiben willst, die mit <strong>allen Listen</strong> arbeiten soll – unabhängig vom Typ:</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printList</span><span class="hljs-params">(List&lt;?&gt; list)</span> {
+    <span class="hljs-keyword">for</span> (Object obj : list) {
+        System.out.println(obj);
+    }
+}
+</code></pre>
+<hr>
+<h3 id="b-gebundene-wildcards">b) Gebundene Wildcards</h3>
+<h4 id="i-obere-schranke-upper-bound--extends-typ">i. Obere Schranke („upper bound“): <code>&lt;? extends Typ&gt;</code></h4>
+<p>Damit erlaubst du <strong>alle Unterklassen</strong> von <code>Typ</code> (einschließlich <code>Typ</code> selbst).</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-type">double</span> <span class="hljs-title function_">sumNumbers</span><span class="hljs-params">(List&lt;? extends Number&gt; numbers)</span> {
+    <span class="hljs-type">double</span> <span class="hljs-variable">sum</span> <span class="hljs-operator">=</span> <span class="hljs-number">0.0</span>;
+    <span class="hljs-keyword">for</span> (Number n : numbers) {
+        sum += n.doubleValue();
+    }
+    <span class="hljs-keyword">return</span> sum;
+}
+</code></pre>
+<ul>
+<li>Die Methode akzeptiert z. B. <code>List&lt;Integer&gt;</code>, <code>List&lt;Double&gt;</code>, <code>List&lt;Float&gt;</code> usw.</li>
+<li><strong>Merke:</strong> Du kannst aus einer solchen Collection lesen, aber (fast) nichts „Typisches“ hineinschreiben.</li>
+</ul>
+<h4 id="ii-untere-schranke-lower-bound--super-typ">ii. Untere Schranke („lower bound“): <code>&lt;? super Typ&gt;</code></h4>
+<p>Damit erlaubst du <strong>Typ</strong> und alle seine Oberklassen.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">addIntegers</span><span class="hljs-params">(List&lt;? <span class="hljs-built_in">super</span> Integer&gt; list)</span> {
+    list.add(<span class="hljs-number">42</span>);       <span class="hljs-comment">// Hinzufügen erlaubt</span>
+    <span class="hljs-comment">// Integer value = list.get(0); // Nicht erlaubt: Rückgabewert ist nur Object!</span>
+}
+</code></pre>
+<ul>
+<li>Die Methode kann z. B. <code>List&lt;Integer&gt;</code>, <code>List&lt;Number&gt;</code>, <code>List&lt;Object&gt;</code> entgegennehmen.</li>
+<li><strong>Merke:</strong> Du kannst „sicher“ schreiben, aber beim Lesen bekommst du nur <code>Object</code>.</li>
+</ul>
+<hr>
+<h3 id="c-typische-anwendungsfälle-für-wildcards">c) Typische Anwendungsfälle für Wildcards</h3>
+<ul>
+<li><strong>Ungebundene Wildcard (<code>&lt;?&gt;</code>):</strong>
+Wenn du eine Collection nur lesen (durchlaufen, anzeigen) willst und der konkrete Typ egal ist.</li>
+<li><strong>Obere Schranke (<code>&lt;? extends Typ&gt;</code>):</strong>
+Wenn du mit Objekten arbeitest, die bestimmte Eigenschaften/Methoden haben (z. B. alle Zahlen addieren), aber nichts hinzufügen musst.</li>
+<li><strong>Untere Schranke (<code>&lt;? super Typ&gt;</code>):</strong>
+Wenn du Elemente sicher hinzufügen willst (z. B. alle Integer zu einer passenden Liste).</li>
+</ul>
+<hr>
+<h3 id="d-merksatz-pecs-producer-extends-consumer-super">d) Merksatz: „PECS“ (Producer Extends, Consumer Super)</h3>
+<ul>
+<li><strong>Producer Extends:</strong>
+Wenn eine Methode „liefert“ (z. B. Daten ausliest/produziert), nimm <code>&lt;? extends Typ&gt;</code>.</li>
+<li><strong>Consumer Super:</strong>
+Wenn eine Methode „konsumiert“ (z. B. Elemente hinzufügt), nimm <code>&lt;? super Typ&gt;</code>.</li>
+</ul>
+<hr>
+<h2 id="3-übungen-zum-selbststudium">3. Übungen zum Selbststudium</h2>
+<ol>
+<li>Schreibe eine Methode, die jede beliebige Liste ausgibt (<code>printList(List&lt;?&gt; list)</code>).</li>
+<li>Schreibe eine Methode, die aus einer <code>List&lt;? extends Number&gt;</code> alle Werte aufsummiert.</li>
+<li>Schreibe eine Methode, die Integer-Werte zu einer <code>List&lt;? super Integer&gt;</code> hinzufügt.</li>
+</ol>
+<hr>
+<h2 id="4-zusammenfassung">4. Zusammenfassung</h2>
+<ul>
+<li><strong>Typ-Parameter</strong> machen Klassen und Methoden flexibel für unterschiedliche, aber bekannte Typen.</li>
+<li><strong>Wildcards</strong> machen Methoden flexibel für verschiedene (verwandte) Typen, deren genaue Ausprägung nicht immer wichtig ist.</li>
+<li><strong>Beschränkte Typ-Parameter</strong> erlauben gezielte Einschränkungen (z. B. „nur Zahlen“).</li>
+<li>Wildcards helfen besonders beim Lesen und Schreiben von Collections – beachte dabei die <strong>PECS-Regel</strong>.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices und typische Stolperfallen in Java &lpar;Multithreading&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-und-typische-stolperfallen-in-java-multithreading">Handout: Best Practices und typische Stolperfallen in Java (Multithreading)</h1>
+<hr>
+<h2 id="61-thread-leaks-vermeiden-threads-korrekt-beenden">6.1 Thread-Leaks vermeiden (Threads korrekt beenden)</h2>
+<h3 id="was-ist-ein-thread-leak">Was ist ein Thread-Leak?</h3>
+<ul>
+<li>Ein <strong>Thread-Leak</strong> bezeichnet Threads, die nach Beendigung ihrer eigentlichen Aufgabe weiterlaufen und nicht korrekt beendet werden.</li>
+<li>Folge: Erhöhter Ressourcenverbrauch (CPU, Speicher), potenzieller Absturz durch „OutOfMemoryError“ bei zu vielen Threads.</li>
+</ul>
+<h3 id="ursachen">Ursachen:</h3>
+<ul>
+<li>Endlosschleifen oder fehlerhafte Abbruchbedingungen im Thread.</li>
+<li>Threads warten unbegrenzt auf Ressourcen/Ereignisse, die nie eintreten.</li>
+</ul>
+<h3 id="best-practices">Best Practices:</h3>
+<ul>
+<li>
+<p><strong>Abbruch-Bedingungen prüfen:</strong>
+Setze eine Abbruch-Flag (z. B. <code>volatile boolean running</code>), das regelmäßig geprüft wird:</p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Worker</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Thread</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">running</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">while</span> (running) {
+            <span class="hljs-comment">// Arbeit</span>
+        }
+    }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">stopWorker</span><span class="hljs-params">()</span> { running = <span class="hljs-literal">false</span>; }
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Interrupts verwenden:</strong>
+Ermögliche dem Thread, durch <code>interrupt()</code> sanft beendet zu werden. Prüfe regelmäßig <code>Thread.interrupted()</code>:</p>
+<pre><code class="language-java"><span class="hljs-keyword">while</span> (!Thread.currentThread().isInterrupted()) { ... }
+</code></pre>
+</li>
+<li>
+<p><strong>Thread Pools bevorzugen:</strong>
+Vermeide direkte Thread-Erzeugung, nutze stattdessen <code>ExecutorService</code> und rufe am Ende <code>shutdown()</code> auf.</p>
+</li>
+</ul>
+<hr>
+<h2 id="62-fehlerquellen-beim-synchronisieren-zu-grobezu-feine-sperren-unnötige-synchronisation">6.2 Fehlerquellen beim Synchronisieren: zu grobe/zu feine Sperren, unnötige Synchronisation</h2>
+<h3 id="a-zu-grobe-sperren-coarse-grained-locking">a) Zu grobe Sperren (Coarse-grained Locking)</h3>
+<ul>
+<li>
+<p><strong>Problem:</strong> Zu große synchronisierte Bereiche verringern Parallelität und führen zu Performance-Einbußen.</p>
+</li>
+<li>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">processAll</span><span class="hljs-params">()</span> { 
+    <span class="hljs-comment">// großer, langsamer Codeblock</span>
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Lösung:</strong> Nur wirklich kritische Codeabschnitte schützen.</p>
+</li>
+</ul>
+<h3 id="b-zu-feine-sperren-fine-grained-locking">b) Zu feine Sperren (Fine-grained Locking)</h3>
+<ul>
+<li><strong>Problem:</strong> Viele, kleine Locks können zu Deadlocks und komplexen Fehlerbildern führen.</li>
+<li><strong>Beispiel:</strong> Verschachtelte Synchronisation auf mehreren Objekten.</li>
+</ul>
+<h3 id="c-unnötige-synchronisation">c) Unnötige Synchronisation</h3>
+<ul>
+<li><strong>Problem:</strong> Synchronisation auf Code, der nur lokale Variablen verwendet (gar keine gemeinsame Ressource).</li>
+<li><strong>Lösung:</strong> Synchronisation nur für gemeinsam genutzte Daten verwenden.</li>
+</ul>
+<h3 id="faustregeln"><strong>Faustregeln:</strong></h3>
+<ul>
+<li>So wenig wie nötig synchronisieren, aber so viel wie nötig!</li>
+<li>Kritische Abschnitte so klein wie möglich halten.</li>
+<li>Synchronisation möglichst immer auf das gleiche Objekt/Monitor.</li>
+</ul>
+<hr>
+<h2 id="63-debugging-von-multithreading-problemen">6.3 Debugging von Multithreading-Problemen</h2>
+<h3 id="typische-probleme">Typische Probleme:</h3>
+<ul>
+<li>Deadlocks</li>
+<li>Race Conditions (unerwartete Werte)</li>
+<li>Livelocks (Threads arbeiten, aber kommen nie zum Ziel)</li>
+</ul>
+<h3 id="werkzeuge-und-methoden">Werkzeuge und Methoden:</h3>
+<ul>
+<li>
+<p><strong>Thread Dumps:</strong>
+Zeigen alle laufenden Threads, deren Zustände und Locks.</p>
+<ul>
+<li>
+<p>In der IDE: „Dump Threads“-Funktion (meist bei „Run“/„Debug“).</p>
+</li>
+<li>
+<p>Über Konsole:</p>
+<pre><code>jstack &lt;PID&gt;
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>VisualVM:</strong>
+Kostenloses Java-Tool, zeigt laufende Threads, Locks und CPU-Auslastung.</p>
+</li>
+<li>
+<p><strong>Logging:</strong>
+Logge kritische Aktionen, Zustände und Locking-Verhalten zur Laufzeit (ggf. mit Thread-IDs).</p>
+</li>
+<li>
+<p><strong>Timeouts setzen:</strong>
+Vermeide endloses Warten, indem du Zeitlimits für Locking-Operationen (<code>tryLock(timeout)</code>) oder <code>wait(timeout)</code> verwendest.</p>
+</li>
+</ul>
+<h3 id="tipps">Tipps:</h3>
+<ul>
+<li>Suche nach „WAITING“ oder „BLOCKED“ Threads im Dump – oft Anzeichen für Deadlocks.</li>
+<li>Prüfe, ob Locks immer wieder freigegeben werden (<code>finally</code>-Block bei <code>lock.lock()</code>!).</li>
+</ul>
+<hr>
+<h2 id="64-performance-überlegungen-synchronisations-overhead-contention-false-sharing">6.4 Performance-Überlegungen: Synchronisations-Overhead, Contention, False Sharing</h2>
+<h3 id="a-synchronisations-overhead">a) Synchronisations-Overhead</h3>
+<ul>
+<li>Synchronisation kostet Zeit (Lock holen/freigeben) – insbesondere bei hoher Thread-Anzahl und geringem „echten“ Parallelismus.</li>
+<li>Übermäßige Synchronisation macht Programme langsam.</li>
+</ul>
+<h3 id="b-contention-lock-konkurrenz">b) Contention (Lock-Konkurrenz)</h3>
+<ul>
+<li>
+<p>Wenn viele Threads auf denselben Lock warten, kommt es zu „Lock Contention“.</p>
+</li>
+<li>
+<p>Folge: Threads stehen „Schlange“, statt parallel zu arbeiten.</p>
+</li>
+<li>
+<p><strong>Lösung:</strong></p>
+<ul>
+<li>Arbeitslast auf mehrere unabhängige Ressourcen (Sharding, Partitioning) verteilen.</li>
+<li>Nur das Nötigste synchronisieren.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-false-sharing">c) False Sharing</h3>
+<ul>
+<li>
+<p><strong>Definition:</strong> Verschiedene Threads schreiben auf Variablen, die auf demselben CPU-Cache-Line liegen.</p>
+</li>
+<li>
+<p>Obwohl sie logisch unabhängig sind, stören sich die Threads gegenseitig durch den Hardware-Cache.</p>
+</li>
+<li>
+<p><strong>Folge:</strong> Unerwartete Performance-Einbrüche.</p>
+</li>
+<li>
+<p><strong>Lösung:</strong></p>
+<ul>
+<li>Variablen, die oft von unterschiedlichen Threads beschrieben werden, räumlich im Speicher trennen (Padding).</li>
+<li>Im Normalfall selten problematisch, aber in hochperformanten Programmen relevant.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Wie kannst du sicherstellen, dass ein Thread wirklich beendet wird und nicht zum „Thread-Leak“ wird?</li>
+<li>Wann ist Synchronisation notwendig – und wann überflüssig?</li>
+<li>Was ist der Unterschied zwischen Deadlock, Livelock und Contention?</li>
+<li>Welche Tools oder Methoden nutzt du, um Multithreading-Probleme zu analysieren?</li>
+<li>Warum kann zu viel Synchronisation die Performance sogar verschlechtern?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Korrektes Beenden von Threads ist essentiell, um Ressourcenlecks zu vermeiden.</li>
+<li>Synchronisiere nur kritische Abschnitte und mit so wenigen Locks wie möglich.</li>
+<li>Nutze Tools wie VisualVM und Thread Dumps, um Fehler zu erkennen und zu analysieren.</li>
+<li>Berücksichtige Performance-Aspekte wie Synchronisations-Overhead, Contention und False Sharing, um skalierbare Multithread-Anwendungen zu schreiben.</li>
+<li>Überprüfe regelmäßig, ob dein Code thread-sicher UND performant ist – das schließt sich nicht aus!</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

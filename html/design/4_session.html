@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Abh&auml;ngigkeiten und Kommunikation zwischen Modulen</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-abhängigkeiten-und-kommunikation-zwischen-modulen">Handout: Abhängigkeiten und Kommunikation zwischen Modulen</h1>
+<hr>
+<h2 id="41-api-design-für-modulgrenzen-zb-service-interfaces">4.1 API-Design für Modulgrenzen (z. B. Service Interfaces)</h2>
+<h3 id="api-design-an-modulgrenzen"><strong>API-Design an Modulgrenzen</strong></h3>
+<ul>
+<li>Die <strong>API</strong> eines Moduls ist die einzige „offizielle“ Schnittstelle, über die andere Module darauf zugreifen können.</li>
+<li>Gute APIs sind <strong>klar</strong>, <strong>stabil</strong> und <strong>minimal</strong> – sie verstecken interne Details und legen nur das Notwendige offen.</li>
+<li><strong>Service Interfaces</strong> sind zentrale Werkzeuge: Sie abstrahieren Implementierungen und definieren verlässliche Verträge zwischen Modulen.</li>
+</ul>
+<p><strong>Beispiel (Java):</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Modul &quot;user.api&quot;</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">UserService</span> {
+    User <span class="hljs-title function_">findById</span><span class="hljs-params">(String id)</span>;
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">save</span><span class="hljs-params">(User user)</span>;
+}
+</code></pre>
+<ul>
+<li>Das Interface wird exportiert – Implementierungen sind oft in separaten Modulen gekapselt.</li>
+</ul>
+<hr>
+<h2 id="42-dependency-inversion-principle-dip-und-dependency-injection-im-modulkontext">4.2 Dependency Inversion Principle (DIP) und Dependency Injection im Modulkontext</h2>
+<h3 id="dependency-inversion-principle-dip"><strong>Dependency Inversion Principle (DIP)</strong></h3>
+<ul>
+<li><strong>Prinzip:</strong> Abhängigkeiten sollten immer von <strong>Abstraktionen</strong> (Interfaces) und nicht von konkreten Implementierungen ausgehen.</li>
+<li>Dadurch sind Module austauschbar, testbar und weniger eng gekoppelt.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<ul>
+<li>Anstatt: <code>OrderService</code> nutzt direkt <code>MySqlOrderRepository</code></li>
+<li>Besser: <code>OrderService</code> kennt nur das Interface <code>OrderRepository</code></li>
+</ul>
+<h3 id="dependency-injection-di-im-modulkontext"><strong>Dependency Injection (DI) im Modulkontext</strong></h3>
+<ul>
+<li>
+<p>Die konkreten Abhängigkeiten werden zur Laufzeit „injiziert“ – oft per Konstruktor, Setter oder Framework.</p>
+</li>
+<li>
+<p>Im Modulkontext bedeutet das:</p>
+<ul>
+<li>Die API ist abstrahiert.</li>
+<li>Implementierungen werden (ggf. per Service Loader, Factories oder DI-Framework) zur Verfügung gestellt.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> OrderRepository repo;
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">OrderService</span><span class="hljs-params">(OrderRepository repo)</span> {
+        <span class="hljs-built_in">this</span>.repo = repo;
+    }
+}
+</code></pre>
+<ul>
+<li><code>OrderService</code> ist unabhängig davon, <em>wie</em> das Repository bereitgestellt wird.</li>
+</ul>
+<hr>
+<h2 id="43-varianten-der-modulintegration">4.3 Varianten der Modulintegration</h2>
+<h3 id="431-service-loader-spi-service-provider-interface"><strong>4.3.1 Service Loader (SPI, Service Provider Interface)</strong></h3>
+<ul>
+<li>
+<p><strong>Mechanismus in Java</strong>: Dynamische Entdeckung und Nutzung von Implementierungen für ein Interface zur Laufzeit.</p>
+</li>
+<li>
+<p><strong>Vorgehen:</strong></p>
+<ol>
+<li>Definiere ein Service-Interface (z. B. <code>PaymentProvider</code>).</li>
+<li>Implementierer veröffentlichen Implementierungen und registrieren sie in
+<code>META-INF/services/&lt;interface name&gt;</code>.</li>
+<li>Andere Module können mit <code>ServiceLoader.load(PaymentProvider.class)</code> zur Laufzeit alle Implementierungen finden.</li>
+</ol>
+</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">for</span> (PaymentProvider p : ServiceLoader.load(PaymentProvider.class)) {
+    p.pay(...);
+}
+</code></pre>
+<ul>
+<li>Ermöglicht lose gekoppelte, erweiterbare Systeme (z. B. Plugins).</li>
+</ul>
+<hr>
+<h3 id="432-events-und-messaging"><strong>4.3.2 Events und Messaging</strong></h3>
+<ul>
+<li><strong>Modulgrenzen über Events verbinden:</strong> Ein Modul sendet Ereignisse, andere Module reagieren.</li>
+<li>Vorteil: Module sind <em>komplett</em> entkoppelt, kennen sich nicht direkt.</li>
+<li>In Java: Oft mit Observer Pattern, EventBus, oder modernen Messaging-Lösungen (z. B. Kafka, JMS).</li>
+<li>Gut geeignet für asynchrone, reaktive Systeme.</li>
+</ul>
+<p><strong>Beispiel (vereinfacht):</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Event Publisher</span>
+eventBus.post(<span class="hljs-keyword">new</span> <span class="hljs-title class_">UserCreatedEvent</span>(user));
+
+<span class="hljs-comment">// Event Listener</span>
+eventBus.register(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>() {
+    <span class="hljs-meta">@Subscribe</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">handle</span><span class="hljs-params">(UserCreatedEvent e)</span> { ... }
+});
+</code></pre>
+<hr>
+<h3 id="433-rest-bei-verteilten-systemen"><strong>4.3.3 REST (bei verteilten Systemen)</strong></h3>
+<ul>
+<li>
+<p>Module (oder Microservices) laufen als unabhängige Prozesse, kommunizieren über standardisierte HTTP(S)-Schnittstellen (REST-APIs).</p>
+</li>
+<li>
+<p><strong>Vorteile:</strong> Technologieneutral, unabhängig deploybar, flexibel skalierbar.</p>
+</li>
+<li>
+<p><strong>Beispiele:</strong></p>
+<ul>
+<li>Ein Auth-Service bietet <code>/users</code>-API an, ein Bestell-Service nutzt diese API über HTTP.</li>
+</ul>
+</li>
+<li>
+<p><strong>Achtung:</strong> Fehlerbehandlung, Versionierung und API-Design werden noch wichtiger!</p>
+</li>
+</ul>
+<hr>
+<h2 id="44-zyklische-abhängigkeiten-vermeiden">4.4 Zyklische Abhängigkeiten vermeiden</h2>
+<h3 id="warum-gefährlich"><strong>Warum gefährlich?</strong></h3>
+<ul>
+<li>
+<p>Wenn zwei oder mehr Module sich gegenseitig brauchen (A ↔ B), entsteht eine <strong>zyklische Abhängigkeit</strong>.</p>
+</li>
+<li>
+<p>Folgen:</p>
+<ul>
+<li>Komplizierte Builds, schwierige Wartung, erschwerte Testbarkeit und Deployment-Probleme.</li>
+<li>Im JPMS (Java Module System) <strong>verboten</strong>: Zyklische Modulabhängigkeiten führen zu Compiler-Fehlern.</li>
+</ul>
+</li>
+</ul>
+<h3 id="strategien-zur-vermeidung"><strong>Strategien zur Vermeidung:</strong></h3>
+<ul>
+<li><strong>Schnittstellen in eigene API-Module auslagern</strong>
+(z. B. <code>user.api</code>, <code>order.api</code>), Implementierungen in getrennten Modulen.</li>
+<li><strong>Events oder Messaging verwenden</strong> statt direkter Aufrufe.</li>
+<li><strong>Abhängigkeiten umdrehen</strong> (Dependency Inversion Principle).</li>
+<li><strong>Architekturreviews</strong> und automatisierte Tools wie <code>jdeps</code> oder Maven Enforcer verwenden.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Warum sind Service-Interfaces und abstrakte APIs für Modulgrenzen so wichtig?</li>
+<li>Wie hilft Dependency Injection dabei, lose Kopplung zwischen Modulen zu erzielen?</li>
+<li>Wann lohnt sich Events/Messaging oder REST als Integrationsmuster?</li>
+<li>Was sind die größten Risiken zyklischer Abhängigkeiten?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li><strong>Sauberes API-Design</strong> ist das A und O für modulare Software – immer über Service-Interfaces abstrahieren.</li>
+<li><strong>Dependency Inversion</strong> und <strong>Dependency Injection</strong> ermöglichen flexible, austauschbare und testbare Modulintegration.</li>
+<li>Verschiedene Integrationsmuster – <strong>Service Loader</strong>, <strong>Events/Messaging</strong>, <strong>REST</strong> – sind je nach Szenario sinnvoll.</li>
+<li><strong>Zyklische Abhängigkeiten</strong> müssen unbedingt vermieden werden – sonst leidet Wartbarkeit, Modularität und Skalierbarkeit!</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

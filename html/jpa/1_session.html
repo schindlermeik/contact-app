@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundverst&auml;ndnis JPA</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-grundverständnis-jpa">Handout: Grundverständnis JPA</h3>
+<h4 id="11-was-ist-jpa--ziel-und-motivation">1.1 Was ist JPA? – Ziel und Motivation</h4>
+<p><strong>JPA</strong> steht für <strong>Java Persistence API</strong>. Es ist eine Spezifikation, also ein standardisiertes Regelwerk für die Verwaltung von relationalen Daten in Java-Anwendungen. Das Hauptziel von JPA ist es, die Entwicklung von Anwendungen zu vereinfachen, die mit Datenbanken interagieren.</p>
+<p>Die Motivation hinter JPA ist die Beseitigung des sogenannten <strong>Impedance Mismatch</strong> – dem grundlegenden Unterschied zwischen der objektorientierten Welt von Java (Klassen, Objekte) und der relationalen Welt von Datenbanken (Tabellen, Spalten). In einer Java-Anwendung arbeiten wir mit Objekten, während eine Datenbank Daten in Tabellen speichert. Diese beiden Welten passen nicht direkt zueinander. JPA bietet einen Weg, Java-Objekte (sogenannte <strong>Entities</strong>) nahtlos in Datenbanktabellen zu überführen und umgekehrt. Dieser Prozess wird <strong>Objekt-Relationales Mapping (ORM)</strong> genannt.</p>
+<p>JPA ist <strong>nur die Spezifikation</strong>. Das bedeutet, dass es keine eigene Implementierung ist, sondern eine Reihe von Regeln und APIs, die von anderen Frameworks (den sogenannten <strong>JPA-Providern</strong>) umgesetzt werden müssen. Bekannte JPA-Provider sind <strong>Hibernate, EclipseLink und OpenJPA</strong>.</p>
+<hr>
+<h4 id="12-abgrenzung-jpa-vs-jdbc-vs-hibernate">1.2 Abgrenzung: JPA vs. JDBC vs. Hibernate</h4>
+<p>Um JPA besser zu verstehen, ist es hilfreich, es von anderen Techniken abzugrenzen.</p>
+<ul>
+<li>
+<p><strong>JDBC (Java Database Connectivity)</strong>: Dies ist die unterste Ebene für Datenbankzugriffe in Java. JDBC ist ein API, das es Ihnen ermöglicht, direkt SQL-Anweisungen an die Datenbank zu senden. Sie müssen die SQL-Befehle (INSERT, SELECT, UPDATE, DELETE) manuell schreiben, die Verbindung zur Datenbank verwalten und die Ergebnisse in Java-Objekte umwandeln. JDBC ist sehr flexibel, aber auch sehr aufwendig, da Sie viel Boilerplate-Code schreiben müssen.</p>
+</li>
+<li>
+<p><strong>JPA (Java Persistence API)</strong>: Wie bereits erwähnt, ist JPA eine <strong>Spezifikation</strong> für ORM. Es definiert, wie Java-Klassen als Datenbanktabellen gemappt werden, wie Transaktionen verwaltet werden und wie Abfragen formuliert werden. JPA abstrahiert die Komplexität von JDBC, sodass Sie sich nicht mehr um das Schreiben von SQL-Code kümmern müssen. Stattdessen arbeiten Sie mit Java-Objekten und annotieren diese, um das Mapping festzulegen.</p>
+</li>
+<li>
+<p><strong>Hibernate</strong>: Hibernate ist ein konkreter <strong>JPA-Provider</strong>. Es ist die wohl bekannteste und am weitesten verbreitete Implementierung der JPA-Spezifikation. Hibernate kann aber auch als eigenständiges ORM-Framework verwendet werden, das über die JPA-Spezifikation hinausgeht und zusätzliche Funktionen bietet. In der Praxis verwenden die meisten Entwickler Hibernate, um die JPA-Spezifikation umzusetzen.</p>
+</li>
+</ul>
+<p><strong>Zusammenfassend lässt sich sagen:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Technik</th>
+<th style="text-align:left">Beschreibung</th>
+<th style="text-align:left">Beziehung zueinander</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>JDBC</strong></td>
+<td style="text-align:left">API auf unterster Ebene für direkte SQL-Befehle</td>
+<td style="text-align:left">Ist die Basis. JPA-Provider wie Hibernate nutzen intern JDBC, um mit der Datenbank zu kommunizieren.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>JPA</strong></td>
+<td style="text-align:left">Eine Spezifikation für Objekt-Relationales Mapping (ORM)</td>
+<td style="text-align:left">Definiert die Regeln, wie man ein ORM-System aufbaut.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Hibernate</strong></td>
+<td style="text-align:left">Eine konkrete Implementierung der JPA-Spezifikation</td>
+<td style="text-align:left">Setzt die Regeln von JPA um und bietet zusätzliche Features.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="13-typische-anwendungsfälle-von-jpa">1.3 Typische Anwendungsfälle von JPA</h4>
+<p>JPA ist in einer Vielzahl von Szenarien nützlich, insbesondere dort, wo es um die Verwaltung von persistenten Daten geht. Hier sind einige typische Anwendungsfälle:</p>
+<ul>
+<li>
+<p><strong>Business-Anwendungen mit Datenbankzugriff</strong>: Jede Anwendung, die Benutzerprofile, Bestellungen, Produktkataloge oder andere Geschäftsdaten in einer relationalen Datenbank speichern und abrufen muss, profitiert von JPA. Anstatt manuell SQL zu schreiben, können Sie einfach mit Java-Objekten arbeiten.</p>
+</li>
+<li>
+<p><strong>Webanwendungen</strong>: In Webanwendungen, die auf Frameworks wie Spring oder Jakarta EE basieren, wird JPA häufig zur Persistenzschicht verwendet. Es ermöglicht eine saubere Trennung der Geschäftslogik von der Datenzugriffslogik.</p>
+</li>
+<li>
+<p><strong>Microservices</strong>: Auch in der Welt der Microservices wird JPA oft eingesetzt, um die Datenhaltung für einzelne Services zu verwalten. Jeder Service kann seine eigene Datenbank haben und JPA verwenden, um die Daten effizient zu persistieren.</p>
+</li>
+<li>
+<p><strong>Unternehmensanwendungen (Enterprise Applications)</strong>: In großen, komplexen Systemen vereinfacht JPA die Wartung und Entwicklung erheblich. Änderungen am Datenmodell sind leichter zu handhaben, da das Mapping in den Java-Klassen definiert ist und nicht in Hunderten von manuell geschriebenen SQL-Abfragen.</p>
+</li>
+</ul>
+<p>Im Grunde genommen ist JPA immer dann die richtige Wahl, wenn Sie die Komplexität des direkten SQL-Schreibens vermeiden und eine saubere, objektorientierte Herangehensweise für die Datenhaltung in einer relationalen Datenbank bevorzugen.</p>
+
+            
+            
+        </body>
+        </html>

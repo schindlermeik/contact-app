@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praktische &Uuml;bungen und Beispiele zu Optional</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praktische-übungen-und-beispiele-zu-optional">Handout: Praktische Übungen und Beispiele zu Optional</h1>
+<hr>
+<h2 id="1-typische-methoden-mit-optional-als-rückgabe-implementieren">1. Typische Methoden mit Optional als Rückgabe implementieren</h2>
+<h3 id="aufgabe-1">Aufgabe 1</h3>
+<p><strong>Implementiere eine Methode, die einen Benutzernamen zu einer ID sucht. Der Benutzername kann fehlen. Gib das Ergebnis als <code>Optional&lt;String&gt;</code> zurück.</strong></p>
+<p><strong>Lösung:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> Optional&lt;String&gt; <span class="hljs-title function_">findeBenutzernameById</span><span class="hljs-params">(String id)</span> {
+    Map&lt;String, String&gt; benutzerDb = Map.of(
+        <span class="hljs-string">&quot;101&quot;</span>, <span class="hljs-string">&quot;Anna&quot;</span>,
+        <span class="hljs-string">&quot;102&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>
+    );
+    <span class="hljs-keyword">if</span> (benutzerDb.containsKey(id)) {
+        <span class="hljs-keyword">return</span> Optional.of(benutzerDb.get(id));
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> Optional.empty();
+    }
+}
+
+<span class="hljs-comment">// Verwendung:</span>
+Optional&lt;String&gt; benutzer = findeBenutzernameById(<span class="hljs-string">&quot;101&quot;</span>);
+benutzer.ifPresent(System.out::println); <span class="hljs-comment">// Gibt &quot;Anna&quot; aus</span>
+</code></pre>
+<hr>
+<h2 id="2-fehlerbehandlung-mit-optional-im-vergleich-zu-klassischen-null-checks">2. Fehlerbehandlung mit Optional im Vergleich zu klassischen Null-Checks</h2>
+<h3 id="aufgabe-2">Aufgabe 2</h3>
+<p><strong>Vergleiche zwei Varianten einer Methode – einmal mit null, einmal mit Optional – und wie man das Ergebnis verarbeitet.</strong></p>
+<p><strong>a) Mit null:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> String <span class="hljs-title function_">findeEmail</span><span class="hljs-params">(String name)</span> {
+    <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;Anna&quot;</span>.equals(name)) {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;anna@example.com&quot;</span>;
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+    }
+}
+
+<span class="hljs-comment">// Fehleranfällig:</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">email</span> <span class="hljs-operator">=</span> findeEmail(<span class="hljs-string">&quot;Bernd&quot;</span>);
+<span class="hljs-keyword">if</span> (email != <span class="hljs-literal">null</span>) {
+    System.out.println(email.toLowerCase());
+} <span class="hljs-keyword">else</span> {
+    System.out.println(<span class="hljs-string">&quot;Keine Email gefunden!&quot;</span>);
+}
+</code></pre>
+<p><strong>b) Mit Optional:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> Optional&lt;String&gt; <span class="hljs-title function_">findeEmailOptional</span><span class="hljs-params">(String name)</span> {
+    <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;Anna&quot;</span>.equals(name)) {
+        <span class="hljs-keyword">return</span> Optional.of(<span class="hljs-string">&quot;anna@example.com&quot;</span>);
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> Optional.empty();
+    }
+}
+
+<span class="hljs-comment">// Sicherer:</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">email</span> <span class="hljs-operator">=</span> findeEmailOptional(<span class="hljs-string">&quot;Bernd&quot;</span>)
+    .map(String::toLowerCase)
+    .orElse(<span class="hljs-string">&quot;Keine Email gefunden!&quot;</span>);
+
+System.out.println(email);
+</code></pre>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Keine Gefahr einer NullPointerException.</li>
+<li>Der Umgang mit dem „kein Wert“-Fall ist <strong>typisiert und klar geregelt</strong>.</li>
+</ul>
+<hr>
+<h2 id="3-refactoring-null-basierte-methode-auf-optional-umstellen">3. Refactoring: Null-basierte Methode auf Optional umstellen</h2>
+<h3 id="aufgabe-3">Aufgabe 3</h3>
+<p><strong>Nimm eine bestehende Methode, die bisher null zurückgibt, und stelle sie auf Optional um.</strong></p>
+<p><strong>Vorher:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> String <span class="hljs-title function_">findeTelefonnummer</span><span class="hljs-params">(String name)</span> {
+    <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;Anna&quot;</span>.equals(name)) {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;01234&quot;</span>;
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+}
+</code></pre>
+<p><strong>Nachher:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> Optional&lt;String&gt; <span class="hljs-title function_">findeTelefonnummer</span><span class="hljs-params">(String name)</span> {
+    <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;Anna&quot;</span>.equals(name)) {
+        <span class="hljs-keyword">return</span> Optional.of(<span class="hljs-string">&quot;01234&quot;</span>);
+    }
+    <span class="hljs-keyword">return</span> Optional.empty();
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">nummer</span> <span class="hljs-operator">=</span> findeTelefonnummer(<span class="hljs-string">&quot;Bernd&quot;</span>)
+    .orElse(<span class="hljs-string">&quot;Nicht gefunden&quot;</span>);
+System.out.println(nummer); <span class="hljs-comment">// Gibt &quot;Nicht gefunden&quot; aus</span>
+</code></pre>
+<hr>
+<h2 id="4-weitere-übungsaufgaben-zum-selbststudium">4. Weitere Übungsaufgaben zum Selbststudium</h2>
+<ol>
+<li>Implementiere eine Methode, die eine Person nach E-Mail sucht und ein Optional<Person> zurückgibt.</li>
+<li>Nutze <code>map()</code> und <code>filter()</code>, um aus einem Optional<String> nur dann die Länge zurückzugeben, wenn der String länger als 5 Zeichen ist.</li>
+<li>Führe ein Refactoring einer bestehenden Methode durch, die bisher mit <code>null</code> arbeitet, und verwende stattdessen Optional.</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li><strong>Optional als Rückgabetyp macht Code sicherer und klarer – keine NullPointerExceptions mehr!</strong></li>
+<li><strong>Verwende <code>map()</code>, <code>orElse()</code> und Co., um Optionals elegant auszuwerten.</strong></li>
+<li><strong>Beim Refactoring von „null“-Methoden auf Optional ändert sich oft wenig Code, aber die Lesbarkeit und Sicherheit steigt deutlich.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

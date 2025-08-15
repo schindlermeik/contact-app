@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung ins Debugging</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-ins-debugging">Handout: Einführung ins Debugging</h1>
+<hr>
+<h2 id="1-was-ist-debugging">1. Was ist Debugging?</h2>
+<ul>
+<li><strong>Debugging</strong> ist der systematische Prozess, Fehler (Bugs) in Software zu finden, zu analysieren und zu beheben.</li>
+<li>Ein „Bug“ ist jede unerwünschte oder unerwartete Verhaltensweise eines Programms – vom kleinen Rechenfehler bis zum Absturz der Anwendung.</li>
+<li>Ziel des Debuggings: Herausfinden, <strong>wo</strong> im Code und <strong>warum</strong> ein Fehler auftritt und <strong>wie</strong> er sich beseitigen lässt.</li>
+</ul>
+<h3 id="typische-schritte-beim-debuggen">Typische Schritte beim Debuggen</h3>
+<ol>
+<li><strong>Fehler bemerken</strong> (z. B. Absturz, falsche Ausgabe, Ausnahme)</li>
+<li><strong>Fehler reproduzieren</strong> (kann ich den Bug zuverlässig auslösen?)</li>
+<li><strong>Fehlerursache eingrenzen</strong> (welcher Teil des Codes ist verantwortlich?)</li>
+<li><strong>Fehler beseitigen</strong> (Code ändern, testen)</li>
+<li><strong>Nachtesten</strong> (tritt der Fehler weiterhin auf?)</li>
+</ol>
+<h3 id="debugging-werkzeuge">Debugging-Werkzeuge</h3>
+<ul>
+<li><strong>Debugger:</strong> Spezielle Tools (wie der Debugger in IntelliJ IDEA), die erlauben, den Programmablauf Schritt für Schritt zu verfolgen, Variablen zu inspizieren, den Call-Stack anzuschauen und den Code gezielt zu untersuchen.</li>
+<li><strong>Breakpoints:</strong> Markierungen im Code, an denen das Programm beim Debuggen anhält.</li>
+</ul>
+<hr>
+<h2 id="2-unterschied-debugging-vs-logging-vs-testen">2. Unterschied: Debugging vs. Logging vs. Testen</h2>
+<h3 id="a-debugging">a) Debugging</h3>
+<ul>
+<li><strong>Aktive Fehlersuche</strong>: Der Entwickler untersucht das laufende Programm gezielt mit Werkzeugen, um Fehler zu finden und zu verstehen.</li>
+<li>Typisch: Setzen von Breakpoints, Durchlaufen des Codes Schritt für Schritt, Live-Analyse von Variablen und Zuständen.</li>
+</ul>
+<h3 id="b-logging">b) Logging</h3>
+<ul>
+<li>
+<p><strong>Protokollierung von Informationen</strong> während des Programmablaufs.</p>
+</li>
+<li>
+<p>Logs werden meist während der normalen Ausführung (im Betrieb) geschrieben und helfen dabei, nachträglich Fehler und Abläufe zu rekonstruieren.</p>
+</li>
+<li>
+<p><strong>Unterschied zum Debugging:</strong></p>
+<ul>
+<li>Logging ist „passiv“ (schreibt nur mit), Debugging ist „aktiv“ (steuert und untersucht den Code).</li>
+<li>Logs sind nützlich für Fehler, die im Produktivsystem auftreten und im Debugger schwer reproduzierbar sind.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-testen">c) Testen</h3>
+<ul>
+<li>
+<p><strong>Testen</strong> prüft, ob ein Programm korrekt funktioniert – meist automatisiert (z. B. Unit-Tests).</p>
+</li>
+<li>
+<p>Tests helfen, Fehler früh zu finden, <strong>bevor</strong> der Code ausgeführt oder in Produktion gebracht wird.</p>
+</li>
+<li>
+<p><strong>Unterschied zu Debugging:</strong></p>
+<ul>
+<li>Testen ist präventiv, Debugging ist reaktiv.</li>
+<li>Tests zeigen, <strong>dass</strong> ein Fehler existiert, Debugging zeigt, <strong>warum</strong> der Fehler auftritt und <strong>wo</strong> er steckt.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="tabelle-vergleich-der-techniken">Tabelle: Vergleich der Techniken</h3>
+<table>
+<thead>
+<tr>
+<th>Technik</th>
+<th>Ziel</th>
+<th>Wann?</th>
+<th>Typische Werkzeuge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Debugging</td>
+<td>Fehler finden und verstehen</td>
+<td>Während Entwicklung, bei Bugs</td>
+<td>Debugger, Breakpoints</td>
+</tr>
+<tr>
+<td>Logging</td>
+<td>Abläufe dokumentieren, Fehler erkennen</td>
+<td>Immer (Entwicklung + Produktion)</td>
+<td>Logger (z. B. Log4j, SLF4J)</td>
+</tr>
+<tr>
+<td>Testen</td>
+<td>Fehler vorbeugen, Korrektheit sichern</td>
+<td>Vor Release, bei Änderungen</td>
+<td>Unit-Tests, Integrationstests</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="3-wann-und-warum-debugging-einsetzen">3. Wann und warum Debugging einsetzen?</h2>
+<h3 id="wann-ist-debugging-sinnvoll">Wann ist Debugging sinnvoll?</h3>
+<ul>
+<li><strong>Fehlverhalten tritt auf</strong>, das sich mit bloßem Code-Lesen nicht sofort erklären lässt.</li>
+<li><strong>Tests schlagen fehl</strong> und die Ursache ist nicht auf Anhieb sichtbar.</li>
+<li><strong>Komplexe Abläufe, viele Abhängigkeiten</strong> oder Multithreading sind beteiligt.</li>
+<li>Beim Arbeiten an <strong>fremdem oder altem Code</strong>, den man noch nicht gut kennt.</li>
+</ul>
+<h3 id="warum-ist-debugging-wichtig">Warum ist Debugging wichtig?</h3>
+<ul>
+<li>Es ist oft <strong>die einzige Methode</strong>, um komplexe Fehler wirklich zu verstehen und gezielt zu beheben.</li>
+<li>Debugging macht Zusammenhänge und Zustände im Code sichtbar, die bei der reinen Code-Analyse leicht übersehen werden.</li>
+<li><strong>Gutes Debugging</strong> spart Zeit und Nerven – es hilft, zielgerichtet und effizient Fehler zu beseitigen, statt „auf Verdacht“ zu ändern.</li>
+<li>Debugging-Fähigkeiten sind eine <strong>Kernkompetenz jedes Entwicklers</strong> und unverzichtbar im Berufsalltag.</li>
+</ul>
+<hr>
+<h2 id="4-tipps-für-einsteiger">4. Tipps für Einsteiger</h2>
+<ul>
+<li>Versuche, Fehler zuerst <strong>systematisch zu reproduzieren</strong>.</li>
+<li>Notiere die <strong>Eingaben und Zustände</strong>, bei denen der Fehler auftritt.</li>
+<li><strong>Nutze Debugger und Breakpoints</strong>, statt „println“-Ausgaben überall im Code.</li>
+<li>Lerne die Debugging-Werkzeuge deiner IDE (z. B. IntelliJ) kennen – sie bieten viel mehr, als man auf den ersten Blick sieht.</li>
+</ul>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li><a href="https://www.jetbrains.com/help/idea/debugging-your-first-java-application.html">IntelliJ IDEA – Debugging Your First Java Application (offizielles Tutorial)</a></li>
+<li><a href="https://entwickler.de/online/java/debugging-einsteiger-tipps-579865319.html">Einstieg ins Debugging (Java Magazin, deutsch)</a></li>
+<li>Buch: „Effective Debugging“ von Diomidis Spinellis</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Funktionale Nutzung von Optional</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-funktionale-nutzung-von-optional">Handout: Funktionale Nutzung von Optional</h1>
+<hr>
+<h2 id="1-verkettung-mit-map-und-flatmap">1. Verkettung mit <code>map()</code> und <code>flatMap()</code></h2>
+<p>Mit den Methoden <code>map()</code> und <code>flatMap()</code> lässt sich Optional wie ein kleiner Stream behandeln:
+Du kannst Werte im Optional transformieren, ohne explizit zu prüfen, ob ein Wert vorhanden ist.</p>
+<h3 id="a-mapfunctiont-r">a) <code>.map(Function&lt;T, R&gt;)</code></h3>
+<ul>
+<li><strong>Wendet eine Funktion auf den Wert an, falls vorhanden.</strong></li>
+<li>Gibt ein neues Optional zurück – entweder mit dem Ergebnis, oder leer, falls der Ursprungswert leer war.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Optional&lt;String&gt; name = Optional.of(<span class="hljs-string">&quot;Anna&quot;</span>);
+Optional&lt;Integer&gt; laenge = name.map(String::length);
+System.out.println(laenge.orElse(<span class="hljs-number">0</span>)); <span class="hljs-comment">// 4</span>
+
+Optional&lt;String&gt; leer = Optional.empty();
+Optional&lt;Integer&gt; leerLaenge = leer.map(String::length);
+System.out.println(leerLaenge.isPresent()); <span class="hljs-comment">// false</span>
+</code></pre>
+<hr>
+<h3 id="b-flatmapfunctiont-optionalr">b) <code>.flatMap(Function&lt;T, Optional&lt;R&gt;&gt;)</code></h3>
+<ul>
+<li><strong>Wendet eine Funktion an, die selbst ein Optional zurückgibt.</strong></li>
+<li>Praktisch für verschachtelte Abfragen, bei denen Methoden bereits ein Optional liefern.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Optional&lt;String&gt; <span class="hljs-title function_">findeNutzername</span><span class="hljs-params">(String userId)</span> {
+    <span class="hljs-comment">// Liefert Optional.empty(), wenn userId unbekannt</span>
+}
+
+Optional&lt;String&gt; userId = Optional.of(<span class="hljs-string">&quot;42&quot;</span>);
+Optional&lt;String&gt; nutzername = userId.flatMap(Main::findeNutzername);
+</code></pre>
+<p><strong>Unterschied zu <code>map()</code>:</strong></p>
+<ul>
+<li><code>map()</code> würde in diesem Fall ein <code>Optional&lt;Optional&lt;String&gt;&gt;</code> liefern (Doppel-Optional).</li>
+<li><code>flatMap()</code> „entpackt“ das innere Optional automatisch.</li>
+</ul>
+<hr>
+<h2 id="2-bedingtes-weiterarbeiten-mit-filter">2. Bedingtes Weiterarbeiten mit <code>filter()</code></h2>
+<p>Mit <code>filter()</code> kann man Werte im Optional nach einer Bedingung „durchlassen“ oder „verwerfen“.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Optional&lt;String&gt; name = Optional.of(<span class="hljs-string">&quot;Anna&quot;</span>);
+Optional&lt;String&gt; nurMitA = name.filter(n -&gt; n.startsWith(<span class="hljs-string">&quot;A&quot;</span>));
+System.out.println(nurMitA.isPresent()); <span class="hljs-comment">// true</span>
+
+Optional&lt;String&gt; leer = name.filter(n -&gt; n.startsWith(<span class="hljs-string">&quot;B&quot;</span>));
+System.out.println(leer.isPresent()); <span class="hljs-comment">// false</span>
+</code></pre>
+<ul>
+<li><code>filter()</code> gibt das ursprüngliche Optional zurück, <strong>wenn die Bedingung erfüllt ist</strong>, sonst ein leeres Optional.</li>
+</ul>
+<hr>
+<h2 id="3-optionals-in-kombination-mit-streams">3. Optionals in Kombination mit Streams</h2>
+<p><code>Optional</code> und Streams können zusammen verwendet werden, zum Beispiel:</p>
+<h3 id="a-optional-in-einen-stream-umwandeln-stream-ab-java-9">a) Optional in einen Stream umwandeln (<code>stream()</code>, ab Java 9)</h3>
+<ul>
+<li>Damit kann ein Optional in Stream-Operationen eingebaut werden.</li>
+<li>Ein Optional mit Wert wird zu einem Stream mit einem Element, ein leeres Optional zu einem leeren Stream.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Optional&lt;String&gt; opt = Optional.of(<span class="hljs-string">&quot;Hallo&quot;</span>);
+opt.stream().forEach(System.out::println); <span class="hljs-comment">// Gibt &quot;Hallo&quot; aus</span>
+
+Optional&lt;String&gt; leer = Optional.empty();
+leer.stream().forEach(System.out::println); <span class="hljs-comment">// Gibt nichts aus</span>
+</code></pre>
+<h3 id="b-optional-als-rückgabewert-in-stream-pipelines">b) Optional als Rückgabewert in Stream-Pipelines</h3>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bob&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+
+<span class="hljs-comment">// Suche den ersten Namen, der mit „C“ beginnt:</span>
+Optional&lt;String&gt; gefunden = namen.stream()
+    .filter(n -&gt; n.startsWith(<span class="hljs-string">&quot;C&quot;</span>))
+    .findFirst();
+</code></pre>
+<p>Oder: Mehrere Optionals in einen Stream einbinden:</p>
+<pre><code class="language-java">List&lt;Optional&lt;String&gt;&gt; optionals = Arrays.asList(
+    Optional.of(<span class="hljs-string">&quot;a&quot;</span>),
+    Optional.empty(),
+    Optional.of(<span class="hljs-string">&quot;b&quot;</span>)
+);
+
+List&lt;String&gt; werte = optionals.stream()
+    .flatMap(Optional::stream)
+    .collect(Collectors.toList());
+<span class="hljs-comment">// Ergebnis: [&quot;a&quot;, &quot;b&quot;]</span>
+</code></pre>
+<hr>
+<h2 id="4-praxis-tipps">4. Praxis-Tipps</h2>
+<ul>
+<li>Nutze <code>map()</code> für einfache Transformationen, <code>flatMap()</code> für verschachtelte Optionals.</li>
+<li>Mit <code>filter()</code> kannst du Optionals bequem bedingt „weiterreichen“.</li>
+<li>Durch Kombination von Optionals und Streams wird Code besonders ausdrucksstark und kompakt.</li>
+</ul>
+<hr>
+<h2 id="5-übungen-zum-selbststudium">5. Übungen zum Selbststudium</h2>
+<ol>
+<li>Wandle einen Optional<String> mit <code>map()</code> in einen Optional<Integer> um, der die Länge des Strings enthält.</li>
+<li>Nutze <code>filter()</code>, um aus einem Optional<String> nur Werte zu erhalten, die länger als 5 Zeichen sind.</li>
+<li>Wandle eine Liste von Optionals in eine Liste aller enthaltenen Werte (ohne leere), indem du Streams und <code>flatMap()</code> verwendest.</li>
+</ol>
+<hr>
+<h2 id="6-merksätze">6. Merksätze</h2>
+<ul>
+<li><strong>Mit <code>map</code> und <code>flatMap</code> können Optionals elegant verarbeitet und verschachtelt werden.</strong></li>
+<li><strong><code>filter()</code> macht bedingte Wertweitergabe einfach und sicher.</strong></li>
+<li><strong>Optional und Stream ergänzen sich perfekt, um null-sicheren, modernen Code zu schreiben.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

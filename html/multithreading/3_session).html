@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Kommunikation und Zusammenarbeit von Threads in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-kommunikation-und-zusammenarbeit-von-threads-in-java">Handout: Kommunikation und Zusammenarbeit von Threads in Java</h1>
+<hr>
+<h2 id="31-gemeinsame-nutzung-von-ressourcen-shared-objects-membervariablen">3.1 Gemeinsame Nutzung von Ressourcen (Shared Objects, Membervariablen)</h2>
+<p><strong>Was bedeutet „gemeinsame Nutzung“?</strong></p>
+<ul>
+<li>
+<p>Mehrere Threads greifen auf dieselben Variablen, Objekte oder Ressourcen zu (z. B. Datenbanken, Dateien, Speicherobjekte).</p>
+</li>
+<li>
+<p>Beispiele:</p>
+<ul>
+<li>Zwei Threads bearbeiten dieselbe Liste.</li>
+<li>Ein Thread schreibt einen Wert in eine Variable, ein anderer liest ihn.</li>
+</ul>
+</li>
+</ul>
+<p><strong>In Java:</strong></p>
+<ul>
+<li>
+<p>Alle Membervariablen und Objekte, die von mehreren Threads referenziert werden können, sind potenziell „Shared Objects“.</p>
+</li>
+<li>
+<p>Typisches Szenario:</p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Counter</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+        value++;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getValue</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> value;
+    }
+}
+</code></pre>
+<p>Mehrere Threads teilen sich dasselbe <code>Counter</code>-Objekt.</p>
+</li>
+</ul>
+<p><strong>Risiko:</strong>
+Ohne Synchronisation können Inkonsistenzen oder Datenverluste auftreten!</p>
+<hr>
+<h2 id="32-probleme-ohne-synchronisation-race-conditions-inkonsistente-zustände">3.2 Probleme ohne Synchronisation: Race Conditions, inkonsistente Zustände</h2>
+<h3 id="a-race-conditions-wettlaufsituationen">a) Race Conditions (Wettlaufsituationen)</h3>
+<ul>
+<li>
+<p><strong>Definition:</strong>
+Ein Race Condition entsteht, wenn der Programmausgang davon abhängt, wie der Scheduler (die JVM/das Betriebssystem) die Threads abwechselnd ausführt.</p>
+</li>
+<li>
+<p><strong>Beispiel (gefährlich):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">UnsafeCounter</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+        count++; <span class="hljs-comment">// Nicht thread-sicher!</span>
+    }
+}
+
+<span class="hljs-comment">// Zwei Threads rufen increment() &quot;gleichzeitig&quot; auf.</span>
+</code></pre>
+</li>
+<li>
+<p><strong>Gefahr:</strong>
+Zwei Threads lesen denselben Wert, inkrementieren getrennt und schreiben beide das gleiche Ergebnis zurück → ein Inkrement geht verloren.</p>
+</li>
+</ul>
+<h3 id="b-inkonsistente-zustände">b) Inkonsistente Zustände</h3>
+<ul>
+<li>
+<p><strong>Beschreibung:</strong>
+Wenn ein Thread eine Ressource liest, die gerade von einem anderen Thread verändert wird, können „kaputte“ oder unvollständige Werte entstehen.</p>
+</li>
+<li>
+<p><strong>Beispiel:</strong></p>
+<ul>
+<li>Thread A liest eine Liste, während Thread B gerade ein Element hinzufügt oder entfernt.</li>
+<li>Führt oft zu <code>ConcurrentModificationException</code> oder fehlerhaften Ergebnissen.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-sichtbarkeitsprobleme-visibility-problems">c) Sichtbarkeitsprobleme (Visibility Problems)</h3>
+<ul>
+<li>
+<p><strong>Problem:</strong>
+Änderungen eines Threads an gemeinsamen Variablen werden von anderen Threads nicht oder nicht rechtzeitig gesehen.</p>
+</li>
+<li>
+<p><strong>Ursache:</strong>
+CPU-Caches und Optimierungen der JVM.</p>
+</li>
+<li>
+<p><strong>Beispiel-Lösung:</strong></p>
+<ul>
+<li>Mit dem Schlüsselwort <code>volatile</code> können Sichtbarkeitsprobleme bei einfachen Variablen verhindert werden.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="33-thread-zustände-und-status-abfragen">3.3 Thread-Zustände und Status-Abfragen</h2>
+<h3 id="a-wichtige-zustände-vgl-23">a) Wichtige Zustände (vgl. 2.3):</h3>
+<ul>
+<li><strong>NEW</strong>: Thread-Objekt existiert, wurde aber noch nicht gestartet (<code>start()</code> nicht aufgerufen).</li>
+<li><strong>RUNNABLE</strong>: Thread ist bereit oder läuft gerade.</li>
+<li><strong>BLOCKED</strong>: Thread wartet auf einen Lock (Monitor).</li>
+<li><strong>WAITING/TIMED_WAITING</strong>: Thread wartet auf ein Signal oder eine bestimmte Zeitspanne (<code>wait()</code>, <code>join()</code>, <code>sleep()</code>).</li>
+<li><strong>TERMINATED</strong>: Thread hat die <code>run()</code>-Methode verlassen, ist also fertig.</li>
+</ul>
+<p><strong>Status-Abfrage in Java:</strong></p>
+<ul>
+<li>
+<p>Mit der Methode <code>getState()</code> kann der aktuelle Zustand eines Threads abgefragt werden:</p>
+<pre><code class="language-java"><span class="hljs-type">Thread</span> <span class="hljs-variable">t</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>();
+System.out.println(t.getState()); <span class="hljs-comment">// NEW</span>
+t.start();
+System.out.println(t.getState()); <span class="hljs-comment">// RUNNABLE oder anderes, je nach Timing</span>
+</code></pre>
+</li>
+<li>
+<p>Mit <code>isAlive()</code> kannst du prüfen, ob ein Thread aktuell noch läuft:</p>
+<pre><code class="language-java"><span class="hljs-keyword">if</span> (t.isAlive()) {
+    System.out.println(<span class="hljs-string">&quot;Thread läuft noch.&quot;</span>);
+}
+</code></pre>
+</li>
+</ul>
+<p><strong>Praktischer Tipp:</strong></p>
+<ul>
+<li>Beobachte mit kleinen Testprogrammen, wie sich die Zustände beim Starten, Warten und Beenden von Threads ändern.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Was kann passieren, wenn mehrere Threads ohne Synchronisation auf dasselbe Objekt zugreifen?</li>
+<li>Was ist ein Race Condition und wie zeigt es sich in Java?</li>
+<li>Wie lässt sich der aktuelle Status eines Threads im Code abfragen?</li>
+<li>Warum kann es sein, dass Änderungen eines Threads an einer Variable von einem anderen Thread nicht sofort gesehen werden?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Threads können gemeinsam Ressourcen nutzen – das macht Programme leistungsfähig, aber auch fehleranfällig.</li>
+<li>Ohne Synchronisation treten Race Conditions und Inkonsistenzen auf.</li>
+<li>Das Verständnis von Thread-Zuständen und Statusabfragen ist Grundlage für stabile Multithread-Programme.</li>
+<li>Geeignete Synchronisationsmechanismen (Thema der nächsten Einheit) sind essenziell für die korrekte Zusammenarbeit von Threads in Java.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

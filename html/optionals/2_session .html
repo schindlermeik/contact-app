@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in Optional</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-optional">Handout: Einführung in Optional</h1>
+<hr>
+<h2 id="1-was-ist-optional">1. Was ist <code>Optional</code>?</h2>
+<p><strong><code>Optional</code></strong> ist eine Klasse, die seit Java 8 im Paket <code>java.util</code> verfügbar ist.
+Sie dient dazu, die Möglichkeit des Fehlens eines Werts explizit und sicher im Typ auszudrücken, anstatt wie bisher <code>null</code> zu verwenden.</p>
+<ul>
+<li>Ein <code>Optional&lt;T&gt;</code> kann entweder einen Wert vom Typ <code>T</code> enthalten – <strong>oder leer sein</strong> (kein Wert).</li>
+<li>Optional ist ein <strong>Container</strong>, der entweder „voll“ (Wert vorhanden) oder „leer“ (kein Wert) ist.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Optional&lt;String&gt; vielleichtName = Optional.of(<span class="hljs-string">&quot;Anna&quot;</span>);
+Optional&lt;String&gt; keinName = Optional.empty();
+</code></pre>
+<hr>
+<h2 id="2-ziele-und-vorteile-von-optional">2. Ziele und Vorteile von <code>Optional</code></h2>
+<ul>
+<li><strong>NullPointerExceptions vermeiden:</strong>
+Mit <code>Optional</code> wird das Fehlen eines Wertes <strong>explizit</strong> im Typ sichtbar – und kann nicht versehentlich übersehen werden.</li>
+<li><strong>Explizite Fehlerbehandlung:</strong>
+Der Umgang mit möglicherweise fehlenden Werten wird <strong>erzwingbar</strong>: Der Entwickler muss sich aktiv entscheiden, wie er mit dem „leeren Fall“ umgeht.</li>
+<li><strong>Bessere Lesbarkeit:</strong>
+Methoden, die ein <code>Optional</code> zurückgeben, <strong>signalisieren klar</strong>, dass das Ergebnis fehlen kann – statt versteckter <code>null</code>-Rückgaben.</li>
+<li><strong>Fördert funktionalen Stil:</strong>
+Viele Methoden auf Optional (wie <code>map</code>, <code>flatMap</code>, <code>filter</code>) erlauben eine <strong>dekorative, ausdrucksstarke Verarbeitung</strong> von Werten.</li>
+</ul>
+<p><strong>Praxisbeispiel:</strong>
+Ohne Optional:</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> String <span class="hljs-title function_">findeEmail</span><span class="hljs-params">(String name)</span> {
+    <span class="hljs-keyword">if</span> (db.contains(name)) {
+        <span class="hljs-keyword">return</span> db.getEmail(name);
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+    }
+}
+</code></pre>
+<p>Mit Optional:</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> Optional&lt;String&gt; <span class="hljs-title function_">findeEmail</span><span class="hljs-params">(String name)</span> {
+    <span class="hljs-keyword">if</span> (db.contains(name)) {
+        <span class="hljs-keyword">return</span> Optional.of(db.getEmail(name));
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> Optional.empty();
+    }
+}
+</code></pre>
+<p>Jetzt ist klar: Das Ergebnis <strong>kann fehlen</strong> – und der Aufrufer <strong>muss</strong> damit umgehen!</p>
+<hr>
+<h2 id="3-vergleich-null-referenz-vs-optional">3. Vergleich: Null-Referenz vs. Optional</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Null-Referenz</strong></th>
+<th><strong>Optional</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fehlerursache</td>
+<td>Kann zu NPE führen, wenn Zugriff auf null</td>
+<td>Keine NPE, aber erzwungene Prüfung</td>
+</tr>
+<tr>
+<td>Semantik</td>
+<td>Fehlen eines Wertes oft <strong>nicht sichtbar</strong></td>
+<td>Fehlen wird <strong>explizit signalisiert</strong></td>
+</tr>
+<tr>
+<td>Handhabung</td>
+<td>Vergessen von Null-Checks häufig</td>
+<td>Muss als Optional behandelt werden</td>
+</tr>
+<tr>
+<td>Typischer Umgang</td>
+<td><code>if (obj != null)</code></td>
+<td><code>if (optional.isPresent())</code> oder besser: Methoden von Optional nutzen</td>
+</tr>
+<tr>
+<td>Rückgabe von Methoden</td>
+<td>Oft <code>null</code></td>
+<td>Empfohlen: <code>Optional&lt;T&gt;</code></td>
+</tr>
+<tr>
+<td>Lesbarkeit</td>
+<td>Fehlende Werte schwer zu erkennen</td>
+<td>Deutlich erkennbar im Methodenkopf</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="4-merksätze">4. Merksätze</h2>
+<ul>
+<li><code>Optional</code> ist ein <strong>sicherer Container</strong> für möglicherweise fehlende Werte.</li>
+<li>Die Verwendung von <code>Optional</code> <strong>erzwingt</strong> einen bewussten Umgang mit dem „kein Wert“-Fall.</li>
+<li><code>Optional</code> erhöht die <strong>Lesbarkeit und Sicherheit</strong> von APIs und Methoden.</li>
+</ul>
+<hr>
+<h2 id="5-reflexionsfragen-selbststudium">5. Reflexionsfragen (Selbststudium)</h2>
+<ol>
+<li>Wo hast du in deinem bisherigen Code Methoden mit möglicher <code>null</code>-Rückgabe?
+Wie würde der Code aussehen, wenn du dort <code>Optional</code> verwendest?</li>
+<li>Wie zwingt dich <code>Optional</code>, anders mit fehlenden Werten umzugehen als bisher?</li>
+<li>Welche Vorteile siehst du für große Projekte, wenn <code>Optional</code> durchgängig verwendet wird?</li>
+</ol>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Testen und Weiterentwickeln modularer Software</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-testen-und-weiterentwickeln-modularer-software">Handout: Testen und Weiterentwickeln modularer Software</h1>
+<hr>
+<h2 id="61-modultests-und-integrationstests">6.1 Modultests und Integrationstests</h2>
+<h3 id="modultests-unit-tests-auf-modulebene"><strong>Modultests (Unit-Tests auf Modulebene)</strong></h3>
+<ul>
+<li>Ziel: Einzelne Module isoliert testen, unabhängig von anderen Modulen.</li>
+<li><strong>Testgegenstand:</strong> Öffentliche API des Moduls, nicht interne Implementierungsdetails.</li>
+<li><strong>Werkzeuge:</strong> In Java typischerweise JUnit, TestNG oder ähnliche Frameworks.</li>
+</ul>
+<p><strong>Best Practice:</strong></p>
+<ul>
+<li>Für jedes öffentliche Interface/Jede Schnittstelle des Moduls sollten aussagekräftige Tests existieren.</li>
+<li>Testdoubles (Stubs, Mocks) für externe Abhängigkeiten verwenden.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Test für ein <code>OrderService</code>-Interface, wobei das zugrunde liegende <code>PaymentService</code> gemockt wird.</p>
+<hr>
+<h3 id="integrationstests"><strong>Integrationstests</strong></h3>
+<ul>
+<li>Ziel: Zusammenspiel mehrerer Module testen – werden die Verträge/Schnittstellen korrekt eingehalten?</li>
+<li>Fokus: End-to-End-Tests über Modulgrenzen hinweg.</li>
+<li><strong>Testumgebung:</strong> Oft ein separater Test- oder Staging-Server, ggf. mit Testdatenbanken.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Testet, ob das User-Modul korrekt mit dem Authentifizierungsmodul interagiert.</p>
+<hr>
+<h2 id="62-testbarkeit-durch-modularisierung">6.2 Testbarkeit durch Modularisierung</h2>
+<h3 id="vorteile-modularer-systeme-für-das-testen"><strong>Vorteile modularer Systeme für das Testen</strong></h3>
+<ul>
+<li><strong>Isolation:</strong>
+Jedes Modul kann unabhängig von anderen getestet werden.</li>
+<li><strong>Austauschbare Abhängigkeiten:</strong>
+Externe Abhängigkeiten werden als Schnittstellen entworfen, so dass sie im Test einfach durch Mocks oder Stubs ersetzt werden können.</li>
+<li><strong>Klare Schnittstellen:</strong>
+Vereinfachen die Formulierung gezielter, umfassender Tests.</li>
+</ul>
+<p><strong>Praktischer Effekt:</strong></p>
+<ul>
+<li>Fehler werden schneller gefunden.</li>
+<li>Regressionstests sind gezielter und effizienter.</li>
+<li>Automatisierte Tests lassen sich leichter in CI/CD-Pipelines integrieren.</li>
+</ul>
+<hr>
+<h2 id="63-refactoring-modularer-systeme">6.3 Refactoring modularer Systeme</h2>
+<h3 id="was-ist-refactoring"><strong>Was ist Refactoring?</strong></h3>
+<ul>
+<li>Das strukturierte Überarbeiten des Codes, <strong>ohne</strong> das beobachtbare Verhalten zu ändern.</li>
+<li>Ziel: Bessere Wartbarkeit, Klarheit und Modularität.</li>
+</ul>
+<h3 id="refactoring-in-modularen-systemen"><strong>Refactoring in modularen Systemen</strong></h3>
+<ul>
+<li><strong>Module konsolidieren/splitten:</strong>
+Zu große Module aufteilen, zu kleine Module zusammenfassen.</li>
+<li><strong>Schnittstellen anpassen:</strong>
+Unnötige Exporte reduzieren, interne Details besser kapseln.</li>
+<li><strong>Abhängigkeiten minimieren:</strong>
+Zyklische oder unnötige Abhängigkeiten entfernen.</li>
+<li><strong>Automatisierte Tests sichern:</strong>
+Refactoring stets durch umfangreiche Tests absichern!</li>
+</ul>
+<p><strong>Typische Refactoring-Schritte:</strong></p>
+<ul>
+<li>API-Umstellungen (z. B. Methoden umbenennen)</li>
+<li>Modulgrenzen verschieben (Responsibility Shifts)</li>
+<li>Technische Schulden abbauen</li>
+</ul>
+<hr>
+<h2 id="64-wartung-und-evolution-strategien-für-langlebige-modularität">6.4 Wartung und Evolution: Strategien für langlebige Modularität</h2>
+<h3 id="best-practices-für-nachhaltige-modularität"><strong>Best Practices für nachhaltige Modularität</strong></h3>
+<ul>
+<li><strong>Stabile APIs:</strong>
+Schnittstellen nur ändern, wenn wirklich nötig. API-Dokumentation aktuell halten.</li>
+<li><strong>Semantic Versioning:</strong>
+Änderungen an Schnittstellen nur mit entsprechender Versionsanpassung.</li>
+<li><strong>Deprecation-Strategien:</strong>
+Veraltete Funktionen zuerst kennzeichnen und später entfernen, nicht abrupt löschen.</li>
+<li><strong>Automatisierte Regressionstests:</strong>
+Jede Änderung an Modulen durch Tests absichern.</li>
+</ul>
+<h3 id="weiterentwicklung-modularer-systeme"><strong>Weiterentwicklung modularer Systeme</strong></h3>
+<ul>
+<li><strong>Neue Features als neue Module:</strong>
+Bestehende Kernmodule möglichst unangetastet lassen.</li>
+<li><strong>Legacy-Module modernisieren:</strong>
+Schrittweise Refactoring und Ersetzen alter Komponenten durch neue.</li>
+<li><strong>Regelmäßige Architektur-Reviews:</strong>
+Prüfen, ob die Modulstruktur noch sinnvoll und leistungsfähig ist.</li>
+<li><strong>Dokumentation pflegen:</strong>
+Modulstruktur, APIs und Abhängigkeiten immer nachvollziehbar halten.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Warum ist die Trennung von Modultests und Integrationstests wichtig?</li>
+<li>Wie erleichtert Modularisierung das Testen und die Wartung im Projektalltag?</li>
+<li>Welche Risiken können beim Refactoring modularer Systeme auftreten?</li>
+<li>Wie stellst du sicher, dass deine Module auch nach Jahren noch wartbar bleiben?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Modularisierung macht Software leichter testbar, wartbar und evolvierbar.</li>
+<li>Modultests prüfen einzelne Module isoliert; Integrationstests das Zusammenspiel.</li>
+<li>Regelmäßiges Refactoring und stabile, gut dokumentierte APIs sind das Fundament langlebiger modularer Systeme.</li>
+<li>Eine nachhaltige Entwicklung setzt auf automatisierte Tests, klare Schnittstellen und planvolle Weiterentwicklung.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

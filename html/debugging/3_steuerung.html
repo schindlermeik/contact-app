@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Steuern des Programmlaufs beim Debugging in IntelliJ</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-steuern-des-programmlaufs-beim-debugging-in-intellij">Handout: Steuern des Programmlaufs beim Debugging in IntelliJ</h1>
+<hr>
+<h2 id="1-grundlagen">1. Grundlagen</h2>
+<p>Während einer Debugging-Session hast du in IntelliJ IDEA viele Möglichkeiten, den Ablauf deines Programms präzise zu steuern.
+Dadurch kannst du gezielt nachvollziehen, wie der Code ausgeführt wird, welche Werte Variablen haben und wo Fehler entstehen.</p>
+<hr>
+<h2 id="2-die-wichtigsten-steuerfunktionen">2. Die wichtigsten Steuerfunktionen</h2>
+<h3 id="a-step-over-nächste-zeile-ausführen--shortcut-f8">a) <strong>Step Over</strong> (Nächste Zeile ausführen – Shortcut: <code>F8</code>)</h3>
+<ul>
+<li>
+<p><strong>Funktion:</strong> Führt die nächste Codezeile aus, ohne in aufgerufene Methoden hineinzugehen.</p>
+</li>
+<li>
+<p><strong>Wann nutzen?</strong></p>
+<ul>
+<li>Wenn dich der <em>Ergebniswert</em> einer Methode interessiert, aber nicht deren interner Ablauf.</li>
+</ul>
+</li>
+<li>
+<p><strong>Praxisbeispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">int</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> calculate(); <span class="hljs-comment">// &lt;--- Hier Breakpoint</span>
+System.out.println(result);
+</code></pre>
+<p>Mit „Step Over“ wird <code>calculate()</code> komplett ausgeführt und erst bei der nächsten Zeile (<code>println</code>) wieder angehalten.</p>
+</li>
+</ul>
+<hr>
+<h3 id="b-step-into-in-methode-springen--shortcut-f7">b) <strong>Step Into</strong> (In Methode springen – Shortcut: <code>F7</code>)</h3>
+<ul>
+<li>
+<p><strong>Funktion:</strong> Springt beim Ausführen der nächsten Zeile <em>in</em> die aufgerufene Methode hinein.</p>
+</li>
+<li>
+<p><strong>Wann nutzen?</strong></p>
+<ul>
+<li>Wenn du wissen willst, wie eine Methode im Detail funktioniert oder wo sie Fehler macht.</li>
+</ul>
+</li>
+<li>
+<p><strong>Praxisbeispiel:</strong>
+Breakpoint auf einer Zeile mit Methodenaufruf – „Step Into“ springt direkt an den Anfang dieser Methode.</p>
+</li>
+</ul>
+<hr>
+<h3 id="c-step-out-aus-methode-herausspringen--shortcut-shift--f8">c) <strong>Step Out</strong> (Aus Methode herausspringen – Shortcut: <code>Shift + F8</code>)</h3>
+<ul>
+<li>
+<p><strong>Funktion:</strong> Führt die aktuelle Methode zu Ende aus und hält erst wieder nach deren Rückgabe an (in der aufrufenden Methode).</p>
+</li>
+<li>
+<p><strong>Wann nutzen?</strong></p>
+<ul>
+<li>Wenn du „tief“ im Call-Stack bist und zurück zur aufrufenden Stelle willst, ohne jede einzelne Zeile durchzugehen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Praxisbeispiel:</strong>
+Beim Debuggen einer Hilfsmethode merkst du, dass du zurück ins Hauptprogramm willst – „Step Out“ bringt dich dorthin.</p>
+</li>
+</ul>
+<hr>
+<h3 id="d-run-to-cursor-bis-zur-cursorposition-ausführen--shortcut-alt--f9">d) <strong>Run to Cursor</strong> (Bis zur Cursorposition ausführen – Shortcut: <code>Alt + F9</code>)</h3>
+<ul>
+<li>
+<p><strong>Funktion:</strong> Führt das Programm bis zur Zeile aus, in der der Cursor aktuell steht.</p>
+</li>
+<li>
+<p><strong>Wann nutzen?</strong></p>
+<ul>
+<li>Um schnell zu einem interessanten Punkt im Code zu springen, ohne Breakpoints zu setzen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Praxisbeispiel:</strong>
+Programm steht am Breakpoint, du möchtest direkt zehn Zeilen weiter untersuchen – Cursor platzieren, „Run to Cursor“ anklicken.</p>
+</li>
+</ul>
+<hr>
+<h3 id="e-evaluate-expression-während-des-debuggens-shortcut-alt--f8">e) <strong>Evaluate Expression während des Debuggens</strong> (Shortcut: <code>Alt + F8</code>)</h3>
+<ul>
+<li>
+<p><strong>Funktion:</strong> Öffnet ein Fenster, in dem du beliebige Java-Ausdrücke auswerten kannst.</p>
+</li>
+<li>
+<p><strong>Wann nutzen?</strong></p>
+<ul>
+<li>Um Werte von Variablen, Methodenaufrufen oder sogar komplexen Ausdrücken „on the fly“ zu überprüfen, ohne den Code zu verändern.</li>
+</ul>
+</li>
+<li>
+<p><strong>Praxisbeispiel:</strong>
+Während das Programm im Debugger pausiert ist, möchtest du wissen, wie das Ergebnis von <code>list.size()</code>, <code>user.isActive()</code> oder sogar <code>calculateSum(a, b)</code> aussieht.</p>
+</li>
+</ul>
+<p><strong>Ablauf:</strong></p>
+<ul>
+<li>Debugger pausiert am Breakpoint</li>
+<li><code>Alt + F8</code> drücken oder im Debug-Fenster „Evaluate Expression“ auswählen</li>
+<li>Ausdruck eingeben und „Evaluate“ klicken</li>
+</ul>
+<hr>
+<h3 id="f-programmlauf-fortsetzen-anhalten-beenden">f) <strong>Programmlauf fortsetzen, anhalten, beenden</strong></h3>
+<ul>
+<li>
+<p><strong>Fortsetzen</strong> (<code>F9</code>):</p>
+<ul>
+<li>Das Programm läuft ab der aktuellen Position weiter, bis zum nächsten Breakpoint oder bis zum Programmende.</li>
+</ul>
+</li>
+<li>
+<p><strong>Anhalten</strong> (Pause-Symbol):</p>
+<ul>
+<li>Setzt die laufende Anwendung an der aktuellen Ausführungsstelle fest (z. B. um spontan in die Analyse einzusteigen).</li>
+</ul>
+</li>
+<li>
+<p><strong>Beenden</strong> (Stopp-Symbol):</p>
+<ul>
+<li>Stoppt das Debuggen und beendet das Programm.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-praxis-tipps-für-effizientes-debugging">3. Praxis-Tipps für effizientes Debugging</h2>
+<ul>
+<li>Nutze die <strong>Shortcuts</strong> – das spart viel Zeit!</li>
+<li>Kombiniere „Step Over“ und „Step Into“, um gezielt zwischen Übersicht und Detailanalyse zu wechseln.</li>
+<li>„Evaluate Expression“ ist ideal, um Hypothesen zu überprüfen, ohne den Code zu ändern.</li>
+<li>Mit „Run to Cursor“ kannst du lange Durchläufe oder Schleifen überspringen, ohne viele Breakpoints zu setzen.</li>
+<li>Halte immer die Debug-Konsole im Blick – hier werden Stack-Traces, Variablenwerte und Hinweise angezeigt.</li>
+</ul>
+<hr>
+<h2 id="4-visualisierung-die-wichtigsten-debugging-buttons-in-intellij">4. Visualisierung: Die wichtigsten Debugging-Buttons in IntelliJ</h2>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>Symbol</th>
+<th>Funktion</th>
+<th>Shortcut</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Step Over</td>
+<td>➔</td>
+<td>Nächste Zeile</td>
+<td>F8</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Step Into</td>
+<td>⬇</td>
+<td>In Methode springen</td>
+<td>F7</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Step Out</td>
+<td>⬆</td>
+<td>Aus Methode rausgehen</td>
+<td>Shift + F8</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Run to Cursor</td>
+<td>↩</td>
+<td>Bis Cursor ausführen</td>
+<td>Alt + F9</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Continue/Resume</td>
+<td>▶</td>
+<td>Fortsetzen</td>
+<td>F9</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Evaluate Expression</td>
+<td>∑</td>
+<td>Ausdruck auswerten</td>
+<td>Alt + F8</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Stop Debugging</td>
+<td>■</td>
+<td>Debugging beenden</td>
+<td>-</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Pause</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Programmlauf anhalten</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="5-weiterführende-ressourcen">5. Weiterführende Ressourcen</h2>
+<ul>
+<li><a href="https://www.jetbrains.com/help/idea/debugging-your-first-java-application.html">Offizielle IntelliJ Doku: Debugging</a></li>
+<li><a href="https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf">IntelliJ IDEA Reference Card (Shortcuts)</a></li>
+<li><a href="https://www.youtube.com/watch?v=KIK5S_6kUA8">Video-Tutorial: Debugging in IntelliJ (YouTube)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

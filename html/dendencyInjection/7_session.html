@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Zusammenfassung und Best Practices zu Dependency Injection &lpar;DI&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-zusammenfassung-und-best-practices-zu-dependency-injection-di">Handout: Zusammenfassung und Best Practices zu Dependency Injection (DI)</h1>
+<hr>
+<h2 id="71-zusammenfassung-der-wichtigsten-erkenntnisse">7.1 Zusammenfassung der wichtigsten Erkenntnisse</h2>
+<h3 id="was-ist-dependency-injection">Was ist Dependency Injection?</h3>
+<ul>
+<li><strong>Dependency Injection (DI)</strong> ist ein Entwurfsmuster, bei dem Abhängigkeiten von außen an eine Komponente übergeben („injiziert“) werden.</li>
+<li>Ziel ist, die Kopplung zwischen Klassen zu lockern und die Flexibilität, Testbarkeit sowie Wartbarkeit zu erhöhen.</li>
+</ul>
+<h3 id="grundprinzipien">Grundprinzipien</h3>
+<ul>
+<li><strong>Inversion of Control (IoC):</strong>
+Die Kontrolle über die Bereitstellung von Abhängigkeiten liegt nicht mehr bei der Komponente, sondern beim aufrufenden Code (z. B. Main-Klasse oder Framework).</li>
+<li><strong>Lose Kopplung:</strong>
+Komponenten kennen nur noch Schnittstellen (Abstraktionen), nicht die konkreten Implementierungen.</li>
+<li><strong>Single Responsibility Principle:</strong>
+Komponenten sind nur für ihre Fachlogik verantwortlich, nicht für die Erzeugung oder Verwaltung von Abhängigkeiten.</li>
+</ul>
+<h3 id="arten-der-di">Arten der DI</h3>
+<ul>
+<li><strong>Konstruktor-Injektion:</strong>
+Abhängigkeiten werden beim Erzeugen eines Objekts übergeben (empfohlener Standard).</li>
+<li><strong>Setter-Injektion:</strong>
+Abhängigkeiten werden nach der Objekterstellung über Setter-Methoden gesetzt (für optionale Abhängigkeiten geeignet).</li>
+<li><strong>Interface-Injektion:</strong>
+Ein spezielles Interface verlangt vom Aufrufer, eine Abhängigkeit bereitzustellen (selten, eher Spezialfall).</li>
+</ul>
+<h3 id="vorteile-von-di">Vorteile von DI</h3>
+<ul>
+<li><strong>Reduzierte Kopplung</strong></li>
+<li><strong>Mehr Flexibilität &amp; Austauschbarkeit von Komponenten</strong></li>
+<li><strong>Verbesserte Testbarkeit (Mocking, Unit Tests)</strong></li>
+<li><strong>Förderung von Clean Code &amp; SOLID-Prinzipien</strong></li>
+</ul>
+<h3 id="implementierung">Implementierung</h3>
+<ul>
+<li><strong>Manuelle DI</strong> ist für kleine und mittlere Projekte gut machbar.</li>
+<li><strong>DI-Frameworks</strong> (wie Spring, Guice, Quarkus) werden bei wachsender Komplexität empfohlen.</li>
+</ul>
+<hr>
+<h2 id="72-dos--donts-bei-der-manuellen-di">7.2 Dos &amp; Don’ts bei der manuellen DI</h2>
+<h3 id="dos">Dos</h3>
+<ul>
+<li><strong>Constructor Injection verwenden</strong> für zwingende Abhängigkeiten.</li>
+<li><strong>Setter Injection nutzen</strong> für optionale oder nachträglich veränderbare Abhängigkeiten.</li>
+<li><strong>Abhängigkeiten als Interfaces typisieren</strong> – nie direkt auf konkrete Klassen festlegen.</li>
+<li><strong>Klassen mit klarer Verantwortlichkeit</strong> entwickeln – pro Klasse wenige Abhängigkeiten.</li>
+<li><strong>„Composition Root“ (z. B. Main-Klasse)</strong> als zentralen Ort für das Verdrahten der Objekte verwenden.</li>
+<li><strong>Unit Tests</strong> für alle kritischen Komponenten schreiben, idealerweise mit Mock-Implementierungen.</li>
+<li><strong>Code und Abhängigkeiten gut dokumentieren</strong> (Javadoc, Kommentare).</li>
+<li><strong>Regelmäßig Refactoring durchführen</strong> – zu viele Abhängigkeiten in einer Klasse als Warnsignal sehen.</li>
+</ul>
+<h3 id="donts">Don’ts</h3>
+<ul>
+<li><strong>Keine gemischten Ansätze:</strong> Nicht einige Abhängigkeiten injizieren und andere direkt im Konstruktor erzeugen.</li>
+<li><strong>Keine „versteckten“ new-Aufrufe:</strong> Business-Logik sollte keine eigenen Abhängigkeiten erzeugen.</li>
+<li><strong>Keine globalen statischen Abhängigkeiten:</strong> Statische Methoden oder globale Zustände erschweren Testbarkeit und Flexibilität.</li>
+<li><strong>Keine Zirkulären Abhängigkeiten:</strong> Niemals zwei Klassen direkt gegenseitig injizieren – das ist ein Architekturfehler!</li>
+<li><strong>Nicht zu viele Abhängigkeiten in eine Klasse packen:</strong> Das widerspricht dem Single Responsibility Principle und macht Code unübersichtlich.</li>
+</ul>
+<hr>
+<h2 id="73-literatur--und-linktipps-für-die-vertiefung">7.3 Literatur- und Linktipps für die Vertiefung</h2>
+<h3 id="bücher">Bücher</h3>
+<ul>
+<li><strong>&quot;Dependency Injection: Principles, Practices, and Patterns&quot;</strong>
+Mark Seemann, Steven van Deursen – Umfangreiches, praxisnahes Werk für Einsteiger und Fortgeschrittene.</li>
+<li><strong>&quot;Clean Code: Refactoring, Patterns, Testen und Techniken für sauberen Code&quot;</strong>
+Robert C. Martin – Für ein tieferes Verständnis zu Prinzipien wie SOLID, sauberen Schnittstellen und testbarem Code.</li>
+</ul>
+<h3 id="online-artikel--ressourcen">Online-Artikel &amp; Ressourcen</h3>
+<ul>
+<li>
+<p><strong>Martin Fowler: <a href="https://martinfowler.com/articles/injection.html">Inversion of Control Containers and the Dependency Injection pattern</a></strong></p>
+<ul>
+<li>Der Klassiker zu IoC und DI, englisch, sehr gut verständlich.</li>
+</ul>
+</li>
+<li>
+<p><strong>Baeldung: <a href="https://www.baeldung.com/inversion-control-and-dependency-injection-in-spring">Dependency Injection Explained</a></strong></p>
+<ul>
+<li>Gute Einführung und viele Beispiele, auch für Spring.</li>
+</ul>
+</li>
+<li>
+<p><strong>Clean Code Developer: <a href="https://clean-code-developer.de/solid">SOLID-Prinzipien</a></strong></p>
+<ul>
+<li>Überblick und Erklärungen zu den wichtigsten Prinzipien für nachhaltigen Code.</li>
+</ul>
+</li>
+<li>
+<p><strong>Spring Framework Documentation: <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans">Core - Dependency Injection</a></strong></p>
+<ul>
+<li>Auch wenn du kein Spring verwendest: Viele Hintergründe und Beispiele.</li>
+</ul>
+</li>
+</ul>
+<h3 id="übungen--tutorials">Übungen &amp; Tutorials</h3>
+<ul>
+<li><a href="https://www.codingame.com/playgrounds/7137/dependency-injection">Codingame: Dependency Injection puzzles</a></li>
+<li>[Refactoring Guru: <a href="https://refactoring.guru/design-patterns/dependency-injection">Dependency Injection Pattern</a>]</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ul>
+<li>Welche Vorteile und Herausforderungen hast du selbst bei der Einführung von DI erlebt?</li>
+<li>Was würdest du an bestehenden Projekten in Bezug auf Abhängigkeitsmanagement verbessern?</li>
+<li>Wie könntest du Kollegen von den Vorteilen von DI überzeugen?</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

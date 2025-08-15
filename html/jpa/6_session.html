@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Abfragen und Filterm&ouml;glichkeiten</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-abfragen-und-filtermöglichkeiten">Handout: Abfragen und Filtermöglichkeiten</h3>
+<p>JPA bietet dir verschiedene mächtige Wege, um Daten aus deiner Datenbank abzufragen. Je nach Anwendungsfall kannst du dich für die einfachste oder die flexibelste Methode entscheiden.</p>
+<h4 id="61-verwendung-von-jpql-java-persistence-query-language">6.1 Verwendung von JPQL (Java Persistence Query Language)</h4>
+<p><strong>JPQL</strong> ist die standardisierte Abfragesprache von JPA. Sie ist der SQL-Syntax sehr ähnlich, aber es gibt einen entscheidenden Unterschied: Du schreibst deine Abfragen nicht für Tabellen und Spalten, sondern für deine <strong>Entitätsklassen</strong> und ihre <strong>Attribute</strong>. Dadurch ist deine Anwendung unabhängiger von der genauen Datenbankimplementierung.</p>
+<p><strong>Beispiel:</strong> Eine SQL-Abfrage würde so aussehen: <code>SELECT * FROM kunden WHERE kunden_name = 'Max'</code>. Eine JPQL-Abfrage operiert auf der Entität <code>Kunde</code>:</p>
+<pre><code class="language-java"><span class="hljs-comment">// Beispiel: Kunden finden, deren Name &#x27;Max Mustermann&#x27; ist</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">jpql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;SELECT k FROM Kunde k WHERE k.name = :name&quot;</span>;
+
+TypedQuery&lt;Kunde&gt; query = entityManager.createQuery(jpql, Kunde.class);
+query.setParameter(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Max Mustermann&quot;</span>);
+
+List&lt;Kunde&gt; kunden = query.getResultList();
+</code></pre>
+<p><strong>Wichtige Elemente der JPQL-Syntax:</strong></p>
+<ul>
+<li><strong><code>SELECT</code></strong>: Du wählst Entitäts-Objekte aus (<code>SELECT k FROM Kunde k</code>). <code>k</code> ist ein Alias, den du frei wählen kannst.</li>
+<li><strong><code>FROM</code></strong>: Du gibst den Namen der Entitätsklasse an (nicht den Tabellennamen!).</li>
+<li><strong><code>WHERE</code></strong>: Hier kannst du Bedingungen formulieren. Du verwendest die Attribute deiner Entität (<code>k.name</code>), nicht die Spaltennamen.</li>
+<li><strong><code>ORDER BY</code></strong>, <strong><code>GROUP BY</code></strong>, <strong><code>JOIN</code></strong>: Diese Klauseln funktionieren ähnlich wie in SQL.</li>
+</ul>
+<hr>
+<h4 id="62-named-queries">6.2 Named Queries</h4>
+<p>Wenn du eine Abfrage häufig verwendest, ist es unpraktisch, den JPQL-String immer wieder neu zu tippen. <strong>Named Queries</strong> lösen dieses Problem, indem du deine Abfragen zentral in deiner Entitätsklasse oder in der <code>orm.xml</code> definierst. Du gibst der Abfrage einen Namen und kannst sie dann einfach über diesen Namen aufrufen.</p>
+<p><strong>Definieren einer Named Query:</strong>
+Du verwendest die Annotation <strong><code>@NamedQuery</code></strong> über deiner Entitätsklasse.</p>
+<pre><code class="language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-meta">@NamedQuery(name = &quot;Kunde.findByName&quot;, 
+            query = &quot;SELECT k FROM Kunde k WHERE k.name = :name&quot;)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Kunde</span> {
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p><strong>Verwenden einer Named Query:</strong>
+Jetzt kannst du die Abfrage im Code ganz einfach über ihren Namen aufrufen:</p>
+<pre><code class="language-java">TypedQuery&lt;Kunde&gt; query = entityManager.createNamedQuery(<span class="hljs-string">&quot;Kunde.findByName&quot;</span>, Kunde.class);
+query.setParameter(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Max Mustermann&quot;</span>);
+
+List&lt;Kunde&gt; kunden = query.getResultList();
+</code></pre>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li><strong>Wartbarkeit</strong>: Alle Abfragen sind an einem Ort. Wenn sich eine Abfrage ändert, musst du sie nur an einer Stelle anpassen.</li>
+<li><strong>Lesbarkeit</strong>: Der Code wird übersichtlicher, da er nur den Namen der Abfrage enthält, nicht den langen String.</li>
+</ul>
+<hr>
+<h4 id="63-criteria-api-typensichere-abfragen">6.3 Criteria API (Typensichere Abfragen)</h4>
+<p>Die <strong>Criteria API</strong> ist eine fortgeschrittenere, objektorientierte Alternative zu JPQL. Anstatt Abfragen als Strings zu schreiben, erstellst du sie programmatisch, indem du Java-Objekte verwendest. Das macht deine Abfragen <strong>typsicher</strong>. Ein Tippfehler in einem Attributnamen führt zu einem Kompilierungsfehler, nicht erst zu einem Laufzeitfehler. Die Criteria API ist besonders nützlich für <strong>dynamische Abfragen</strong>, deren Bedingungen zur Laufzeit variieren können.</p>
+<p><strong>Beispiel:</strong> Kunden nach Namen filtern, aber nur wenn der Name nicht leer ist.</p>
+<pre><code class="language-java"><span class="hljs-comment">// Setup für die Criteria API</span>
+<span class="hljs-type">CriteriaBuilder</span> <span class="hljs-variable">cb</span> <span class="hljs-operator">=</span> entityManager.getCriteriaBuilder();
+CriteriaQuery&lt;Kunde&gt; cq = cb.createQuery(Kunde.class);
+Root&lt;Kunde&gt; kunde = cq.from(Kunde.class);
+
+<span class="hljs-comment">// Die Abfrage aufbauen</span>
+cq.select(kunde);
+
+<span class="hljs-type">String</span> <span class="hljs-variable">filterName</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Max Mustermann&quot;</span>;
+<span class="hljs-keyword">if</span> (filterName != <span class="hljs-literal">null</span> &amp;&amp; !filterName.isEmpty()) {
+    <span class="hljs-comment">// Dynamische WHERE-Klausel hinzufügen</span>
+    cq.where(cb.equal(kunde.get(<span class="hljs-string">&quot;name&quot;</span>), filterName));
+}
+
+TypedQuery&lt;Kunde&gt; query = entityManager.createQuery(cq);
+List&lt;Kunde&gt; kunden = query.getResultList();
+</code></pre>
+<p>Die Criteria API ist komplexer, aber sie bietet dir eine hohe Flexibilität, da du die Abfrage-Elemente (WHERE-Bedingungen, JOINs etc.) dynamisch hinzufügen oder weglassen kannst.</p>
+<hr>
+<h4 id="64-native-queries-sql">6.4 Native Queries (SQL)</h4>
+<p>Manchmal stößt du an die Grenzen von JPQL oder der Criteria API, weil du eine sehr spezifische, datenbankspezifische Funktion nutzen möchtest, die JPA nicht unterstützt. In solchen Fällen kannst du auf <strong>Native Queries</strong> zurückgreifen. Das sind ganz normale SQL-Abfragen, die du direkt an die Datenbank sendest.</p>
+<p><strong>Vorsicht:</strong> Native Queries sind nicht portierbar. Wenn du die Datenbank wechselst, musst du die SQL-Abfrage möglicherweise anpassen.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Natives SQL-Statement verwenden, um alle Kunden zu finden</span>
+<span class="hljs-type">Query</span> <span class="hljs-variable">nativeQuery</span> <span class="hljs-operator">=</span> entityManager.createNativeQuery(<span class="hljs-string">&quot;SELECT * FROM kunden&quot;</span>, Kunde.class);
+List&lt;Kunde&gt; kunden = nativeQuery.getResultList();
+</code></pre>
+<ul>
+<li><code>createNativeQuery(sql, resultClass)</code>: Du übergibst deinen SQL-String und die Entitätsklasse, in die die Ergebnisse gemappt werden sollen.</li>
+<li><strong>Wann solltest du Native Queries verwenden?</strong>
+<ul>
+<li>Du musst einen datenbankspezifischen Befehl ausführen (z. B. einen Stored Procedure aufrufen).</li>
+<li>Du hast eine hochoptimierte, komplexe SQL-Abfrage, die mit JPQL nur schwer umzusetzen wäre.</li>
+<li>Performance-Engpässe, bei denen du die genaue Kontrolle über das SQL-Statement benötigst.</li>
+</ul>
+</li>
+</ul>
+<p>Indem du diese vier Abfragemöglichkeiten beherrschst, kannst du in jeder Situation die passende Methode für den Datenbankzugriff in deiner JPA-Anwendung auswählen.</p>
+
+            
+            
+        </body>
+        </html>

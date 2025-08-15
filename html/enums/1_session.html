@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in Enums &lpar;Java&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-enums-java">Handout: Einführung in Enums (Java)</h1>
+<hr>
+<h2 id="1-was-sind-enums">1. Was sind Enums?</h2>
+<p><strong>Enums</strong> (kurz für <em>Enumerationen</em> oder <em>Aufzählungstypen</em>) sind ein spezieller Datentyp in Java, mit dem eine feste Menge benannter, konstanter Werte definiert werden kann.</p>
+<ul>
+<li>Ein Enum repräsentiert alle zulässigen Werte für eine bestimmte Variable, z. B. die Wochentage, die Himmelsrichtungen oder Statusangaben wie „AKTIV“ oder „INAKTIV“.</li>
+<li>Jeder Wert eines Enums ist ein <strong>eigenständiges Objekt</strong>, vom Compiler automatisch als <code>public static final</code> angelegt.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Wochentag</span> {
+    MONTAG, DIENSTAG, MITTWOCH, DONNERSTAG, FREITAG, SAMSTAG, SONNTAG
+}
+</code></pre>
+<ul>
+<li>Hier können Variablen vom Typ <code>Wochentag</code> nur einen der sieben Wochentage annehmen.</li>
+<li>Die Werte werden <strong>typischerweise in Großbuchstaben</strong> geschrieben.</li>
+</ul>
+<hr>
+<h2 id="2-unterschiede-zu-klassischen-konstanten-final-static-felder">2. Unterschiede zu klassischen Konstanten (<code>final static</code> Felder)</h2>
+<p>Vor Java 5 wurden oft <strong>Konstanten</strong> mit <code>public static final</code> deklariert, um feste Werte zu definieren.</p>
+<p><strong>Beispiel (alte Variante):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Farbe</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">ROT</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">GRUEN</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">BLAU</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>;
+}
+</code></pre>
+<p><strong>Nachteile:</strong></p>
+<ul>
+<li>Keine Typprüfung: Jeder beliebige <code>int</code>-Wert kann gesetzt werden (z. B. 17).</li>
+<li>Keine Gruppierung im Typensystem: Es bleibt beim primitiven Datentyp.</li>
+<li>Keine Erweiterungen möglich (z. B. Methoden, Attribute).</li>
+</ul>
+<p><strong>Mit Enum:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Farbe</span> {
+    ROT, GRUEN, BLAU
+}
+</code></pre>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Variablen können <strong>nur</strong> einen gültigen Wert annehmen, der im Enum definiert ist.</li>
+<li>Der Compiler prüft, ob der Wert gültig ist.</li>
+<li>Zusätzliche Methoden und Attribute können dem Enum hinzugefügt werden.</li>
+</ul>
+<p><strong>Vergleichstabelle:</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Klassische Konstante (<code>static final</code>)</th>
+<th>Enum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Typprüfung</strong></td>
+<td>Nein</td>
+<td>Ja</td>
+</tr>
+<tr>
+<td><strong>Nur erlaubte Werte</strong></td>
+<td>Nein</td>
+<td>Ja</td>
+</tr>
+<tr>
+<td><strong>Eigene Methoden</strong></td>
+<td>Nein</td>
+<td>Ja</td>
+</tr>
+<tr>
+<td><strong>Sicher im Switch</strong></td>
+<td>Nein</td>
+<td>Ja</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="3-motivation-warum-enums-anstelle-von-int--oder-string-konstanten">3. Motivation: Warum Enums anstelle von <code>int</code>- oder <code>String</code>-Konstanten?</h2>
+<h3 id="a-typsicherheit">a) <strong>Typsicherheit</strong></h3>
+<p>Mit Enums kannst du Variablen <em>nur</em> mit erlaubten Werten belegen.
+<strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">Farbe</span> <span class="hljs-variable">f</span> <span class="hljs-operator">=</span> Farbe.ROT; <span class="hljs-comment">// Gültig</span>
+<span class="hljs-comment">// f = 5; // Compilerfehler: Falscher Typ!</span>
+</code></pre>
+<h3 id="b-klarheit-und-lesbarkeit">b) <strong>Klarheit und Lesbarkeit</strong></h3>
+<p>Enums machen den Code viel <strong>verständlicher</strong> als Zahlen oder Strings:</p>
+<pre><code class="language-java"><span class="hljs-comment">// Weniger lesbar</span>
+<span class="hljs-type">int</span> <span class="hljs-variable">status</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>; <span class="hljs-comment">// Was bedeutet 2?</span>
+
+<span class="hljs-comment">// Klar und deutlich</span>
+<span class="hljs-type">Status</span> <span class="hljs-variable">s</span> <span class="hljs-operator">=</span> Status.AKTIV;
+</code></pre>
+<h3 id="c-fehlervermeidung">c) <strong>Fehlervermeidung</strong></h3>
+<p>Mit Enums kann niemand „magische Zahlen“ oder „Tippfehler-Strings“ einschleusen:</p>
+<pre><code class="language-java"><span class="hljs-comment">// Mit String</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">wochentag</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Monntag&quot;</span>; <span class="hljs-comment">// Tippfehler, aber Compiler merkt es nicht!</span>
+
+<span class="hljs-comment">// Mit Enum</span>
+<span class="hljs-type">Wochentag</span> <span class="hljs-variable">tag</span> <span class="hljs-operator">=</span> Wochentag.MONTAG; <span class="hljs-comment">// Tippfehler? -&gt; Compilerfehler!</span>
+</code></pre>
+<h3 id="d-erweiterbarkeit-und-funktionalität">d) <strong>Erweiterbarkeit und Funktionalität</strong></h3>
+<p>Enums können <strong>Methoden</strong> und <strong>Eigenschaften</strong> besitzen:</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Planet</span> {
+    ERDE(<span class="hljs-number">5.97E24</span>), MARS(<span class="hljs-number">6.42E23</span>);
+
+    <span class="hljs-keyword">private</span> <span class="hljs-type">double</span> masse;
+
+    Planet(<span class="hljs-type">double</span> masse) {
+        <span class="hljs-built_in">this</span>.masse = masse;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-type">double</span> <span class="hljs-title function_">getMasse</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> masse;
+    }
+}
+</code></pre>
+<h3 id="e-nutzung-in-switch-statements">e) <strong>Nutzung in <code>switch</code>-Statements</strong></h3>
+<p>Enums sind für die Verwendung in <code>switch</code>-Anweisungen optimiert:</p>
+<pre><code class="language-java"><span class="hljs-type">Wochentag</span> <span class="hljs-variable">tag</span> <span class="hljs-operator">=</span> Wochentag.MONTAG;
+<span class="hljs-keyword">switch</span>(tag) {
+    <span class="hljs-keyword">case</span> MONTAG: System.out.println(<span class="hljs-string">&quot;Wochenstart!&quot;</span>); <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> FREITAG: System.out.println(<span class="hljs-string">&quot;Bald Wochenende!&quot;</span>); <span class="hljs-keyword">break</span>;
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<hr>
+<h2 id="4-zusammenfassung">4. Zusammenfassung</h2>
+<ul>
+<li><strong>Enums</strong> sind der moderne und sichere Weg, eine feste Menge von Werten zu definieren.</li>
+<li>Sie bieten Typsicherheit, Lesbarkeit und viele zusätzliche Möglichkeiten.</li>
+<li>Enums vermeiden Fehler, die bei der Nutzung von <code>int</code>- oder <code>String</code>-Konstanten häufig auftreten.</li>
+<li>Sie sind einfach zu nutzen und können erweitert werden (z. B. Methoden, Attribute).</li>
+</ul>
+<hr>
+<h2 id="5-übungsaufgaben-zum-selbststudium">5. Übungsaufgaben zum Selbststudium</h2>
+<ol>
+<li>
+<p>Definiere ein Enum <code>Fahrtrichtung</code> mit den Werten <code>VORWAERTS</code>, <code>RUECKWAERTS</code>, <code>LINKS</code>, <code>RECHTS</code>.</p>
+</li>
+<li>
+<p>Ersetze im folgenden Code alle Farbangaben durch ein Enum:</p>
+<pre><code class="language-java"><span class="hljs-comment">// Alt</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">ROT</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">BLAU</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">GRUEN</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>;
+</code></pre>
+</li>
+<li>
+<p>Probiere aus, was passiert, wenn du einer Enum-Variablen einen ungültigen Wert zuweist.</p>
+</li>
+</ol>
+
+            
+            
+        </body>
+        </html>

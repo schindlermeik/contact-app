@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices bei JDBC</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-bei-jdbc">Handout: Best Practices bei JDBC</h1>
+<p>Um professionelle und wartbare Datenbankanwendungen zu entwickeln, reicht es nicht aus, die grundlegenden Befehle zu kennen. Es gibt eine Reihe von bewährten Vorgehensweisen, die deinen Code robuster und effizienter machen.</p>
+<h2 id="61-trennung-von-logik-und-datenbankzugriff-dao-pattern">6.1 Trennung von Logik und Datenbankzugriff (DAO-Pattern)</h2>
+<p>Ein häufiger Fehler, besonders bei Anfängern, ist es, den Datenbankzugriff (<code>Connection</code>, <code>Statement</code>, <code>ResultSet</code> etc.) direkt in der Geschäftslogik (z.B. in der <code>main</code>-Methode oder einer Anwendungslogik-Klasse) zu vermischen. Das macht den Code unübersichtlich, schwer testbar und unflexibel.</p>
+<p>Die Lösung ist das <strong>DAO-Pattern (Data Access Object)</strong>.</p>
+<h3 id="was-ist-das-dao-pattern">Was ist das DAO-Pattern?</h3>
+<p>Das DAO-Pattern trennt die <strong>Anwendungslogik</strong> von der <strong>Datenzugriffslogik</strong>. Jedes DAO-Objekt ist für die Interaktion mit einer bestimmten Entität oder Tabelle in der Datenbank zuständig.</p>
+<p><strong>Vorteile des DAO-Patterns:</strong></p>
+<ul>
+<li><strong>Sauberer Code:</strong> Deine Hauptanwendung muss nicht wissen, wie die Daten gespeichert oder abgerufen werden. Sie ruft einfach eine Methode wie <code>userDao.findById(123)</code> auf.</li>
+<li><strong>Leichte Wartbarkeit:</strong> Wenn sich die Datenbanktechnologie ändert (z.B. von MySQL zu PostgreSQL), musst du nur die Implementierung des DAO ändern, nicht aber deine gesamte Anwendung.</li>
+<li><strong>Bessere Testbarkeit:</strong> Du kannst die DAOs einfach durch Mock-Objekte ersetzen, um deine Geschäftslogik zu testen, ohne eine echte Datenbankverbindung aufbauen zu müssen.</li>
+</ul>
+<p><strong>Beispielhafter Aufbau:</strong></p>
+<ul>
+<li><strong>Modell-Klasse (Entity):</strong> Eine einfache Java-Klasse, die die Daten repräsentiert.<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> id;
+    <span class="hljs-keyword">private</span> String name;
+    <span class="hljs-comment">// Getter und Setter</span>
+}
+</code></pre>
+</li>
+<li><strong>DAO-Interface:</strong> Definiert die Methoden, die dein DAO bereitstellen soll.<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">UserDao</span> {
+    User <span class="hljs-title function_">findById</span><span class="hljs-params">(<span class="hljs-type">int</span> id)</span>;
+    List&lt;User&gt; <span class="hljs-title function_">findAll</span><span class="hljs-params">()</span>;
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">save</span><span class="hljs-params">(User user)</span>;
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">update</span><span class="hljs-params">(User user)</span>;
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">delete</span><span class="hljs-params">(<span class="hljs-type">int</span> id)</span>;
+}
+</code></pre>
+</li>
+<li><strong>DAO-Implementierung:</strong> Die Klasse, die das Interface implementiert und die eigentliche JDBC-Logik enthält.<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserDaoJdbc</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">UserDao</span> {
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> User <span class="hljs-title function_">findById</span><span class="hljs-params">(<span class="hljs-type">int</span> id)</span> {
+        <span class="hljs-comment">// JDBC-Code mit PreparedStatement zum Abrufen eines Users</span>
+        <span class="hljs-comment">// ...</span>
+        <span class="hljs-keyword">return</span> user;
+    }
+    <span class="hljs-comment">// Weitere Methoden implementieren</span>
+}
+</code></pre>
+</li>
+</ul>
+<h2 id="62-prepared-statements-zur-vermeidung-von-sql-injections">6.2 Prepared Statements zur Vermeidung von SQL-Injections</h2>
+<p>Wie bereits im Abschnitt 3.1 erwähnt, ist die Verwendung von <strong><code>PreparedStatement</code></strong> gegenüber <code>Statement</code> die wichtigste Sicherheitsmaßnahme.</p>
+<p><strong>SQL-Injection</strong> ist eine Angriffsmethode, bei der bösartiger Code in die SQL-Abfrage eingeschleust wird. Wenn du die Eingabe eines Benutzers direkt in einen SQL-String einfügst, machst du deine Anwendung angreifbar.</p>
+<p><strong>Schlechtes Beispiel (anfällig für SQL-Injection):</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">userInput</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Max Mustermann&#x27; OR &#x27;1&#x27;=&#x27;1&quot;</span>;
+<span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;SELECT * FROM user WHERE name = &#x27;&quot;</span> + userInput + <span class="hljs-string">&quot;&#x27;&quot;</span>;
+<span class="hljs-comment">// SQL-Befehl wird zu: SELECT * FROM user WHERE name = &#x27;Max Mustermann&#x27; OR &#x27;1&#x27;=&#x27;1&#x27;</span>
+<span class="hljs-comment">// Dies würde alle Benutzer zurückgeben!</span>
+</code></pre>
+<p><strong>Gutes Beispiel (sicher durch <code>PreparedStatement</code>):</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">userInput</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Max Mustermann&#x27; OR &#x27;1&#x27;=&#x27;1&quot;</span>;
+<span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;SELECT * FROM user WHERE name = ?&quot;</span>;
+<span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">ps</span> <span class="hljs-operator">=</span> connection.prepareStatement(sql);
+ps.setString(<span class="hljs-number">1</span>, userInput);
+<span class="hljs-comment">// Der Platzhalter ? stellt sicher, dass der userInput als reiner Wert und nicht als Code interpretiert wird.</span>
+</code></pre>
+<p><code>PreparedStatement</code> ist nicht nur sicherer, sondern auch performanter, da die Datenbank den Befehl nur einmal kompiliert. <strong>Verwende niemals <code>Statement</code> für dynamische Abfragen.</strong></p>
+<h2 id="63-logging-und-debugging-von-sql-statements">6.3 Logging und Debugging von SQL-Statements</h2>
+<p>In komplexen Anwendungen ist es oft schwierig nachzuvollziehen, welche SQL-Befehle tatsächlich ausgeführt werden. Ein gutes <strong>Logging</strong>-System kann hierbei eine große Hilfe sein.</p>
+<ul>
+<li>
+<p><strong>Wozu Logging?</strong></p>
+<ul>
+<li><strong>Fehleranalyse:</strong> Wenn eine Abfrage fehlschlägt, siehst du im Log, welcher Befehl genau gesendet wurde.</li>
+<li><strong>Performance-Analyse:</strong> Du kannst die Ausführungszeiten von Abfragen protokollieren, um Performance-Engpässe zu identifizieren.</li>
+<li><strong>Debuggen:</strong> Du kannst die genauen Werte sehen, die an die Platzhalter (<code>?</code>) eines <code>PreparedStatement</code> gebunden wurden.</li>
+</ul>
+</li>
+<li>
+<p><strong>Tools:</strong></p>
+<ul>
+<li>Verwende professionelle Logging-Frameworks wie <strong>SLF4J</strong> in Kombination mit <strong>Logback</strong> oder <strong>Log4j2</strong>.</li>
+<li>Du kannst auch spezielle JDBC-Treiber-Ergänzungen wie <strong>P6Spy</strong> oder <strong>log4jdbc</strong> verwenden, die den gesamten JDBC-Verkehr protokollieren, ohne dass du den Code manuell ändern musst.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel für manuelles Logging (für kleine Projekte):</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// String sql = &quot;INSERT INTO user (name) VALUES (?)&quot;;</span>
+<span class="hljs-comment">// System.out.println(&quot;Executing SQL: &quot; + sql);</span>
+<span class="hljs-comment">// preparedStatement.setString(1, name);</span>
+<span class="hljs-comment">// System.out.println(&quot;  with parameter 1: &quot; + name);</span>
+</code></pre>
+<p>Das manuelle Logging ist umständlich und sollte nur in einfachen Fällen angewendet werden. Besser ist die Nutzung eines professionellen Logging-Frameworks.</p>
+<h2 id="64-performance-tipps-batch-processing-connection-pooling">6.4 Performance-Tipps (Batch Processing, Connection Pooling)</h2>
+<h3 id="connection-pooling">Connection Pooling</h3>
+<p>Jede neue Datenbankverbindung aufzubauen ist ein zeit- und ressourcenintensiver Prozess. In Anwendungen, die viele kurze Datenbankanfragen verarbeiten müssen (z.B. Webanwendungen), kann dies schnell zu einem Engpass werden.</p>
+<p><strong>Connection Pooling</strong> löst dieses Problem: Statt die Verbindung nach jeder Anfrage zu schließen, wird ein Pool von bereits geöffneten Verbindungen verwaltet. Wenn deine Anwendung eine Verbindung benötigt, erhält sie einfach eine &quot;ausgeliehene&quot; Verbindung aus diesem Pool. Ist sie fertig, gibt sie die Verbindung wieder an den Pool zurück.</p>
+<ul>
+<li><strong>Vorteile:</strong> Deutlich höhere Performance, da die teure Verbindungsherstellung entfällt.</li>
+<li><strong>Empfohlene Bibliotheken:</strong> <strong>HikariCP</strong>, <strong>c3p0</strong> oder der in den meisten Application Servern (wie Tomcat oder WildFly) integrierte Pool.</li>
+</ul>
+<h3 id="batch-processing">Batch Processing</h3>
+<p>Wenn du viele <code>INSERT</code>, <code>UPDATE</code> oder <code>DELETE</code>-Anweisungen nacheinander ausführen musst, ist es sehr ineffizient, jede Anweisung einzeln an die Datenbank zu senden.</p>
+<p><strong>Batch Processing</strong> ermöglicht es, mehrere SQL-Anweisungen zu bündeln und sie in einem einzigen Aufruf an die Datenbank zu senden.</p>
+<p><strong>Beispiel für Batch Processing:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;INSERT INTO mitarbeiter (vorname, nachname) VALUES (?, ?)&quot;</span>;
+<span class="hljs-keyword">try</span> (<span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">preparedStatement</span> <span class="hljs-operator">=</span> connection.prepareStatement(sql)) {
+    <span class="hljs-comment">// AutoCommit für Transaktion deaktivieren</span>
+    connection.setAutoCommit(<span class="hljs-literal">false</span>);
+    
+    <span class="hljs-comment">// Ersten Datensatz hinzufügen</span>
+    preparedStatement.setString(<span class="hljs-number">1</span>, <span class="hljs-string">&quot;Max&quot;</span>);
+    preparedStatement.setString(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Mustermann&quot;</span>);
+    preparedStatement.addBatch(); <span class="hljs-comment">// Fügt den Befehl zum Batch hinzu</span>
+    
+    <span class="hljs-comment">// Zweiten Datensatz hinzufügen</span>
+    preparedStatement.setString(<span class="hljs-number">1</span>, <span class="hljs-string">&quot;Erika&quot;</span>);
+    preparedStatement.setString(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Musterfrau&quot;</span>);
+    preparedStatement.addBatch();
+    
+    <span class="hljs-comment">// ... weitere Datensätze ...</span>
+    
+    <span class="hljs-comment">// Batch ausführen</span>
+    <span class="hljs-type">int</span>[] affectedRows = preparedStatement.executeBatch();
+    
+    <span class="hljs-comment">// Änderungen übernehmen</span>
+    connection.commit();
+}
+</code></pre>
+<ul>
+<li><strong>Vorteile:</strong> Reduziert den Netzwerk-Overhead erheblich und beschleunigt Operationen, die eine große Menge an Daten verarbeiten.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

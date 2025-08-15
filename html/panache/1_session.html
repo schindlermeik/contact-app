@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in Panache</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-panache">Handout: Einführung in Panache</h1>
+<hr>
+<h2 id="11-was-ist-panache--zielsetzung-und-philosophie">1.1 Was ist Panache? – Zielsetzung und Philosophie</h2>
+<h3 id="was-ist-panache">Was ist Panache?</h3>
+<p><strong>Panache</strong> ist ein Framework bzw. eine Erweiterung für <strong>Quarkus</strong> (ein modernes Java-Framework für Cloud-native Anwendungen), das die Arbeit mit Datenbanken und JPA-Entities deutlich vereinfacht und produktiver macht. Panache verfolgt dabei einen „Opinionated Approach“, d. h. es trifft Entscheidungen, wie bestimmte Dinge gemacht werden sollten, damit Entwickler schneller und mit weniger Boilerplate-Code produktiv sein können.</p>
+<h3 id="zielsetzung-von-panache">Zielsetzung von Panache</h3>
+<ul>
+<li><strong>Maximale Produktivität:</strong>
+Reduzierung von wiederkehrendem und fehleranfälligem Code („Boilerplate“), wie er bei klassischem JPA üblich ist.</li>
+<li><strong>Intuitive, ausdrucksstarke API:</strong>
+Schreibweise im Stil moderner Programmiersprachen wie Kotlin, Groovy oder Python.</li>
+<li><strong>Konzentration aufs Wesentliche:</strong>
+Der Entwickler fokussiert sich auf die Geschäftslogik statt auf technische Details der Datenpersistenz.</li>
+<li><strong>Optimiert für Quarkus:</strong>
+Perfekt zugeschnitten auf performante Microservices, Cloud-Deployments und die Containerwelt (z. B. Docker, Kubernetes).</li>
+</ul>
+<h3 id="kernidee">Kernidee</h3>
+<p>Mit Panache sollen Datenbankoperationen so einfach und lesbar wie möglich sein, ohne sich ständig um das Management des <code>EntityManager</code> oder Transaktionen kümmern zu müssen.</p>
+<hr>
+<h2 id="12-vorteile-gegenüber-klassischem-jpa-und-repository-pattern">1.2 Vorteile gegenüber klassischem JPA und Repository-Pattern</h2>
+<h3 id="vergleich-klassisches-jpa-vs-panache">Vergleich: Klassisches JPA vs. Panache</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Klassisches JPA</strong></th>
+<th><strong>Panache</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Codeumfang</strong></td>
+<td>Viel Boilerplate, viele Getter/Setter</td>
+<td>Minimal, meist nur 1–2 Zeilen</td>
+</tr>
+<tr>
+<td><strong>Lesbarkeit</strong></td>
+<td>Oft unübersichtlich</td>
+<td>Sehr lesbar, deklarativ</td>
+</tr>
+<tr>
+<td><strong>Zugriffsmuster</strong></td>
+<td><code>EntityManager</code> muss verwaltet werden</td>
+<td>Methoden wie <code>find()</code>, <code>listAll()</code></td>
+</tr>
+<tr>
+<td><strong>CRUD-Operationen</strong></td>
+<td>Immer eigene Methoden schreiben</td>
+<td>Out-of-the-box vorhanden</td>
+</tr>
+<tr>
+<td><strong>Transaktionen</strong></td>
+<td>Explizit oder mit Annotationen</td>
+<td>Automatisch im passenden Kontext</td>
+</tr>
+</tbody>
+</table>
+<h4 id="beispiel-entity-speichern">Beispiel: Entity speichern</h4>
+<p><strong>Klassisch mit JPA:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+user.setName(<span class="hljs-string">&quot;Anna&quot;</span>);
+entityManager.persist(user);
+</code></pre>
+<p><strong>Mit Panache:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+user.name = <span class="hljs-string">&quot;Anna&quot;</span>;
+user.persist();
+</code></pre>
+<h4 id="beispiel-alle-einträge-holen">Beispiel: Alle Einträge holen</h4>
+<p><strong>Klassisch mit JPA:</strong></p>
+<pre><code class="language-java">TypedQuery&lt;User&gt; query = entityManager.createQuery(<span class="hljs-string">&quot;SELECT u FROM User u&quot;</span>, User.class);
+List&lt;User&gt; users = query.getResultList();
+</code></pre>
+<p><strong>Mit Panache:</strong></p>
+<pre><code class="language-java">List&lt;User&gt; users = User.listAll();
+</code></pre>
+<h3 id="vorteile-von-panache-im-überblick">Vorteile von Panache im Überblick</h3>
+<ul>
+<li><strong>Weniger Code:</strong>
+Viele Standardmethoden (persist, find, delete, listAll) sind bereits implementiert.</li>
+<li><strong>Aktives Record-Pattern:</strong>
+Direktes Arbeiten mit Entitätsmethoden (ähnlich wie bei Ruby on Rails oder ActiveRecord in anderen Sprachen).</li>
+<li><strong>Repository-Pattern als Option:</strong>
+Auch ein Repository-Pattern kann mit Panache genutzt werden (flexibel je nach Projektanforderung).</li>
+<li><strong>Schneller Einstieg:</strong>
+Entwickler können sich auf Geschäftslogik konzentrieren.</li>
+<li><strong>Mehr „Konvention vor Konfiguration“:</strong>
+Viele Dinge sind bereits durch sinnvolle Defaults gelöst.</li>
+<li><strong>Bessere Lesbarkeit:</strong>
+Datenbankoperationen sind intuitiv und selbstbeschreibend.</li>
+<li><strong>Integrierte Unterstützung für gängige Features:</strong>
+z. B. Paging, Sortierung, dynamische Queries.</li>
+</ul>
+<hr>
+<h2 id="13-wann-und-warum-panache-einsetzen">1.3 Wann und warum Panache einsetzen?</h2>
+<h3 id="wann-ist-panache-sinnvoll">Wann ist Panache sinnvoll?</h3>
+<ul>
+<li><strong>Microservice-Architekturen:</strong>
+Perfekt für kleine bis mittlere Anwendungen und Microservices, wo Produktivität und Geschwindigkeit entscheidend sind.</li>
+<li><strong>CRUD-lastige Anwendungen:</strong>
+Ideal, wenn viele Standardoperationen (Create, Read, Update, Delete) benötigt werden.</li>
+<li><strong>Rapid Prototyping und MVPs:</strong>
+Wenn es schnell gehen muss und Wartbarkeit im Fokus steht.</li>
+<li><strong>Entwicklung mit Quarkus:</strong>
+Panache ist für Quarkus gemacht – der volle Funktionsumfang entfaltet sich dort.</li>
+</ul>
+<h3 id="wann-ist-panache-weniger-geeignet">Wann ist Panache weniger geeignet?</h3>
+<ul>
+<li><strong>Extrem komplexe Domänenmodelle:</strong>
+Bei sehr ausgefallenen Datenbankoperationen oder exotischen Mapping-Fällen kann „plain JPA“ mehr Flexibilität bieten.</li>
+<li><strong>Bestehende Legacy-Anwendungen:</strong>
+Migration von sehr komplexen Altprojekten auf Panache ist oft aufwändig.</li>
+</ul>
+<h3 id="warum-panache-nutzen">Warum Panache nutzen?</h3>
+<ul>
+<li><strong>Produktivitäts-Booster:</strong>
+Weniger Zeit mit Infrastrukturcode verbringen, mehr Fokus auf Businesslogik.</li>
+<li><strong>Wartbarer Code:</strong>
+Weniger selbstgeschriebene Hilfsmethoden, dadurch geringere Fehleranfälligkeit.</li>
+<li><strong>Saubere und intuitive APIs:</strong>
+Methoden wie <code>User.find(&quot;name&quot;, &quot;Anna&quot;)</code> sind für jeden Entwickler leicht zu verstehen.</li>
+</ul>
+<hr>
+<h3 id="zusammenfassung">Zusammenfassung</h3>
+<ul>
+<li><strong>Panache vereinfacht JPA massiv:</strong>
+Es ist für moderne, cloud-native Java-Entwicklung konzipiert.</li>
+<li><strong>Ideal für Quarkus und Microservices:</strong>
+Nutze Panache, wenn du schnell und sauber auf Datenbanken zugreifen möchtest.</li>
+<li><strong>Weniger Boilerplate, mehr Klarheit:</strong>
+Du sparst dir repetitive Aufgaben und erhöhst die Wartbarkeit deines Codes.</li>
+</ul>
+<hr>
+<p><strong>Weiterführende Links:</strong></p>
+<ul>
+<li><a href="https://quarkus.io/guides/hibernate-orm-panache">Offizielle Quarkus Panache Dokumentation</a></li>
+<li><a href="https://quarkus.io/guides/getting-started">Quarkus Getting Started Guide</a></li>
+<li><a href="https://quarkus.io/blog/quarkus-panache-primer/">Vergleich: JPA vs. Panache (Blogartikel, englisch)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

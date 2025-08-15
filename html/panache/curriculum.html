@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Vereinfachter Datenzugriff mit Panache &ndash; Curriculum</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <p>Sehr gerne! Hier ist ein strukturiertes <strong>Curriculum</strong> für
+<strong>Vereinfachter Datenzugriff mit Panache</strong>
+(beispielhaft aus dem Quarkus-Ökosystem, aber adaptierbar für andere moderne Java-Stacks):</p>
+<hr>
+<h2 id="vereinfachter-datenzugriff-mit-panache--curriculum">Vereinfachter Datenzugriff mit Panache – Curriculum</h2>
+<h3 id="1-einführung-in-panache">1. Einführung in Panache</h3>
+<ul>
+<li>1.1 Was ist Panache? – Zielsetzung und Philosophie</li>
+<li>1.2 Vorteile gegenüber klassischem JPA und Repository-Pattern</li>
+<li>1.3 Wann und warum Panache einsetzen?</li>
+</ul>
+<h3 id="2-voraussetzungen--projekt-setup">2. Voraussetzungen &amp; Projekt-Setup</h3>
+<ul>
+<li>2.1 Integration von Panache in ein Maven-Projekt</li>
+<li>2.2 Notwendige Abhängigkeiten für Panache (z. B. Quarkus, Hibernate ORM, Panache Extensions)</li>
+<li>2.3 Datenbankanbindung und Konfiguration (Beispiel: PostgreSQL)</li>
+</ul>
+<h3 id="3-grundlagen-panache-entity-und-panache-repository">3. Grundlagen: Panache-Entity und Panache-Repository</h3>
+<ul>
+<li>3.1 Verwendung der Panache-Entity (<code>extends PanacheEntity</code> / <code>PanacheEntityBase</code>)</li>
+<li>3.2 Automatisierte CRUD-Methoden durch Vererbung</li>
+<li>3.3 Verwendung von Panache Repository Pattern (<code>PanacheRepository&lt;T&gt;</code>)</li>
+<li>3.4 Unterschiede und Einsatzszenarien (Active Record vs. Repository Pattern)</li>
+</ul>
+<h3 id="4-crud-operationen-mit-panache">4. CRUD-Operationen mit Panache</h3>
+<ul>
+<li>4.1 Einfaches Persistieren, Finden, Aktualisieren und Löschen von Entitäten</li>
+<li>4.2 Komfortable Methoden wie <code>find()</code>, <code>listAll()</code>, <code>delete()</code>, etc.</li>
+<li>4.3 Dynamische und statische Queries (Query DSL mit Panache)</li>
+</ul>
+<h3 id="5-erweiterte-features-von-panache">5. Erweiterte Features von Panache</h3>
+<ul>
+<li>5.1 Sortierung, Paging und Filterung</li>
+<li>5.2 Arbeiten mit optionalen Rückgabewerten (z. B. <code>Optional&lt;T&gt;</code>)</li>
+<li>5.3 Umgang mit Beziehungen (One-to-Many, Many-to-One)</li>
+<li>5.4 Nutzung von Transaktionen in Panache</li>
+</ul>
+<h3 id="6-testen-von-panache-entitäten-und--repos">6. Testen von Panache-Entitäten und -Repos</h3>
+<ul>
+<li>6.1 Unit- und Integrationstests für Panache-Modelle</li>
+<li>6.2 Testcontainers für Datenbank-Tests (z. B. mit PostgreSQL)</li>
+</ul>
+<h3 id="7-best-practices-und-fallstricke">7. Best Practices und Fallstricke</h3>
+<ul>
+<li>7.1 Wann lohnt sich Panache – wann ist „plain JPA“ besser?</li>
+<li>7.2 Lesbarkeit vs. Kontrolle: Komplexe Queries und Performance</li>
+<li>7.3 Migration von klassischen JPA-Entitäten zu Panache</li>
+</ul>
+<h3 id="8-praktische-übungen-und-projektarbeit">8. Praktische Übungen und Projektarbeit</h3>
+<ul>
+<li>8.1 Aufbau eines Mini-Microservice mit Panache und PostgreSQL</li>
+<li>8.2 Implementieren typischer Anwendungsfälle (z. B. User- oder Produktverwaltung)</li>
+<li>8.3 Erweiterung: REST-Endpunkte für Panache-basierte Entitäten</li>
+<li>8.4 Optional: Containerisierung mit Quarkus und PostgreSQL (Docker)</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

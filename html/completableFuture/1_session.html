@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in asynchrone Programmierung</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-asynchrone-programmierung">Handout: Einführung in asynchrone Programmierung</h1>
+<hr>
+<h2 id="11-was-bedeutet-asynchron--begriff-motivation-anwendungsfälle">1.1 Was bedeutet „asynchron“? – Begriff, Motivation, Anwendungsfälle</h2>
+<h3 id="was-ist-asynchrone-programmierung"><strong>Was ist asynchrone Programmierung?</strong></h3>
+<ul>
+<li><strong>Asynchron</strong> bedeutet, dass Vorgänge unabhängig voneinander und zu unterschiedlichen Zeitpunkten ablaufen, ohne auf das Ende einer anderen Aufgabe zu warten.</li>
+<li>In der Programmierung spricht man von asynchronem Code, wenn Aufrufe (z. B. Berechnungen, Netzwerkzugriffe, Datenbankanfragen) nicht den aktuellen Thread blockieren. Stattdessen wird die Aufgabe im Hintergrund ausgeführt und das Ergebnis zu einem späteren Zeitpunkt zurückgeliefert.</li>
+</ul>
+<p><strong>Begriffsklärung:</strong></p>
+<ul>
+<li><strong>Synchron:</strong> Der Code läuft Schritt für Schritt ab, jede Zeile wartet, bis die vorherige vollständig beendet ist.</li>
+<li><strong>Asynchron:</strong> Aufgaben werden „losgeschickt“, das Programm läuft weiter, und das Ergebnis wird später übermittelt (z. B. Callback, Future, Promise, Event).</li>
+</ul>
+<h3 id="motivation-für-asynchrone-programmierung"><strong>Motivation für asynchrone Programmierung</strong></h3>
+<ul>
+<li><strong>Reaktionsfähigkeit:</strong> Benutzeroberflächen bleiben flüssig, weil lang laufende Operationen (z. B. Netzwerk, Dateizugriffe) im Hintergrund abgewickelt werden.</li>
+<li><strong>Effizienz:</strong> Threads oder Ressourcen werden nicht durch Warten blockiert, sondern können für andere Aufgaben genutzt werden.</li>
+<li><strong>Skalierbarkeit:</strong> Gerade bei serverseitigen Anwendungen können viele Anfragen gleichzeitig bearbeitet werden, ohne für jede Anfrage einen eigenen Thread dauerhaft zu blockieren.</li>
+</ul>
+<h3 id="typische-anwendungsfälle"><strong>Typische Anwendungsfälle</strong></h3>
+<ul>
+<li><strong>Netzwerk- und Datenbankzugriffe:</strong>
+Während das Programm auf eine Antwort vom Server oder aus der Datenbank wartet, kann es weiterarbeiten.</li>
+<li><strong>I/O-Operationen:</strong>
+Dateioperationen, HTTP-Requests, Datenbankabfragen sind klassische Kandidaten für asynchrones Arbeiten.</li>
+<li><strong>Benutzeroberflächen (UI):</strong>
+Asynchrone Methoden verhindern das „Einfrieren“ von GUIs (z. B. Swing, JavaFX).</li>
+<li><strong>Batch-Verarbeitung und Microservices:</strong>
+In modernen Systemen laufen viele Prozesse gleichzeitig und müssen nicht auf das Ergebnis anderer warten.</li>
+</ul>
+<hr>
+<h2 id="12-vergleich-synchrone-vs-asynchrone-ausführung">1.2 Vergleich: Synchrone vs. asynchrone Ausführung</h2>
+<h3 id="synchron-blockierend"><strong>Synchron (Blockierend)</strong></h3>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> longRunningOperation(); <span class="hljs-comment">// Das Programm wartet, bis die Methode fertig ist</span>
+System.out.println(<span class="hljs-string">&quot;Ergebnis: &quot;</span> + result); <span class="hljs-comment">// Wird erst nach Abschluss von longRunningOperation() ausgeführt</span>
+</code></pre>
+<ul>
+<li>Der aktuelle Thread wartet auf das Ende der Methode.</li>
+<li>Typisch für einfache Programme, sequentielle Verarbeitung.</li>
+</ul>
+<h3 id="asynchron-nicht-blockierend"><strong>Asynchron (Nicht-blockierend)</strong></h3>
+<pre><code class="language-java">CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; longRunningOperation());
+<span class="hljs-comment">// Das Programm läuft sofort weiter, ohne auf das Ergebnis zu warten</span>
+
+future.thenAccept(result -&gt; System.out.println(<span class="hljs-string">&quot;Ergebnis: &quot;</span> + result));
+System.out.println(<span class="hljs-string">&quot;Dies wird sofort ausgegeben, während die Operation noch läuft.&quot;</span>);
+</code></pre>
+<ul>
+<li>Das Ergebnis kommt später (z. B. Callback, Future, Promise).</li>
+<li>Das Programm kann in der Zwischenzeit weitere Aufgaben bearbeiten.</li>
+<li>Gerade in Web-, Server- und UI-Anwendungen sehr nützlich.</li>
+</ul>
+<h3 id="unterschiede-zusammengefasst"><strong>Unterschiede zusammengefasst</strong></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Synchron</th>
+<th>Asynchron</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ablauf</td>
+<td>Schritt für Schritt</td>
+<td>Aufgaben laufen unabhängig</td>
+</tr>
+<tr>
+<td>Blockierung</td>
+<td>Ja (Thread blockiert)</td>
+<td>Nein (Thread arbeitet weiter)</td>
+</tr>
+<tr>
+<td>Rückgabe</td>
+<td>Direkt</td>
+<td>Später (z.B. Callback, Future)</td>
+</tr>
+<tr>
+<td>Typische Nutzung</td>
+<td>Einfache Verarbeitung</td>
+<td>I/O, Netzwerk, parallele Tasks</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="13-vorteile-und-herausforderungen-asynchroner-programmierung">1.3 Vorteile und Herausforderungen asynchroner Programmierung</h2>
+<h3 id="vorteile"><strong>Vorteile</strong></h3>
+<ul>
+<li><strong>Bessere Ressourcenauslastung:</strong> Threads und CPUs werden nicht durch Wartezeiten blockiert.</li>
+<li><strong>Reaktionsfähigkeit:</strong> UI-Anwendungen bleiben bedienbar, Server können mehr parallele Anfragen verarbeiten.</li>
+<li><strong>Skalierbarkeit:</strong> Besonders bei vielen I/O-gebundenen Aufgaben (z. B. Webserver, Microservices).</li>
+</ul>
+<h3 id="herausforderungen"><strong>Herausforderungen</strong></h3>
+<ul>
+<li><strong>Komplexität:</strong>
+Der Kontrollfluss wird schwerer nachzuvollziehen („Was passiert wann?“).</li>
+<li><strong>Fehlerbehandlung:</strong>
+Fehler müssen häufig an anderer Stelle behandelt werden (z. B. im Callback oder im Future).</li>
+<li><strong>Callback-Hölle:</strong>
+Verschachtelte Callbacks (Callback Hell) können den Code unübersichtlich machen.</li>
+<li><strong>Synchronisation:</strong>
+Gemeinsame Ressourcen müssen besonders sorgfältig geschützt werden.</li>
+<li><strong>Debugging:</strong>
+Stacktraces und Ablauf lassen sich schwerer nachvollziehen.</li>
+</ul>
+<h3 id="wann-lohnt-sich-asynchrone-programmierung"><strong>Wann lohnt sich asynchrone Programmierung?</strong></h3>
+<ul>
+<li>Wenn du lang laufende, nicht-CPU-gebundene Operationen (z. B. Netzwerk, Datenbank) hast.</li>
+<li>Wenn du viele gleichzeitige Aufgaben verwalten musst (z. B. Server, Verarbeitung von Benutzerinteraktionen).</li>
+<li>Wenn die Benutzerfreundlichkeit im Vordergrund steht (flüssige UI).</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>In welchen Fällen ist asynchrone Programmierung unverzichtbar?</li>
+<li>Was sind die Hauptunterschiede zwischen synchronem und asynchronem Code?</li>
+<li>Welche typischen Fehlerquellen oder Schwierigkeiten kennst du aus asynchronem Code?</li>
+<li>Welche Vorteile bietet asynchrone Programmierung für skalierbare Systeme?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li><strong>Asynchrone Programmierung</strong> ermöglicht effizientes, reaktionsschnelles und skalierbares Software-Design.</li>
+<li>Sie bringt aber auch neue Herausforderungen: Fehlerbehandlung, Synchronisation, Nachvollziehbarkeit.</li>
+<li>Moderne Java-Technologien wie <code>CompletableFuture</code> erleichtern den Umgang mit asynchronem Code erheblich.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

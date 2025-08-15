@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Erzeugung von Streams</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-erzeugung-von-streams">Handout: Erzeugung von Streams</h1>
+<hr>
+<h2 id="1-streams-aus-collections-erzeugen">1. Streams aus Collections erzeugen</h2>
+<p>Java Collections (wie <code>List</code>, <code>Set</code>) können ganz einfach in Streams umgewandelt werden. Die gängigsten Methoden sind:</p>
+<h3 id="a-stream">a) <code>.stream()</code></h3>
+<p>Erzeugt einen <strong>sequentiellen</strong> Stream aus der Collection.
+<strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+Stream&lt;String&gt; stream = namen.stream();
+</code></pre>
+<p>Nun kannst du auf diesem Stream weitere Operationen ausführen.</p>
+<h3 id="b-parallelstream">b) <code>.parallelStream()</code></h3>
+<p>Erzeugt einen <strong>parallelen</strong> Stream, der mehrere Prozessorkerne nutzt – nützlich bei sehr großen Datenmengen.
+<strong>Beispiel:</strong></p>
+<pre><code class="language-java">Stream&lt;String&gt; parallelerStream = namen.parallelStream();
+</code></pre>
+<p><strong>Hinweis:</strong> Nicht jeder Code profitiert von Parallelität – sie kann sogar langsamer sein, wenn die Aufgabe zu klein oder nicht thread-sicher ist.</p>
+<hr>
+<h2 id="2-streams-aus-arrays">2. Streams aus Arrays</h2>
+<p>Auch Arrays können bequem in Streams umgewandelt werden – mit Hilfe der Hilfsklasse <code>Arrays</code>.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">String[] farben = {<span class="hljs-string">&quot;Rot&quot;</span>, <span class="hljs-string">&quot;Grün&quot;</span>, <span class="hljs-string">&quot;Blau&quot;</span>};
+Stream&lt;String&gt; farbenStream = Arrays.stream(farben);
+</code></pre>
+<p>Für primitive Datentypen gibt es spezielle Streams:</p>
+<pre><code class="language-java"><span class="hljs-type">int</span>[] zahlen = {<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>};
+<span class="hljs-type">IntStream</span> <span class="hljs-variable">zahlenStream</span> <span class="hljs-operator">=</span> Arrays.stream(zahlen);
+</code></pre>
+<hr>
+<h2 id="3-streams-mit-fabrikmethoden">3. Streams mit Fabrikmethoden</h2>
+<p>Die Klasse <code>Stream</code> bietet mehrere <strong>statische Methoden</strong>, mit denen du Streams flexibel erzeugen kannst:</p>
+<h3 id="a-streamof">a) <code>Stream.of()</code></h3>
+<p>Erzeugt einen Stream aus den übergebenen Argumenten.</p>
+<pre><code class="language-java">Stream&lt;String&gt; stream = Stream.of(<span class="hljs-string">&quot;Apfel&quot;</span>, <span class="hljs-string">&quot;Banane&quot;</span>, <span class="hljs-string">&quot;Kirsche&quot;</span>);
+</code></pre>
+<h3 id="b-streamgenerate">b) <code>Stream.generate()</code></h3>
+<p>Erzeugt einen unendlichen Stream, bei dem jeder Wert durch einen <strong>Supplier</strong> erzeugt wird.</p>
+<pre><code class="language-java">Stream&lt;Double&gt; zufallszahlen = Stream.generate(Math::random);
+<span class="hljs-comment">// Achtung: Unendlicher Stream – daher limit() nutzen!</span>
+zufallszahlen.limit(<span class="hljs-number">5</span>).forEach(System.out::println);
+</code></pre>
+<h3 id="c-streamiterate">c) <code>Stream.iterate()</code></h3>
+<p>Erzeugt einen unendlichen (oder ab Java 9: endlichen) Stream, indem ein Startwert und eine Erzeugungsregel angegeben werden.</p>
+<pre><code class="language-java">Stream&lt;Integer&gt; zahlen = Stream.iterate(<span class="hljs-number">0</span>, n -&gt; n + <span class="hljs-number">2</span>);
+zahlen.limit(<span class="hljs-number">5</span>).forEach(System.out::println); <span class="hljs-comment">// 0, 2, 4, 6, 8</span>
+</code></pre>
+<p>Ab Java 9 kann <code>Stream.iterate()</code> optional eine Abbruchbedingung bekommen:</p>
+<pre><code class="language-java">Stream&lt;Integer&gt; zahlenBis10 = Stream.iterate(<span class="hljs-number">0</span>, n -&gt; n &lt; <span class="hljs-number">10</span>, n -&gt; n + <span class="hljs-number">2</span>);
+zahlenBis10.forEach(System.out::println); <span class="hljs-comment">// 0, 2, 4, 6, 8</span>
+</code></pre>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>Erzeuge einen Stream aus einer Liste von Namen und gib alle Namen in Großbuchstaben aus.</li>
+<li>Wandle ein Array von Ganzzahlen in einen Stream um und berechne die Summe aller Zahlen.</li>
+<li>Nutze <code>Stream.of()</code>, um einen Stream aus vier Farben zu erzeugen, und zähle die Elemente.</li>
+<li>Erzeuge mit <code>Stream.generate()</code> fünf Zufallszahlen zwischen 0 und 1 und gib sie aus.</li>
+<li>Erzeuge mit <code>Stream.iterate()</code> die ersten zehn geraden Zahlen und gib sie aus.</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li><strong>Collections und Arrays können leicht in Streams verwandelt werden.</strong></li>
+<li><strong>Mit Fabrikmethoden sind auch Streams aus beliebigen Werten oder Generatoren möglich.</strong></li>
+<li><strong>Unendliche Streams immer mit <code>limit()</code> begrenzen, sonst läuft das Programm endlos!</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

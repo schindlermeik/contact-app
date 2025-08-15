@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundlegende Debugging-Funktionen in IntelliJ</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundlegende-debugging-funktionen-in-intellij">Handout: Grundlegende Debugging-Funktionen in IntelliJ</h1>
+<hr>
+<h2 id="1-starten-einer-debugging-session">1. Starten einer Debugging-Session</h2>
+<h3 id="a-unterschied-run-vs-debug">a) Unterschied „Run“ vs. „Debug“</h3>
+<ul>
+<li><strong>Run</strong> (▶): Startet das Programm ganz normal.
+Das Programm läuft komplett durch; Fehler lassen sich nur über Ausgaben oder Logs erkennen.</li>
+<li><strong>Debug</strong> (🐞): Startet das Programm im Debug-Modus.
+Ermöglicht das Setzen und Nutzen von Breakpoints, das Schritt-für-Schritt-Durchlaufen, Variablen-Inspektion und vieles mehr.</li>
+</ul>
+<p><strong>Merke:</strong>
+Nur im Debug-Modus kannst du den Programmablauf anhalten, den aktuellen Zustand analysieren und gezielt Fehler suchen.</p>
+<h3 id="b-startoptionen-und-konfigurationen">b) Startoptionen und Konfigurationen</h3>
+<ul>
+<li>
+<p>In IntelliJ findest du oben rechts Schaltflächen für „Run“ und „Debug“.</p>
+</li>
+<li>
+<p><strong>Debugging starten:</strong></p>
+<ul>
+<li>Mit Rechtsklick auf die Klasse/Datei → „Debug“ auswählen</li>
+<li>Oder mit dem Shortcut <code>Shift + F9</code></li>
+</ul>
+</li>
+<li>
+<p>Du kannst eigene <strong>Konfigurationen</strong> anlegen, um z. B. mit bestimmten Argumenten, Umgebungsvariablen oder im Remote-Debugging-Modus zu starten:</p>
+<ul>
+<li>Menü: „Run“ → „Edit Configurations…“</li>
+<li>Hier lassen sich Programme, Tests, Webanwendungen, Docker-Container usw. als Debug-Ziel konfigurieren.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-breakpoints-setzen-entfernen-und-verwalten">2. Breakpoints setzen, entfernen und verwalten</h2>
+<h3 id="a-breakpoints-setzen">a) Breakpoints setzen</h3>
+<ul>
+<li>
+<p><strong>Line Breakpoint:</strong></p>
+<ul>
+<li>Klicke auf den linken Rand neben einer Codezeile (Gutter) oder stelle den Cursor auf die Zeile und drücke <code>Ctrl + F8</code>.</li>
+<li>Beim Debuggen hält das Programm an dieser Stelle an, bevor der Code ausgeführt wird.</li>
+</ul>
+</li>
+</ul>
+<h3 id="b-breakpoints-entfernen">b) Breakpoints entfernen</h3>
+<ul>
+<li>Einfach nochmal auf den roten Punkt im Gutter klicken, oder</li>
+<li><code>Ctrl + F8</code> auf der Zeile, wo bereits ein Breakpoint ist.</li>
+</ul>
+<h3 id="c-breakpoints-verwalten">c) Breakpoints verwalten</h3>
+<ul>
+<li>Alle Breakpoints kannst du zentral im Fenster „View Breakpoints…“ (<code>Ctrl + Shift + F8</code>) sehen, aktivieren/deaktivieren, konfigurieren oder löschen.</li>
+<li>Praktisch, um in großen Projekten den Überblick zu behalten.</li>
+</ul>
+<hr>
+<h3 id="d-arten-von-breakpoints">d) Arten von Breakpoints</h3>
+<h4 id="1-line-breakpoints-standard">1. <strong>Line Breakpoints</strong> (Standard)</h4>
+<ul>
+<li>Setzt du an einer konkreten Zeile – hält das Programm immer dort an.</li>
+<li>Am häufigsten genutzt.</li>
+</ul>
+<h4 id="2-conditional-breakpoints-mit-bedingungen">2. <strong>Conditional Breakpoints</strong> (mit Bedingungen)</h4>
+<ul>
+<li>
+<p>Der Breakpoint stoppt <strong>nur</strong>, wenn eine bestimmte Bedingung erfüllt ist.</p>
+</li>
+<li>
+<p>Beispiel:</p>
+<ul>
+<li>Rechtsklick auf einen bestehenden Breakpoint → „More…“ → „Condition“</li>
+<li>Schreibe einen Java-Ausdruck wie <code>x &gt; 100</code> oder <code>user == null</code></li>
+</ul>
+</li>
+<li>
+<p>Sehr nützlich, um nur bei bestimmten Daten/Fehlern anzuhalten!</p>
+</li>
+</ul>
+<h4 id="3-method-breakpoints">3. <strong>Method Breakpoints</strong></h4>
+<ul>
+<li>Hält am <strong>Beginn</strong> oder <strong>Ende</strong> einer bestimmten Methode an, egal an welcher Zeile.</li>
+<li>Kann auf alle Methoden einer Klasse gesetzt werden.</li>
+<li>Setzen: Rechtsklick auf den Methodennamen → „Toggle Method Breakpoint“</li>
+<li><strong>Achtung:</strong> Method Breakpoints können das Debugging verlangsamen, weil sie tiefer im Bytecode eingreifen.</li>
+</ul>
+<h4 id="4-exception-breakpoints">4. <strong>Exception Breakpoints</strong></h4>
+<ul>
+<li>
+<p>Das Programm stoppt <strong>sofort</strong>, wenn eine bestimmte Exception (Fehler) geworfen wird.</p>
+</li>
+<li>
+<p>Hinzufügen:</p>
+<ul>
+<li>„View Breakpoints…“ öffnen (<code>Ctrl + Shift + F8</code>)</li>
+<li>Auf „+“ klicken, „Java Exception Breakpoint“ auswählen, z. B. <code>NullPointerException</code></li>
+</ul>
+</li>
+<li>
+<p>Sehr hilfreich, wenn der Fehlerort unbekannt ist oder die Exception an mehreren Stellen auftreten kann.</p>
+</li>
+</ul>
+<hr>
+<h3 id="e-temporäre-und-permanente-breakpoints">e) Temporäre und permanente Breakpoints</h3>
+<ul>
+<li>
+<p><strong>Temporäre Breakpoints:</strong></p>
+<ul>
+<li>Halten nur <strong>einmal</strong> an und werden danach automatisch entfernt.</li>
+<li>Setzen: Rechtsklick auf Breakpoint → „Set as Temporary Breakpoint“.</li>
+</ul>
+</li>
+<li>
+<p><strong>Permanente Breakpoints:</strong></p>
+<ul>
+<li>Bleiben bis sie manuell entfernt werden.</li>
+<li>Praktisch für wiederkehrende Analysen oder Langzeit-Fehlersuche.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-zusammenfassung--tipps">3. Zusammenfassung &amp; Tipps</h2>
+<ul>
+<li>Nutze Breakpoints gezielt, um Fehler schnell zu isolieren.</li>
+<li>Conditional Breakpoints sparen Zeit bei großen Datenmengen oder Schleifen.</li>
+<li>Exception Breakpoints helfen bei der Ursachenforschung schwer auffindbarer Fehler.</li>
+<li>Verwalte und organisiere Breakpoints regelmäßig, um den Überblick zu behalten.</li>
+<li>Probiere die verschiedenen Breakpoint-Typen aus, um mit unterschiedlichen Fehlerbildern umzugehen.</li>
+</ul>
+<hr>
+<h2 id="4-weiterführende-links-und-ressourcen">4. Weiterführende Links und Ressourcen</h2>
+<ul>
+<li><a href="https://www.jetbrains.com/help/idea/debugging-your-first-java-application.html">Offizielle IntelliJ Doku – Debugging</a></li>
+<li><a href="https://www.youtube.com/watch?v=KIK5S_6kUA8">YouTube: Debugging in IntelliJ IDEA (englisch)</a></li>
+<li>IntelliJ Cheat Sheet: <a href="https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf">Keymap Übersicht (deutsch/englisch)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

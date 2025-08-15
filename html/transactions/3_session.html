@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Transaktionen mit JPA&sol;Hibernate</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-transaktionen-mit-jpahibernate">Handout: Transaktionen mit JPA/Hibernate</h1>
+<hr>
+<h2 id="31-das-transaktionsmodell-von-jpahibernate">3.1 Das Transaktionsmodell von JPA/Hibernate</h2>
+<h3 id="was-ist-eine-transaktion-in-jpahibernate"><strong>Was ist eine Transaktion in JPA/Hibernate?</strong></h3>
+<ul>
+<li><strong>JPA (Java Persistence API)</strong> ist eine standardisierte API für ORM (Object-Relational Mapping) in Java.</li>
+<li><strong>Hibernate</strong> ist eine weitverbreitete Implementierung von JPA.</li>
+<li>Datenbankoperationen werden grundsätzlich <strong>in Transaktionen</strong> ausgeführt – egal ob Einzeloperationen oder komplexe Geschäftslogik.</li>
+</ul>
+<h3 id="wie-funktionieren-transaktionen-mit-jpa"><strong>Wie funktionieren Transaktionen mit JPA?</strong></h3>
+<ul>
+<li>Das Herzstück ist der <strong>EntityManager</strong>.</li>
+<li>Mit ihm wird der Lebenszyklus von Entitäten und Transaktionen gesteuert.</li>
+<li>Der EntityManager arbeitet im Zusammenhang mit einem <strong>Persistence Context</strong> (Verwaltungsbereich für Objekte im RAM).</li>
+</ul>
+<p><strong>Typischer Ablauf:</strong></p>
+<ol>
+<li>EntityManager starten</li>
+<li>Transaktion beginnen</li>
+<li>Operationen durchführen (persist, merge, remove, find, etc.)</li>
+<li>Transaktion committen (oder bei Fehler rollback)</li>
+<li>EntityManager schließen</li>
+</ol>
+<p><strong>Beispiel (klassisch, ohne Framework):</strong></p>
+<pre><code class="language-java"><span class="hljs-type">EntityManager</span> <span class="hljs-variable">em</span> <span class="hljs-operator">=</span> emf.createEntityManager();
+<span class="hljs-type">EntityTransaction</span> <span class="hljs-variable">tx</span> <span class="hljs-operator">=</span> em.getTransaction();
+
+<span class="hljs-keyword">try</span> {
+    tx.begin();
+    em.persist(<span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(<span class="hljs-string">&quot;Anna&quot;</span>));
+    tx.commit();
+} <span class="hljs-keyword">catch</span> (Exception e) {
+    tx.rollback();
+} <span class="hljs-keyword">finally</span> {
+    em.close();
+}
+</code></pre>
+<hr>
+<h2 id="32-verwendung-von-transactional-in-java-ee-spring-quarkus-etc">3.2 Verwendung von <code>@Transactional</code> (in Java EE, Spring, Quarkus etc.)</h2>
+<h3 id="warum-transactional"><strong>Warum @Transactional?</strong></h3>
+<ul>
+<li>Annotation <code>@Transactional</code> kapselt den Start und das Ende einer Transaktion automatisch.</li>
+<li>Sie sorgt dafür, dass alle Datenbank-Operationen in der Methode in <strong>einer Transaktion</strong> laufen.</li>
+<li>Sehr beliebt in modernen Frameworks (Java EE/Jakarta EE, Spring, Quarkus).</li>
+</ul>
+<h3 id="beispiel"><strong>Beispiel:</strong></h3>
+<h4 id="java-ee--jakarta-ee"><strong>Java EE / Jakarta EE:</strong></h4>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> javax.transaction.Transactional;
+
+<span class="hljs-meta">@Stateless</span> <span class="hljs-comment">// EJB-Bean</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserService</span> {
+
+    <span class="hljs-meta">@PersistenceContext</span>
+    EntityManager em;
+
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">createUser</span><span class="hljs-params">(User user)</span> {
+        em.persist(user);
+        <span class="hljs-comment">// Noch mehr DB-Operationen ...</span>
+    }
+}
+</code></pre>
+<h4 id="spring"><strong>Spring:</strong></h4>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.springframework.transaction.annotation.Transactional;
+
+<span class="hljs-meta">@Service</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserService</span> {
+
+    <span class="hljs-meta">@Autowired</span>
+    EntityManager em;
+
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(User user)</span> {
+        em.persist(user);
+        <span class="hljs-comment">// Noch mehr DB-Operationen ...</span>
+    }
+}
+</code></pre>
+<h4 id="quarkus"><strong>Quarkus:</strong></h4>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> javax.transaction.Transactional;
+
+<span class="hljs-meta">@ApplicationScoped</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserService</span> {
+
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">saveUser</span><span class="hljs-params">(User user)</span> {
+        user.persist();
+        <span class="hljs-comment">// Auch Panache-Methoden laufen dann in einer Transaktion</span>
+    }
+}
+</code></pre>
+<h3 id="was-passiert"><strong>Was passiert?</strong></h3>
+<ul>
+<li>Das Framework beginnt automatisch eine Transaktion, bevor die Methode startet.</li>
+<li>Bei erfolgreichem Durchlauf: <strong>Commit</strong>.</li>
+<li>Bei Exception: <strong>Rollback</strong>.</li>
+<li>Entwickler muss sich nicht um explizite Transaktionssteuerung kümmern.</li>
+</ul>
+<hr>
+<h2 id="33-abgrenzung-container-managed-vs-application-managed-transactions">3.3 Abgrenzung: Container-Managed vs. Application-Managed Transactions</h2>
+<h3 id="a-container-managed-transactions-cmt"><strong>A) Container-Managed Transactions (CMT)</strong></h3>
+<ul>
+<li>Das Framework (Container) steuert den Transaktionsablauf.</li>
+<li>Typisch bei Enterprise-Java-Anwendungen (Java EE, Spring, Quarkus).</li>
+<li>Mit Annotationen wie <code>@Transactional</code> oder EJB-Annotations (<code>@Stateless</code>).</li>
+</ul>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Einfach, wenig Boilerplate.</li>
+<li>Der Entwickler konzentriert sich auf die Geschäftslogik.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Stateless</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PaymentService</span> {
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">transfer</span><span class="hljs-params">(...)</span> { ... }
+}
+</code></pre>
+<hr>
+<h3 id="b-application-managed-transactions-amt"><strong>B) Application-Managed Transactions (AMT)</strong></h3>
+<ul>
+<li>Entwickler steuert den EntityManager und die Transaktionen selbst.</li>
+<li>Besonders in einfachen Setups, bei Migrationsprojekten, bei sehr feingranularer Kontrolle.</li>
+</ul>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Volle Kontrolle über Transaktionsstart und -ende.</li>
+<li>Sinnvoll für spezielle, nicht standardkonforme Szenarien.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">EntityManager</span> <span class="hljs-variable">em</span> <span class="hljs-operator">=</span> emf.createEntityManager();
+<span class="hljs-type">EntityTransaction</span> <span class="hljs-variable">tx</span> <span class="hljs-operator">=</span> em.getTransaction();
+tx.begin();
+<span class="hljs-comment">// ... Datenbankoperationen</span>
+tx.commit();
+</code></pre>
+<hr>
+<h2 id="34-rollback-strategien-und-fehlerbehandlung">3.4 Rollback-Strategien und Fehlerbehandlung</h2>
+<h3 id="rollback-in-transactional-methoden"><strong>Rollback in @Transactional-Methoden</strong></h3>
+<ul>
+<li>Standard:
+Bei <strong>Unchecked Exceptions</strong> (RuntimeException und deren Unterklassen) erfolgt <strong>automatisch ein Rollback</strong>.</li>
+<li><strong>Checked Exceptions</strong> (z. B. <code>IOException</code>) führen meist nicht automatisch zu einem Rollback – außer, du konfigurierst es explizit!</li>
+</ul>
+<p><strong>Spring &amp; Jakarta EE:</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Transactional(rollbackFor = Exception.class)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">doSomething</span><span class="hljs-params">()</span> { ... }
+</code></pre>
+<ul>
+<li>Das bewirkt: Auch bei geprüften Ausnahmen wird zurückgerollt.</li>
+</ul>
+<p><strong>Manuelles Rollback:</strong></p>
+<ul>
+<li>Kann auch durch das Werfen einer Exception forciert werden.</li>
+</ul>
+<hr>
+<h3 id="typische-fehler-und-best-practices"><strong>Typische Fehler und Best Practices</strong></h3>
+<ul>
+<li>
+<p><strong>Fang Exceptions nicht zu früh ab!</strong>
+Lasse Fehler so lange wie möglich „nach oben wandern“, damit Transaktionsmanagement sauber greifen kann.</p>
+</li>
+<li>
+<p><strong>Halte Transaktionen so kurz wie möglich.</strong>
+(Vermeide: unnötige Schleifen, Netzwerkaufrufe, UI-Operationen in Transaktionen.)</p>
+</li>
+<li>
+<p><strong>Keine Nebenwirkungen außerhalb der Transaktion!</strong>
+E-Mails versenden, Events triggern etc. sollte erst nach Commit passieren, da es sonst zu Inkonsistenzen kommen kann.</p>
+</li>
+<li>
+<p><strong>Nutze Logging</strong>, um Rollbacks und Exception-Flows nachvollziehen zu können.</p>
+</li>
+<li>
+<p><strong>Achte auf Nebenläufigkeit und Deadlocks:</strong>
+Lange Transaktionen oder konkurrierende Updates können zu Problemen führen.</p>
+</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li><strong>JPA/Hibernate-Transaktionen</strong> werden meist mit <code>@Transactional</code> gesteuert – Framework übernimmt Commit und Rollback.</li>
+<li><strong>Container-Managed</strong> (z. B. mit Quarkus, Spring, Java EE) ist Standard – weniger Fehlergefahr, mehr Produktivität.</li>
+<li>Für <strong>feingranulare Spezialfälle</strong> kannst du Application-Managed Transactions nutzen.</li>
+<li><strong>Rollback bei Fehlern</strong> ist (bei unchecked Exceptions) Standard – bei checked Exceptions ggf. <code>rollbackFor</code> explizit setzen.</li>
+<li><strong>Best Practices:</strong> Transaktionen klein halten, Fehler sauber behandeln, keine Nebenwirkungen außerhalb der Transaktion.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundprinzipien von Dependency Injection &lpar;DI&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundprinzipien-von-dependency-injection-di">Handout: Grundprinzipien von Dependency Injection (DI)</h1>
+<hr>
+<h2 id="21-inversion-of-control-ioc--das-grundlegende-prinzip-hinter-di">2.1 Inversion of Control (IoC) – Das grundlegende Prinzip hinter DI</h2>
+<h3 id="was-bedeutet-inversion-of-control-ioc">Was bedeutet „Inversion of Control“ (IoC)?</h3>
+<ul>
+<li><strong>IoC</strong> beschreibt ein Prinzip, bei dem die Kontrolle über die Erstellung und Verwaltung von Abhängigkeiten nicht mehr in der Komponente selbst liegt, sondern nach außen (an einen „Container“ oder das aufrufende System) abgegeben wird.</li>
+<li><strong>Kernidee:</strong> Nicht die Klasse entscheidet, was sie verwendet, sondern der Kontext, in dem sie läuft, bestimmt, welche konkreten Abhängigkeiten eingesetzt werden.</li>
+</ul>
+<p><strong>Traditioneller Ansatz (keine IoC):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Car</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">Engine</span> <span class="hljs-variable">engine</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Engine</span>();
+}
+</code></pre>
+<ul>
+<li>Die Klasse erstellt ihre Abhängigkeit selbst.</li>
+</ul>
+<p><strong>Mit IoC (z.B. durch DI):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Car</span> {
+    <span class="hljs-keyword">private</span> Engine engine;
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Car</span><span class="hljs-params">(Engine engine)</span> {
+        <span class="hljs-built_in">this</span>.engine = engine;
+    }
+}
+</code></pre>
+<ul>
+<li>Die Abhängigkeit wird von außen (z.B. beim Erstellen des Objekts) „injiziert“.</li>
+</ul>
+<h3 id="vorteile-von-ioc">Vorteile von IoC:</h3>
+<ul>
+<li>Flexibilität: Komponenten können leichter ausgetauscht werden.</li>
+<li>Erweiterbarkeit: Neue Funktionalität kann einfacher hinzugefügt werden.</li>
+<li>Bessere Testbarkeit: Komponenten lassen sich unabhängig von ihrer Umgebung testen.</li>
+</ul>
+<p><strong>Merksatz:</strong>
+IoC bedeutet, dass eine Klasse weniger „wissen“ und „entscheiden“ muss und stattdessen vom Außenstehenden kontrolliert wird.</p>
+<hr>
+<h2 id="22-loose-coupling-lose-kopplung-durch-di">2.2 Loose Coupling (lose Kopplung) durch DI</h2>
+<h3 id="was-ist-kopplung">Was ist Kopplung?</h3>
+<ul>
+<li><strong>Kopplung</strong> beschreibt, wie stark verschiedene Teile eines Programms voneinander abhängig sind.</li>
+<li><strong>Starke Kopplung</strong> („Tight Coupling“): Viele direkte Abhängigkeiten, Änderungen wirken sich überall aus.</li>
+<li><strong>Lose Kopplung</strong> („Loose Coupling“): Komponenten hängen nur über Schnittstellen (Interfaces) oder Abstraktionen zusammen.</li>
+</ul>
+<p><strong>Beispiel für starke Kopplung:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">NotificationService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">EmailSender</span> <span class="hljs-variable">emailSender</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">EmailSender</span>();
+}
+</code></pre>
+<ul>
+<li><code>NotificationService</code> ist fest an <code>EmailSender</code> gebunden.</li>
+</ul>
+<p><strong>Lose Kopplung durch DI:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">NotificationService</span> {
+    <span class="hljs-keyword">private</span> MessageSender sender;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">NotificationService</span><span class="hljs-params">(MessageSender sender)</span> {
+        <span class="hljs-built_in">this</span>.sender = sender;
+    }
+}
+</code></pre>
+<ul>
+<li><code>MessageSender</code> ist ein Interface, kann verschiedene Implementierungen haben (z.B. <code>EmailSender</code>, <code>SmsSender</code>).</li>
+</ul>
+<h3 id="vorteile-loser-kopplung">Vorteile loser Kopplung:</h3>
+<ul>
+<li>Komponenten können unabhängig voneinander weiterentwickelt und ausgetauscht werden.</li>
+<li>Verbesserte Wiederverwendbarkeit und Wartbarkeit.</li>
+<li>Einfachere Erweiterung um neue Funktionalitäten.</li>
+</ul>
+<p><strong>Merksatz:</strong>
+Lose Kopplung ist ein Schlüssel zu flexibler, robuster Software – Dependency Injection unterstützt das aktiv.</p>
+<hr>
+<h2 id="23-testbarkeit-und-wartbarkeit-durch-di">2.3 Testbarkeit und Wartbarkeit durch DI</h2>
+<h3 id="warum-ist-testbarkeit-wichtig">Warum ist Testbarkeit wichtig?</h3>
+<ul>
+<li>Gute Tests helfen, Fehler frühzeitig zu entdecken und sorgen für Zuverlässigkeit im Betrieb.</li>
+<li>Eng gekoppelte Komponenten sind schwer zu isolieren und zu testen, weil sie viele echte Abhängigkeiten mitbringen (z.B. eine echte Datenbank, ein Webservice).</li>
+</ul>
+<h3 id="wie-hilft-di-bei-der-testbarkeit">Wie hilft DI bei der Testbarkeit?</h3>
+<ul>
+<li>Mit DI können im Test „Dummies“, „Stubs“ oder „Mocks“ als Abhängigkeiten übergeben werden, um das Verhalten zu kontrollieren und vorhersehbar zu machen.</li>
+<li>So lässt sich die Komponente unabhängig von realen, aufwändigen oder schwer zu kontrollierenden Abhängigkeiten testen.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Im Produktivcode:</span>
+<span class="hljs-type">UserService</span> <span class="hljs-variable">service</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UserService</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">RealUserRepository</span>());
+
+<span class="hljs-comment">// Im Test:</span>
+<span class="hljs-type">UserService</span> <span class="hljs-variable">service</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UserService</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">MockUserRepository</span>());
+</code></pre>
+<ul>
+<li>Der Test nutzt ein „Mock“-Objekt, das genau das gewünschte Verhalten simuliert.</li>
+</ul>
+<h3 id="wartbarkeit-durch-di">Wartbarkeit durch DI</h3>
+<ul>
+<li>Änderungen an einer Abhängigkeit (z.B. die Art der Datenhaltung) müssen nicht in allen abhängigen Klassen geändert werden, sondern nur an der zentralen Stelle, an der die Abhängigkeit injiziert wird.</li>
+<li>Das verringert den Wartungsaufwand bei Weiterentwicklung oder Fehlerbehebung.</li>
+</ul>
+<hr>
+<h2 id="24-single-responsibility-principle-und-di">2.4 Single Responsibility Principle und DI</h2>
+<h3 id="was-ist-das-single-responsibility-principle-srp">Was ist das Single Responsibility Principle (SRP)?</h3>
+<ul>
+<li>Eines der <strong>SOLID-Prinzipien</strong>:
+„Eine Klasse sollte nur eine einzige Verantwortlichkeit (Responsibility) haben.“</li>
+<li>Das bedeutet, eine Klasse soll nur für eine einzige Aufgabe oder ein einzelnes Modul der Funktionalität zuständig sein.</li>
+</ul>
+<h3 id="wie-unterstützt-di-das-srp">Wie unterstützt DI das SRP?</h3>
+<ul>
+<li>Wenn eine Klasse ihre Abhängigkeiten nicht selbst erstellt, sondern nur nutzt, konzentriert sie sich auf ihre eigentliche Aufgabe.</li>
+<li>Die Verantwortung für das Bereitstellen von Abhängigkeiten liegt außerhalb der Klasse.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ReportGenerator</span> {
+    <span class="hljs-keyword">private</span> DataProvider dataProvider;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">ReportGenerator</span><span class="hljs-params">(DataProvider dataProvider)</span> {
+        <span class="hljs-built_in">this</span>.dataProvider = dataProvider;
+    }
+
+    <span class="hljs-comment">// Nur für das Erstellen von Reports zuständig, nicht für das Bereitstellen von Daten</span>
+}
+</code></pre>
+<ul>
+<li><code>ReportGenerator</code> ist für das Generieren von Berichten zuständig, nicht für die Erstellung des <code>DataProvider</code> – das entspricht dem SRP.</li>
+</ul>
+<h3 id="vorteile">Vorteile:</h3>
+<ul>
+<li>Weniger komplexe Klassen, leichter zu verstehen und zu testen.</li>
+<li>Änderungen an der Bereitstellung der Abhängigkeit betreffen nicht die eigentliche Logik der Klasse.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen-zur-selbstüberprüfung">Reflexionsfragen zur Selbstüberprüfung</h2>
+<ol>
+<li>Was versteht man unter „Inversion of Control“ und warum ist es für DI wichtig?</li>
+<li>Wie trägt Dependency Injection zu loser Kopplung bei?</li>
+<li>Warum wird die Testbarkeit durch DI verbessert?</li>
+<li>Erkläre, wie DI das Single Responsibility Principle unterstützt.</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li><strong>IoC</strong> ist das Grundprinzip von DI: Die Kontrolle über Abhängigkeiten wird von der Komponente abgegeben.</li>
+<li><strong>Lose Kopplung</strong> durch DI sorgt für flexible, leicht wartbare Software.</li>
+<li><strong>Testbarkeit</strong> wird gesteigert, da Abhängigkeiten leicht durch Mocks ersetzbar sind.</li>
+<li><strong>Single Responsibility Principle:</strong> DI ermöglicht, dass Klassen nur eine Aufgabe haben und nicht für die Erstellung von Abhängigkeiten zuständig sind.</li>
+</ul>
+<hr>
+<p><strong>Praxistipp:</strong>
+Untersuche deinen eigenen Code: Wo werden Abhängigkeiten direkt erstellt? Wie könntest du durch DI für mehr Flexibilität und bessere Testbarkeit sorgen?</p>
+<hr>
+<p><strong>Weitere Lesetipps:</strong></p>
+<ul>
+<li><a href="https://clean-code-developer.de/solid">SOLID-Prinzipien – Clean Code Developer</a></li>
+<li><a href="https://martinfowler.com/bliki/InversionOfControl.html">Inversion of Control – Martin Fowler</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

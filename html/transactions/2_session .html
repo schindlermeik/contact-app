@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Transaktionen in klassischen JDBC-Anwendungen</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-transaktionen-in-klassischen-jdbc-anwendungen">Handout: Transaktionen in klassischen JDBC-Anwendungen</h1>
+<hr>
+<h2 id="21-manuelles-transaktionsmanagement-setautocommit-commit-rollback">2.1 Manuelles Transaktionsmanagement (<code>setAutoCommit</code>, <code>commit</code>, <code>rollback</code>)</h2>
+<h3 id="jdbc-und-transaktionen--grundlagen"><strong>JDBC und Transaktionen – Grundlagen</strong></h3>
+<p>In JDBC ist das Transaktionsmanagement <strong>standardmäßig manuell</strong>.
+Das bedeutet:</p>
+<ul>
+<li><strong>Jede SQL-Anweisung</strong> wird (ohne Änderung der Einstellungen) <strong>sofort nach Ausführung gespeichert</strong> (Auto-Commit-Modus).</li>
+<li><strong>Möchtest du mehrere Anweisungen als eine Transaktion ausführen</strong>, musst du Auto-Commit deaktivieren und die Transaktion selbst steuern.</li>
+</ul>
+<hr>
+<h3 id="wichtige-methoden"><strong>Wichtige Methoden</strong></h3>
+<ul>
+<li><strong><code>setAutoCommit(false)</code></strong>
+Schaltet den Auto-Commit-Modus ab – ab jetzt müssen Transaktionen explizit beendet werden.</li>
+<li><strong><code>commit()</code></strong>
+Schreibt alle seit dem letzten Commit gemachten Änderungen dauerhaft in die Datenbank.</li>
+<li><strong><code>rollback()</code></strong>
+Macht alle Änderungen seit dem letzten Commit rückgängig.</li>
+</ul>
+<hr>
+<h3 id="typischer-ablauf-in-jdbc"><strong>Typischer Ablauf in JDBC:</strong></h3>
+<ol>
+<li><strong>Verbindung öffnen</strong></li>
+<li><strong>Auto-Commit deaktivieren</strong></li>
+<li><strong>SQL-Anweisungen ausführen</strong></li>
+<li><strong>Commit, wenn alles erfolgreich</strong></li>
+<li><strong>Rollback bei Fehler</strong></li>
+<li><strong>Verbindung schließen</strong></li>
+</ol>
+<hr>
+<h2 id="22-beispiel-transaktionen-in-jdbc-try-catch-fehlerfälle">2.2 Beispiel: Transaktionen in JDBC (Try-Catch, Fehlerfälle)</h2>
+<p><strong>Praxisbeispiel:</strong>
+Angenommen, du willst eine Banküberweisung abbilden:</p>
+<ol>
+<li>Betrag von Konto A abziehen</li>
+<li>Betrag zu Konto B hinzufügen</li>
+</ol>
+<p><strong>Das Ganze soll entweder komplett klappen oder gar nicht.</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.sql.*;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">JdbcTransactionExample</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">String</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;jdbc:postgresql://localhost:5432/bankdb&quot;</span>;
+        <span class="hljs-type">String</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;demo&quot;</span>;
+        <span class="hljs-type">String</span> <span class="hljs-variable">password</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;geheim&quot;</span>;
+
+        <span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;
+        <span class="hljs-keyword">try</span> {
+            conn = DriverManager.getConnection(url, user, password);
+            <span class="hljs-comment">// Transaktion starten</span>
+            conn.setAutoCommit(<span class="hljs-literal">false</span>);
+
+            <span class="hljs-comment">// 1. Betrag von Konto A abziehen</span>
+            <span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">withdraw</span> <span class="hljs-operator">=</span> conn.prepareStatement(
+                <span class="hljs-string">&quot;UPDATE konto SET saldo = saldo - ? WHERE id = ?&quot;</span>);
+            withdraw.setDouble(<span class="hljs-number">1</span>, <span class="hljs-number">100</span>);
+            withdraw.setInt(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>);
+            withdraw.executeUpdate();
+
+            <span class="hljs-comment">// 2. Betrag zu Konto B hinzufügen</span>
+            <span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">deposit</span> <span class="hljs-operator">=</span> conn.prepareStatement(
+                <span class="hljs-string">&quot;UPDATE konto SET saldo = saldo + ? WHERE id = ?&quot;</span>);
+            deposit.setDouble(<span class="hljs-number">1</span>, <span class="hljs-number">100</span>);
+            deposit.setInt(<span class="hljs-number">2</span>, <span class="hljs-number">2</span>);
+            deposit.executeUpdate();
+
+            <span class="hljs-comment">// Alles erfolgreich? Dann commit!</span>
+            conn.commit();
+            System.out.println(<span class="hljs-string">&quot;Überweisung erfolgreich!&quot;</span>);
+
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            <span class="hljs-comment">// Fehler? Dann alles rückgängig machen</span>
+            <span class="hljs-keyword">if</span> (conn != <span class="hljs-literal">null</span>) {
+                <span class="hljs-keyword">try</span> {
+                    conn.rollback();
+                    System.out.println(<span class="hljs-string">&quot;Fehler aufgetreten – Transaktion rückgängig gemacht!&quot;</span>);
+                } <span class="hljs-keyword">catch</span> (SQLException ex) {
+                    System.err.println(<span class="hljs-string">&quot;Rollback fehlgeschlagen: &quot;</span> + ex.getMessage());
+                }
+            }
+            e.printStackTrace();
+        } <span class="hljs-keyword">finally</span> {
+            <span class="hljs-comment">// Ressourcen schließen</span>
+            <span class="hljs-keyword">if</span> (conn != <span class="hljs-literal">null</span>) {
+                <span class="hljs-keyword">try</span> { conn.setAutoCommit(<span class="hljs-literal">true</span>); conn.close(); } <span class="hljs-keyword">catch</span> (SQLException e) { }
+            }
+        }
+    }
+}
+</code></pre>
+<hr>
+<h3 id="wichtige-hinweise-zum-beispiel"><strong>Wichtige Hinweise zum Beispiel:</strong></h3>
+<ul>
+<li><strong>Auto-Commit muss vor der ersten Anweisung deaktiviert werden.</strong></li>
+<li><strong>Alle SQL-Statements werden innerhalb desselben Connection-Objekts ausgeführt.</strong></li>
+<li><strong>Ein Fehler (z. B. Konto nicht gefunden, SQL-Fehler) führt zum Rollback.</strong></li>
+<li><strong>Nach Abschluss sollte Auto-Commit wieder aktiviert und die Verbindung geschlossen werden.</strong></li>
+<li><strong>Immer Ressourcen korrekt schließen (am besten try-with-resources).</strong></li>
+</ul>
+<hr>
+<h2 id="23-typische-fehler-und-best-practices">2.3 Typische Fehler und Best Practices</h2>
+<h3 id="häufige-fehlerquellen"><strong>Häufige Fehlerquellen:</strong></h3>
+<ol>
+<li>
+<p><strong>Auto-Commit vergessen zu deaktivieren</strong>
+→ Jede Operation wird einzeln ausgeführt, keine echte Transaktion!</p>
+</li>
+<li>
+<p><strong>Verbindung nicht korrekt geschlossen</strong>
+→ „Connection Leaks“: Datenbank-Server verweigert irgendwann neue Verbindungen.</p>
+</li>
+<li>
+<p><strong>Fehler bei Rollback nicht abgefangen</strong>
+→ Ein Fehler beim Rollback kann zu weiteren Problemen führen; daher immer try-catch beim Rollback.</p>
+</li>
+<li>
+<p><strong>Gemischte Ressourcen/Verbindungen</strong>
+→ Alle Anweisungen müssen auf <strong>derselben</strong> Connection laufen!</p>
+</li>
+<li>
+<p><strong>Transaktionen zu groß oder zu lang</strong>
+→ Zu lange offene Transaktionen erhöhen das Risiko für Deadlocks, Sperren und Performanceprobleme.</p>
+</li>
+</ol>
+<hr>
+<h3 id="best-practices"><strong>Best Practices:</strong></h3>
+<ul>
+<li><strong>Immer</strong> explizit Transaktionen beginnen und beenden (commit/rollback).</li>
+<li><strong>Nutze try-with-resources</strong> für Statements und ResultSets – das schließt Ressourcen zuverlässig.</li>
+<li><strong>Fasse Transaktionen möglichst klein</strong> und auf das Notwendigste zusammen.</li>
+<li><strong>Fehler immer abfangen</strong> und sauber behandeln.</li>
+<li><strong>Setze Auto-Commit nach der Transaktion zurück auf true</strong> (falls die Connection wiederverwendet wird).</li>
+<li><strong>Nutze Logging</strong>, um Transaktionsverläufe und Fehler nachvollziehen zu können.</li>
+</ul>
+<hr>
+<h3 id="zusammenfassung"><strong>Zusammenfassung</strong></h3>
+<ul>
+<li>Transaktionsmanagement ist in JDBC <strong>manuell</strong> – das gibt maximale Kontrolle, erfordert aber sauberes Arbeiten!</li>
+<li>Mit <code>setAutoCommit(false)</code>, <code>commit()</code> und <code>rollback()</code> steuerst du den Ablauf.</li>
+<li>Fehler und unsaubere Handhabung können zu Datenverlust, Inkonsistenzen oder „Connection Leaks“ führen.</li>
+<li>Mit Best Practices und sauberem Code ist sicheres Arbeiten garantiert.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

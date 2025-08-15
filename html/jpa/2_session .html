@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Architektur und Kernkonzepte von JPA</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-architektur-und-kernkonzepte-von-jpa">Handout: Architektur und Kernkonzepte von JPA</h3>
+<p>Dieses Handout taucht tiefer in die Kernarchitektur und die grundlegenden Konzepte von JPA ein.</p>
+<hr>
+<h4 id="21-entity-entitymanager-persistence-context">2.1 Entity, EntityManager, Persistence Context</h4>
+<p>Dies sind die drei zentralen Bausteine, die das Herzstück jeder JPA-Anwendung bilden.</p>
+<ul>
+<li>
+<p><strong>Entity (Entität)</strong>: Eine Entität ist ein einfaches Java-Objekt, das eine Zeile in einer Datenbanktabelle repräsentiert. Um ein normales Java-Objekt zu einer Entität zu machen, wird es mit der Annotation <code>@Entity</code> gekennzeichnet. Jede Entität muss eine eindeutige ID haben, die mit der Annotation <code>@Id</code> markiert wird.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-meta">@Table(name = &quot;kunden&quot;)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Kunde</span> {
+    <span class="hljs-meta">@Id</span>
+    <span class="hljs-meta">@GeneratedValue(strategy = GenerationType.AUTO)</span>
+    <span class="hljs-keyword">private</span> Long id;
+
+    <span class="hljs-keyword">private</span> String name;
+    <span class="hljs-keyword">private</span> String email;
+
+    <span class="hljs-comment">// Getters and Setters</span>
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p>In diesem Beispiel ist die Klasse <code>Kunde</code> eine Entität, die der Tabelle <code>kunden</code> zugeordnet ist. Das Feld <code>id</code> ist der Primärschlüssel.</p>
+</li>
+<li>
+<p><strong>EntityManager</strong>: Der <code>EntityManager</code> ist die zentrale API-Schnittstelle von JPA. Er ist für die Verwaltung des Lebenszyklus von Entitäten zuständig. Mit ihm führen Sie alle CRUD-Operationen (Create, Read, Update, Delete) auf Entitäten durch. Der <code>EntityManager</code> ist quasi das &quot;Tor&quot; zur Datenbank.</p>
+<p><strong>Typische Methoden des <code>EntityManager</code>:</strong></p>
+<ul>
+<li><code>persist(Object entity)</code>: Speichert eine neue Entität in der Datenbank (entspricht einem <code>INSERT</code>).</li>
+<li><code>find(Class entityClass, Object primaryKey)</code>: Sucht eine Entität anhand ihrer ID.</li>
+<li><code>merge(Object entity)</code>: Aktualisiert den Zustand einer Entität in der Datenbank (entspricht einem <code>UPDATE</code>). Wird auch verwendet, um eine <em>detached</em> Entität wieder in den <em>managed</em> Zustand zu überführen.</li>
+<li><code>remove(Object entity)</code>: Löscht eine Entität aus der Datenbank.</li>
+<li><code>createQuery(...)</code>: Erstellt eine Abfrage mit JPQL (Java Persistence Query Language).</li>
+</ul>
+</li>
+<li>
+<p><strong>Persistence Context (Persistenzkontext)</strong>: Der Persistenzkontext ist ein Cache, der alle verwalteten (managed) Entitäten für eine bestimmte <code>EntityManager</code>-Instanz enthält. Wenn Sie eine Entität über den <code>EntityManager</code> laden oder erstellen, wird diese Entität in den Persistenzkontext aufgenommen.</p>
+<p><strong>Wichtige Eigenschaften des Persistenzkontextes:</strong></p>
+<ul>
+<li><strong>Identität</strong>: Innerhalb eines Persistenzkontextes gibt es für dieselbe Datenbankzeile nur ein einziges Entitätsobjekt. Wenn Sie eine Entität mit <code>find()</code> laden und sie sich bereits im Kontext befindet, gibt der <code>EntityManager</code> einfach die bestehende Instanz zurück, ohne die Datenbank erneut abzufragen.</li>
+<li><strong>Automatische Synchronisation</strong>: Der Persistenzkontext verfolgt alle Änderungen an den verwalteten Entitäten. Am Ende einer Transaktion (z.B. beim <code>commit</code>) synchronisiert der <code>EntityManager</code> diese Änderungen automatisch mit der Datenbank. Sie müssen also nicht explizit <code>update</code>-Methoden aufrufen.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="22-die-rolle-der-persistence-unit-persistencexml">2.2 Die Rolle der Persistence Unit (<code>persistence.xml</code>)</h4>
+<p>Die <code>Persistence Unit</code> ist eine logische Gruppierung von Entitätsklassen und Konfigurationseinstellungen. Sie wird in der Datei <code>persistence.xml</code> definiert, die sich typischerweise im Verzeichnis <code>META-INF</code> Ihrer Anwendung befindet.</p>
+<p>Die <code>persistence.xml</code> ist das Konfigurationszentrum für JPA. Sie ist essenziell, um dem JPA-Provider (z.B. Hibernate) mitzuteilen, welche Entitäten er verwalten soll und wie er sich mit der Datenbank verbinden muss.</p>
+<p><strong>Typische Inhalte der <code>persistence.xml</code>:</strong></p>
+<ul>
+<li>
+<p><strong><code>&lt;persistence-unit name=&quot;mein_persistenzeinheit&quot;&gt;</code></strong>: Der Name der Persistenzeinheit. Dieser Name wird verwendet, um einen <code>EntityManager</code> zu erstellen.</p>
+</li>
+<li>
+<p><strong><code>&lt;provider&gt;org.hibernate.jpa.HibernatePersistenceProvider&lt;/provider&gt;</code></strong>: Spezifiziert den JPA-Provider, den Sie verwenden.</p>
+</li>
+<li>
+<p><strong><code>&lt;class&gt;com.example.Kunde&lt;/class&gt;</code></strong>: Listet alle Entitätsklassen auf, die zu dieser Persistenzeinheit gehören. Alternativ kann man in bestimmten Umgebungen (z.B. in der Jakarta EE) auch das Scannen des Classpaths aktivieren.</p>
+</li>
+<li>
+<p><strong><code>&lt;properties&gt;</code></strong>: Hier werden die Konfigurationseigenschaften für den Datenbankzugriff definiert.</p>
+<p><strong>Beispiel-Konfiguration (mit Hibernate):</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">persistence</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://xmlns.jcp.org/xml/ns/persistence&quot;</span>
+             <span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+             <span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">&quot;http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd&quot;</span>
+             <span class="hljs-attr">version</span>=<span class="hljs-string">&quot;2.1&quot;</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">persistence-unit</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;meinePU&quot;</span> <span class="hljs-attr">transaction-type</span>=<span class="hljs-string">&quot;RESOURCE_LOCAL&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">provider</span>&gt;</span>org.hibernate.jpa.HibernatePersistenceProvider<span class="hljs-tag">&lt;/<span class="hljs-name">provider</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">class</span>&gt;</span>com.example.Kunde<span class="hljs-tag">&lt;/<span class="hljs-name">class</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">properties</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.url&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;jdbc:mysql://localhost:3306/meinedb&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.user&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;root&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.password&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;passwort&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.driver&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;com.mysql.cj.jdbc.Driver&quot;</span>/&gt;</span>
+
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.hbm2ddl.auto&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;update&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.show_sql&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">properties</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">persistence-unit</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">persistence</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+<hr>
+<h4 id="23-lebenszyklus-von-entities">2.3 Lebenszyklus von Entities</h4>
+<p>Eine Entität kann verschiedene Zustände durchlaufen. Das Verständnis dieser Zustände ist entscheidend für die korrekte Verwendung von JPA.</p>
+<ol>
+<li>
+<p><strong>New / Transient (Neu / Flüchtiger Zustand)</strong>:</p>
+<ul>
+<li>Die Entität wurde mit <code>new</code> instanziiert, aber noch nicht mit einem <code>EntityManager</code> verknüpft.</li>
+<li>Sie hat noch keine Primärschlüssel-ID.</li>
+<li>In diesem Zustand ist das Objekt flüchtig und existiert nur im Speicher der Anwendung, nicht in der Datenbank oder im Persistenzkontext.</li>
+</ul>
+<p><strong>Übergang:</strong> <code>entityManager.persist(entity)</code></p>
+</li>
+<li>
+<p><strong>Managed (Verwaltet)</strong>:</p>
+<ul>
+<li>Die Entität ist an einen <code>EntityManager</code> und dessen Persistenzkontext gebunden.</li>
+<li>Änderungen an der Entität werden vom <code>EntityManager</code> verfolgt und am Ende der Transaktion automatisch in die Datenbank synchronisiert.</li>
+<li>Sie können Entitäten in diesen Zustand versetzen, indem Sie <code>persist()</code> für eine neue Entität aufrufen oder eine Entität mit <code>find()</code> aus der Datenbank laden.</li>
+</ul>
+<p><strong>Übergang:</strong></p>
+<ul>
+<li><code>entityManager.detach(entity)</code> oder</li>
+<li>Schließen des <code>EntityManager</code> oder der Transaktion.</li>
+</ul>
+</li>
+<li>
+<p><strong>Detached (Abgetrennt)</strong>:</p>
+<ul>
+<li>Die Entität wurde einst vom <code>EntityManager</code> verwaltet, ist aber nicht mehr mit einem Persistenzkontext verbunden.</li>
+<li>Änderungen an der Entität in diesem Zustand werden <strong>nicht</strong> automatisch in der Datenbank gespeichert.</li>
+<li>Die Entität hat immer noch ihre ID.</li>
+</ul>
+<p><strong>Übergang:</strong></p>
+<ul>
+<li><code>entityManager.merge(entity)</code>: Bringt eine <code>detached</code> Entität wieder in den <code>managed</code> Zustand. JPA vergleicht die Entität mit dem Zustand in der Datenbank und führt bei Änderungen einen <code>UPDATE</code> durch.</li>
+</ul>
+</li>
+<li>
+<p><strong>Removed (Entfernt)</strong>:</p>
+<ul>
+<li>Die Entität ist zum Löschen markiert.</li>
+<li>Der <code>EntityManager</code> hat die Methode <code>remove()</code> für diese Entität aufgerufen.</li>
+<li>Die tatsächliche Löschung in der Datenbank erfolgt erst, wenn die Transaktion committet wird.</li>
+</ul>
+<p><strong>Übergang:</strong> <code>entityManager.remove(entity)</code></p>
+</li>
+</ol>
+
+            
+            
+        </body>
+        </html>

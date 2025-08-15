@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundlegende Stream-Operationen in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundlegende-stream-operationen-in-java">Handout: Grundlegende Stream-Operationen in Java</h1>
+<hr>
+<h2 id="1-überblick-zwei-arten-von-operationen">1. Überblick: Zwei Arten von Operationen</h2>
+<ul>
+<li><strong>Intermediäre (zwischenliegende) Operationen:</strong>
+Verarbeiten den Stream und geben wieder einen Stream zurück (verkettbar).</li>
+<li><strong>Terminal-Operationen:</strong>
+Beenden die Pipeline und liefern ein konkretes Ergebnis (Wert, Collection, Seiteneffekt).</li>
+</ul>
+<hr>
+<h2 id="2-intermediäre-operationen-auswahl--erklärung">2. Intermediäre Operationen (Auswahl &amp; Erklärung)</h2>
+<h3 id="a-filterpredicatet">a) <code>filter(Predicate&lt;T&gt;)</code></h3>
+<p>Wählt Elemente aus, die eine Bedingung erfüllen.</p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Anja&quot;</span>);
+namen.stream()
+     .filter(s -&gt; s.startsWith(<span class="hljs-string">&quot;A&quot;</span>))
+     .forEach(System.out::println); <span class="hljs-comment">// Anna, Anja</span>
+</code></pre>
+<hr>
+<h3 id="b-mapfunctiontr">b) <code>map(Function&lt;T,R&gt;)</code></h3>
+<p>Wandelt jedes Element des Streams in ein anderes um.</p>
+<pre><code class="language-java">namen.stream()
+     .map(String::toUpperCase)
+     .forEach(System.out::println); <span class="hljs-comment">// ANNA, BERND, ANJA</span>
+</code></pre>
+<hr>
+<h3 id="c-flatmapfunctiontstreamr">c) <code>flatMap(Function&lt;T,Stream&lt;R&gt;&gt;)</code></h3>
+<p>Faltet mehrere Streams zu einem einzigen zusammen.
+Wird oft genutzt, um Listen von Listen zu verarbeiten.</p>
+<pre><code class="language-java">List&lt;List&lt;String&gt;&gt; listeVonListen = Arrays.asList(
+    Arrays.asList(<span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;b&quot;</span>),
+    Arrays.asList(<span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-string">&quot;d&quot;</span>)
+);
+listeVonListen.stream()
+    .flatMap(Collection::stream)
+    .forEach(System.out::println); <span class="hljs-comment">// a b c d</span>
+</code></pre>
+<hr>
+<h3 id="d-distinct">d) <code>distinct()</code></h3>
+<p>Entfernt Duplikate (nach <code>equals()</code>).</p>
+<pre><code class="language-java">Stream.of(<span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;b&quot;</span>, <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>).distinct().forEach(System.out::println); <span class="hljs-comment">// a b c</span>
+</code></pre>
+<hr>
+<h3 id="e-sorted">e) <code>sorted()</code></h3>
+<p>Sortiert Elemente.
+Standardmäßig nach natürlicher Ordnung, sonst per Comparator.</p>
+<pre><code class="language-java">namen.stream().sorted().forEach(System.out::println);
+namen.stream().sorted(Comparator.comparing(String::length)).forEach(System.out::println);
+</code></pre>
+<hr>
+<h3 id="f-limitlong-n-und-skiplong-n">f) <code>limit(long n)</code> und <code>skip(long n)</code></h3>
+<p>Begrenzt oder überspringt Elemente.</p>
+<pre><code class="language-java">Stream.of(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>).limit(<span class="hljs-number">3</span>).forEach(System.out::println); <span class="hljs-comment">// 1 2 3</span>
+Stream.of(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>).skip(<span class="hljs-number">2</span>).forEach(System.out::println);  <span class="hljs-comment">// 3 4 5</span>
+</code></pre>
+<hr>
+<h2 id="3-terminal-operationen-abschluss-der-pipeline">3. Terminal-Operationen (Abschluss der Pipeline)</h2>
+<h3 id="a-foreachconsumert">a) <code>forEach(Consumer&lt;T&gt;)</code></h3>
+<p>Führt eine Aktion für jedes Element aus (häufig für Ausgabe/Seiteneffekte).</p>
+<pre><code class="language-java">namen.stream().forEach(System.out::println);
+</code></pre>
+<hr>
+<h3 id="b-collectcollectortar">b) <code>collect(Collector&lt;T,A,R&gt;)</code></h3>
+<p>Sammelt die Ergebnisse in eine Collection oder einen anderen Datentyp.</p>
+<pre><code class="language-java">List&lt;String&gt; liste = namen.stream().filter(s -&gt; s.length() &gt; <span class="hljs-number">3</span>).collect(Collectors.toList());
+Set&lt;String&gt; menge = namen.stream().collect(Collectors.toSet());
+<span class="hljs-type">String</span> <span class="hljs-variable">joined</span> <span class="hljs-operator">=</span> namen.stream().collect(Collectors.joining(<span class="hljs-string">&quot;, &quot;</span>));
+</code></pre>
+<hr>
+<h3 id="c-reducebinaryoperatort">c) <code>reduce(BinaryOperator&lt;T&gt;)</code></h3>
+<p>Reduziert alle Elemente zu einem einzigen Wert (z. B. Summe, Produkt).</p>
+<pre><code class="language-java"><span class="hljs-type">int</span> <span class="hljs-variable">summe</span> <span class="hljs-operator">=</span> Stream.of(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>).reduce(<span class="hljs-number">0</span>, (a, b) -&gt; a + b); <span class="hljs-comment">// 10</span>
+</code></pre>
+<hr>
+<h3 id="d-count">d) <code>count()</code></h3>
+<p>Zählt die Elemente im Stream.</p>
+<pre><code class="language-java"><span class="hljs-type">long</span> <span class="hljs-variable">anzahl</span> <span class="hljs-operator">=</span> namen.stream().filter(s -&gt; s.startsWith(<span class="hljs-string">&quot;A&quot;</span>)).count(); <span class="hljs-comment">// 2</span>
+</code></pre>
+<hr>
+<h3 id="e-anymatch-allmatch-nonematch">e) <code>anyMatch()</code>, <code>allMatch()</code>, <code>noneMatch()</code></h3>
+<p>Testet, ob mindestens eins / alle / keines der Elemente eine Bedingung erfüllen.</p>
+<pre><code class="language-java"><span class="hljs-type">boolean</span> <span class="hljs-variable">hatKurzenNamen</span> <span class="hljs-operator">=</span> namen.stream().anyMatch(s -&gt; s.length() &lt; <span class="hljs-number">4</span>); <span class="hljs-comment">// true/false</span>
+<span class="hljs-type">boolean</span> <span class="hljs-variable">alleLang</span> <span class="hljs-operator">=</span> namen.stream().allMatch(s -&gt; s.length() &gt; <span class="hljs-number">2</span>);
+<span class="hljs-type">boolean</span> <span class="hljs-variable">keinX</span> <span class="hljs-operator">=</span> namen.stream().noneMatch(s -&gt; s.contains(<span class="hljs-string">&quot;x&quot;</span>));
+</code></pre>
+<hr>
+<h3 id="f-findfirst-findany">f) <code>findFirst()</code>, <code>findAny()</code></h3>
+<p>Gibt das erste/beliebige Element als <code>Optional&lt;T&gt;</code> zurück.</p>
+<pre><code class="language-java">Optional&lt;String&gt; erster = namen.stream().findFirst();
+erster.ifPresent(System.out::println);
+
+Optional&lt;String&gt; beliebig = namen.parallelStream().findAny();
+</code></pre>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>Filtere aus einer Liste von Namen alle, die mit „B“ beginnen, und gib sie sortiert aus.</li>
+<li>Wandle eine Liste von Zahlen in ihre Quadrate um und sammle sie als neue Liste.</li>
+<li>Finde das erste Element in einer Liste von Strings, das länger als 5 Zeichen ist.</li>
+<li>Zähle, wie viele Namen in einer Liste mit dem Buchstaben „a“ enthalten.</li>
+<li>Füge alle Zahlen in einem Stream mit <code>reduce()</code> zusammen.</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li><strong>Intermediäre Operationen</strong> bauen die Pipeline, <strong>Terminal-Operationen</strong> beenden sie und liefern ein Ergebnis.</li>
+<li>Die meisten Operationen sind <strong>lazy</strong>: Sie werden erst bei einer Terminal-Operation ausgeführt.</li>
+<li>Streams ermöglichen komplexe Datenverarbeitung mit wenigen Zeilen Code!</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

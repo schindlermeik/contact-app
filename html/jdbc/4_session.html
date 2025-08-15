@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; CRUD-Operationen im Detail</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-crud-operationen-im-detail">Handout: CRUD-Operationen im Detail</h1>
+<p><strong>CRUD</strong> steht für <strong>C</strong>reate, <strong>R</strong>ead, <strong>U</strong>pdate, <strong>D</strong>elete und beschreibt die vier grundlegenden Funktionen, die man bei der Arbeit mit Datenbanken benötigt. Diese Operationen bilden das Fundament fast jeder datengetriebenen Anwendung. In diesem Abschnitt werden wir diese Operationen mit <strong>JDBC</strong> und dem bevorzugten <strong><code>PreparedStatement</code></strong>-Objekt detailliert betrachten.</p>
+<hr>
+<h2 id="41-create-einfügen-von-daten-insert">4.1 Create: Einfügen von Daten (<code>INSERT</code>)</h2>
+<p>Die <code>INSERT</code>-Anweisung wird verwendet, um neue Datensätze in eine Tabelle einzufügen. Wir nutzen hierfür die Methode <code>executeUpdate()</code> des <code>PreparedStatement</code>-Objekts, da diese Operation die Datenbank modifiziert.</p>
+<h3 id="411-beispiel-für-insert-mit-preparedstatement">4.1.1 Beispiel für <code>INSERT</code> mit <code>PreparedStatement</code></h3>
+<p>Stellen wir uns eine Tabelle <code>mitarbeiter</code> mit den Spalten <code>id</code>, <code>vorname</code>, <code>nachname</code> und <code>gehalt</code> vor. Die <code>id</code> wird in der Regel automatisch von der Datenbank generiert (z.B. als <code>AUTO_INCREMENT</code>).</p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.sql.*;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">InsertData</span> {
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-comment">// Annahme: &#x27;connection&#x27; ist ein aktives Connection-Objekt</span>
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">connection</span> <span class="hljs-operator">=</span> DriverManager.getConnection(<span class="hljs-string">&quot;jdbc:mysql://localhost:3306/meine_datenbank&quot;</span>, <span class="hljs-string">&quot;benutzer&quot;</span>, <span class="hljs-string">&quot;passwort&quot;</span>)) {
+
+            <span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;INSERT INTO mitarbeiter (vorname, nachname, gehalt) VALUES (?, ?, ?)&quot;</span>;
+            
+            <span class="hljs-comment">// 1. PreparedStatement erstellen</span>
+            <span class="hljs-keyword">try</span> (<span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">preparedStatement</span> <span class="hljs-operator">=</span> connection.prepareStatement(sql)) {
+                
+                <span class="hljs-comment">// 2. Platzhalter mit Werten füllen</span>
+                <span class="hljs-type">String</span> <span class="hljs-variable">vorname</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Max&quot;</span>;
+                <span class="hljs-type">String</span> <span class="hljs-variable">nachname</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Mustermann&quot;</span>;
+                <span class="hljs-type">double</span> <span class="hljs-variable">gehalt</span> <span class="hljs-operator">=</span> <span class="hljs-number">55000.50</span>;
+                
+                preparedStatement.setString(<span class="hljs-number">1</span>, vorname);     <span class="hljs-comment">// Erster Platzhalter (?)</span>
+                preparedStatement.setString(<span class="hljs-number">2</span>, nachname);   <span class="hljs-comment">// Zweiter Platzhalter (?)</span>
+                preparedStatement.setDouble(<span class="hljs-number">3</span>, gehalt);     <span class="hljs-comment">// Dritter Platzhalter (?)</span>
+                
+                <span class="hljs-comment">// 3. SQL-Befehl ausführen und Anzahl der betroffenen Zeilen erhalten</span>
+                <span class="hljs-type">int</span> <span class="hljs-variable">affectedRows</span> <span class="hljs-operator">=</span> preparedStatement.executeUpdate();
+                
+                <span class="hljs-keyword">if</span> (affectedRows &gt; <span class="hljs-number">0</span>) {
+                    System.out.println(<span class="hljs-string">&quot;Ein neuer Mitarbeiter wurde erfolgreich eingefügt.&quot;</span>);
+                } <span class="hljs-keyword">else</span> {
+                    System.out.println(<span class="hljs-string">&quot;Fehler beim Einfügen des Mitarbeiters.&quot;</span>);
+                }
+                
+            } <span class="hljs-keyword">catch</span> (SQLException e) {
+                e.printStackTrace();
+            }
+            
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Wichtig:</strong> Achte darauf, dass der Datentyp der <code>set...</code>-Methode mit dem Spaltentyp in deiner Datenbank übereinstimmt. Für Strings nimmst du <code>setString()</code>, für Integer <code>setInt()</code>, für Doubles <code>setDouble()</code> usw. Die Indexierung der Platzhalter (<code>?</code>) beginnt bei <code>1</code>.</li>
+</ul>
+<hr>
+<h2 id="42-read-auslesen-von-daten-select">4.2 Read: Auslesen von Daten (<code>SELECT</code>)</h2>
+<p>Die <code>SELECT</code>-Anweisung wird verwendet, um Daten aus der Datenbank abzufragen. Als Rückgabewert erhalten wir ein <strong><code>ResultSet</code></strong>-Objekt, das die abgefragten Daten enthält. Die Methode hierfür ist <code>executeQuery()</code>.</p>
+<h3 id="421-beispiel-für-select-und-arbeiten-mit-resultset">4.2.1 Beispiel für <code>SELECT</code> und Arbeiten mit <code>ResultSet</code></h3>
+<p>Wir lesen alle Mitarbeiter aus, die über 50.000 € verdienen.</p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.sql.*;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SelectData</span> {
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-comment">// Annahme: &#x27;connection&#x27; ist ein aktives Connection-Objekt</span>
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">connection</span> <span class="hljs-operator">=</span> DriverManager.getConnection(<span class="hljs-string">&quot;jdbc:mysql://localhost:3306/meine_datenbank&quot;</span>, <span class="hljs-string">&quot;benutzer&quot;</span>, <span class="hljs-string">&quot;passwort&quot;</span>)) {
+            
+            <span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;SELECT id, vorname, nachname, gehalt FROM mitarbeiter WHERE gehalt &gt; ?&quot;</span>;
+            
+            <span class="hljs-keyword">try</span> (<span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">preparedStatement</span> <span class="hljs-operator">=</span> connection.prepareStatement(sql)) {
+                
+                <span class="hljs-comment">// Setze den Gehalts-Parameter</span>
+                preparedStatement.setDouble(<span class="hljs-number">1</span>, <span class="hljs-number">50000.00</span>);
+                
+                <span class="hljs-comment">// Führe die Abfrage aus und erhalte das ResultSet</span>
+                <span class="hljs-keyword">try</span> (<span class="hljs-type">ResultSet</span> <span class="hljs-variable">resultSet</span> <span class="hljs-operator">=</span> preparedStatement.executeQuery()) {
+                    
+                    <span class="hljs-comment">// Iteriere durch die Zeilen des ResultSets</span>
+                    <span class="hljs-keyword">while</span> (resultSet.next()) {
+                        <span class="hljs-comment">// Daten aus dem ResultSet auslesen</span>
+                        <span class="hljs-type">int</span> <span class="hljs-variable">id</span> <span class="hljs-operator">=</span> resultSet.getInt(<span class="hljs-string">&quot;id&quot;</span>);
+                        <span class="hljs-type">String</span> <span class="hljs-variable">vorname</span> <span class="hljs-operator">=</span> resultSet.next().getString(<span class="hljs-string">&quot;vorname&quot;</span>);
+                        <span class="hljs-type">String</span> <span class="hljs-variable">nachname</span> <span class="hljs-operator">=</span> resultSet.getString(<span class="hljs-string">&quot;nachname&quot;</span>);
+                        <span class="hljs-type">double</span> <span class="hljs-variable">gehalt</span> <span class="hljs-operator">=</span> resultSet.getDouble(<span class="hljs-string">&quot;gehalt&quot;</span>);
+                        
+                        System.out.println(<span class="hljs-string">&quot;ID: &quot;</span> + id + <span class="hljs-string">&quot;, Name: &quot;</span> + vorname + <span class="hljs-string">&quot; &quot;</span> + nachname + <span class="hljs-string">&quot;, Gehalt: &quot;</span> + gehalt + <span class="hljs-string">&quot; €&quot;</span>);
+                    }
+                    
+                } <span class="hljs-comment">// Das ResultSet wird hier automatisch geschlossen</span>
+                
+            } <span class="hljs-keyword">catch</span> (SQLException e) {
+                e.printStackTrace();
+            }
+            
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Das <code>ResultSet</code>:</strong> Die Methode <code>resultSet.next()</code> bewegt den Cursor zur nächsten Zeile und gibt <code>true</code> zurück, solange noch Zeilen vorhanden sind. Der <code>while</code>-Loop ist der Standardweg, um alle Zeilen einer Abfrage zu verarbeiten.</li>
+<li><strong>Daten auslesen:</strong> Mit <code>resultSet.getInt()</code>, <code>resultSet.getString()</code> usw. kannst du die Werte einer Spalte aus der aktuellen Zeile auslesen. Du kannst die Spalte entweder über den Spaltennamen (empfohlen) oder den Spaltenindex (beginnend bei 1) ansprechen.</li>
+</ul>
+<hr>
+<h2 id="43-update-ändern-von-daten-update">4.3 Update: Ändern von Daten (<code>UPDATE</code>)</h2>
+<p>Die <code>UPDATE</code>-Anweisung wird verwendet, um bestehende Datensätze in einer Tabelle zu ändern. Hierfür verwenden wir ebenfalls <code>executeUpdate()</code>. Es ist wichtig, immer eine <code>WHERE</code>-Klausel zu verwenden, um sicherzustellen, dass nur die gewünschten Zeilen aktualisiert werden. Ohne eine <code>WHERE</code>-Klausel würden alle Datensätze in der Tabelle geändert werden!</p>
+<h3 id="431-beispiel-für-update-mit-parametern">4.3.1 Beispiel für <code>UPDATE</code> mit Parametern</h3>
+<p>Wir erhöhen das Gehalt eines Mitarbeiters mit einer bestimmten ID.</p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.sql.*;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UpdateData</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">connection</span> <span class="hljs-operator">=</span> DriverManager.getConnection(<span class="hljs-string">&quot;jdbc:mysql://localhost:3306/meine_datenbank&quot;</span>, <span class="hljs-string">&quot;benutzer&quot;</span>, <span class="hljs-string">&quot;passwort&quot;</span>)) {
+            
+            <span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;UPDATE mitarbeiter SET gehalt = ? WHERE id = ?&quot;</span>;
+            
+            <span class="hljs-keyword">try</span> (<span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">preparedStatement</span> <span class="hljs-operator">=</span> connection.prepareStatement(sql)) {
+                
+                <span class="hljs-type">double</span> <span class="hljs-variable">neuesGehalt</span> <span class="hljs-operator">=</span> <span class="hljs-number">60000.00</span>;
+                <span class="hljs-type">int</span> <span class="hljs-variable">mitarbeiterId</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+                
+                preparedStatement.setDouble(<span class="hljs-number">1</span>, neuesGehalt);
+                preparedStatement.setInt(<span class="hljs-number">2</span>, mitarbeiterId);
+                
+                <span class="hljs-type">int</span> <span class="hljs-variable">affectedRows</span> <span class="hljs-operator">=</span> preparedStatement.executeUpdate();
+                
+                <span class="hljs-keyword">if</span> (affectedRows &gt; <span class="hljs-number">0</span>) {
+                    System.out.println(<span class="hljs-string">&quot;Der Datensatz mit der ID &quot;</span> + mitarbeiterId + <span class="hljs-string">&quot; wurde erfolgreich aktualisiert.&quot;</span>);
+                } <span class="hljs-keyword">else</span> {
+                    System.out.println(<span class="hljs-string">&quot;Kein Datensatz mit der ID &quot;</span> + mitarbeiterId + <span class="hljs-string">&quot; gefunden.&quot;</span>);
+                }
+                
+            } <span class="hljs-keyword">catch</span> (SQLException e) {
+                e.printStackTrace();
+            }
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<hr>
+<h2 id="44-delete-löschen-von-daten-delete">4.4 Delete: Löschen von Daten (<code>DELETE</code>)</h2>
+<p>Die <code>DELETE</code>-Anweisung wird verwendet, um Datensätze aus einer Tabelle zu löschen. Auch hierfür nutzen wir <code>executeUpdate()</code>. Wie bei <code>UPDATE</code> ist eine <code>WHERE</code>-Klausel unerlässlich, um gezieltes Löschen zu ermöglichen.</p>
+<h3 id="441-beispiel-für-delete-mit-bedingungen">4.4.1 Beispiel für <code>DELETE</code> mit Bedingungen</h3>
+<p>Wir löschen den Mitarbeiter mit der ID 1.</p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.sql.*;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DeleteData</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">connection</span> <span class="hljs-operator">=</span> DriverManager.getConnection(<span class="hljs-string">&quot;jdbc:mysql://localhost:3306/meine_datenbank&quot;</span>, <span class="hljs-string">&quot;benutzer&quot;</span>, <span class="hljs-string">&quot;passwort&quot;</span>)) {
+            
+            <span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;DELETE FROM mitarbeiter WHERE id = ?&quot;</span>;
+            
+            <span class="hljs-keyword">try</span> (<span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">preparedStatement</span> <span class="hljs-operator">=</span> connection.prepareStatement(sql)) {
+                
+                <span class="hljs-type">int</span> <span class="hljs-variable">mitarbeiterId</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+                
+                preparedStatement.setInt(<span class="hljs-number">1</span>, mitarbeiterId);
+                
+                <span class="hljs-type">int</span> <span class="hljs-variable">affectedRows</span> <span class="hljs-operator">=</span> preparedStatement.executeUpdate();
+                
+                <span class="hljs-keyword">if</span> (affectedRows &gt; <span class="hljs-number">0</span>) {
+                    System.out.println(<span class="hljs-string">&quot;Der Datensatz mit der ID &quot;</span> + mitarbeiterId + <span class="hljs-string">&quot; wurde erfolgreich gelöscht.&quot;</span>);
+                } <span class="hljs-keyword">else</span> {
+                    System.out.println(<span class="hljs-string">&quot;Kein Datensatz mit der ID &quot;</span> + mitarbeiterId + <span class="hljs-string">&quot; gefunden.&quot;</span>);
+                }
+                
+            } <span class="hljs-keyword">catch</span> (SQLException e) {
+                e.printStackTrace();
+            }
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p><strong>Wichtiger Hinweis:</strong> Der <code>try-with-resources</code>-Block (<code>try(...)</code>) ist eine Best-Practice in Java, um sicherzustellen, dass Ressourcen wie <code>Connection</code>, <code>PreparedStatement</code> und <code>ResultSet</code> am Ende automatisch geschlossen werden, selbst wenn eine Ausnahme auftritt. Dies verhindert Ressourcenlecks und macht den Code robuster.</p>
+
+            
+            
+        </body>
+        </html>

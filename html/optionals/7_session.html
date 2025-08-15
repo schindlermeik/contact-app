@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices und typische Fallstricke bei Optional</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-und-typische-fallstricke-bei-optional">Handout: Best Practices und typische Fallstricke bei Optional</h1>
+<hr>
+<h2 id="1-wann-optional-verwenden--und-wann-nicht">1. Wann Optional verwenden – und wann nicht?</h2>
+<p><strong>Verwende Optional:</strong></p>
+<ul>
+<li><strong>Als Rückgabewert von Methoden</strong>, wenn ein Wert <em>fehlen</em> kann (z. B. Suche, Datenbankabfragen, „find“-Methoden).</li>
+<li>Für APIs, bei denen das Fehlen eines Ergebnisses <strong>erwartet und behandelt werden soll</strong>.</li>
+<li>Für Schnittstellen, bei denen das „Fehlen“ explizit dokumentiert und typisiert sein soll.</li>
+</ul>
+<p><strong>Verwende Optional NICHT:</strong></p>
+<ul>
+<li><strong>Nicht als Methoden-Parameter!</strong> (siehe vorheriges Handout)</li>
+<li><strong>Nicht als Feld in Entities, DTOs oder für Serialisierung:</strong> Das kann mit Frameworks wie JPA, Jackson, etc. zu Problemen führen (siehe unten).</li>
+<li><strong>Nicht in Performance-kritischen Bereichen:</strong> Optional ist ein Container-Objekt – bei sehr vielen Objekten kann es Overhead verursachen.</li>
+<li><strong>Nicht für primitive Typen</strong> (außer du verwendest explizit <code>OptionalInt</code>, <code>OptionalLong</code>, ...).</li>
+</ul>
+<p><strong>Merksatz:</strong></p>
+<blockquote>
+<p>Optional ist für <em>Rückgabewerte</em> und <em>API-Design</em>, nicht als Allzweck-Container für alles, was null sein könnte!</p>
+</blockquote>
+<hr>
+<h2 id="2-probleme-bei-der-serialisierung-und-in-datenmodellen">2. Probleme bei der Serialisierung und in Datenmodellen</h2>
+<h3 id="a-serialisierung">a) <strong>Serialisierung:</strong></h3>
+<ul>
+<li>Viele Serialisierungs-Frameworks (wie Jackson, Gson, JPA) <strong>können mit Optional nicht immer korrekt umgehen</strong>.</li>
+<li>Optional ist <strong>kein Wert</strong> im klassischen Sinne, sondern ein Container.</li>
+<li>Die Serialisierung von Optional-Feldern kann zu fehlenden, falschen oder doppelten Werten führen.</li>
+</ul>
+<p><strong>Empfehlung:</strong></p>
+<ul>
+<li>Nutze Optional <strong>NICHT als Feld</strong> in Datenobjekten (z. B. Entities, DTOs, Transferobjekten).</li>
+<li>Setze lieber Felder auf null (und dokumentiere das!), oder verwende separate Wrapper-Klassen für Businesslogik.</li>
+</ul>
+<hr>
+<h2 id="3-optionals-in-collections--sinnvoll">3. Optionals in Collections – sinnvoll?</h2>
+<ul>
+<li><strong>Collections von Optional-Werten sind meistens ein Code-Smell!</strong></li>
+<li>Entweder ist ein Wert in der Collection, oder eben nicht – dafür ist eine leere Collection oft die bessere Wahl.</li>
+<li>Die Kombination „Liste von Optional“ (<code>List&lt;Optional&lt;T&gt;&gt;</code>) führt schnell zu verwirrtem Code und sollte vermieden werden.</li>
+</ul>
+<p><strong>Besser:</strong></p>
+<ul>
+<li>Leere Collections statt Collections mit leeren Optional.</li>
+<li>Wenn einzelne Elemente optional sind, prüfe, ob das Datenmodell sinnvoll ist.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Statt:</p>
+<pre><code class="language-java">List&lt;Optional&lt;String&gt;&gt; namen = ...
+</code></pre>
+<p>Besser:</p>
+<pre><code class="language-java">List&lt;String&gt; namen = ... <span class="hljs-comment">// und nur die existierenden Namen speichern</span>
+</code></pre>
+<hr>
+<h2 id="4-lesbarkeit-und-wartbarkeit-von-code-mit-optional">4. Lesbarkeit und Wartbarkeit von Code mit Optional</h2>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Optional macht APIs <strong>ausdrucksstärker</strong>: Das Fehlen eines Werts ist sofort sichtbar.</li>
+<li>Optionals fördern <strong>sichereren, klareren Code</strong> – kein versehentliches Übersehen von fehlenden Werten mehr.</li>
+</ul>
+<p><strong>Gefahren:</strong></p>
+<ul>
+<li><strong>Zu viele verschachtelte Optionals</strong> (z. B. durch map/flatMap-Ketten) können den Code unübersichtlich machen.</li>
+<li>Wer Optionals wie null behandelt (<code>isPresent</code>/<code>get</code> überall), <strong>verfehlt den eigentlichen Sinn</strong>.</li>
+<li>Ein Zuviel an Optional (z. B. für alles, was fehlen könnte, selbst interne Felder) macht Code schwer lesbar.</li>
+</ul>
+<p><strong>Best Practices:</strong></p>
+<ul>
+<li>Nutze die funktionalen Methoden (<code>map</code>, <code>flatMap</code>, <code>filter</code>, <code>ifPresent</code>, <code>orElse</code>, ...) statt überall <code>isPresent</code>/<code>get</code>.</li>
+<li>Halte die Ketten <strong>kurz</strong> und verständlich.</li>
+<li>Verwende Optionals gezielt für öffentliche APIs und methodische Schnittstellen – <strong>nicht</strong> für alles intern.</li>
+</ul>
+<hr>
+<h2 id="5-übungen-zum-selbststudium">5. Übungen zum Selbststudium</h2>
+<ol>
+<li>Analysiere einen Codeabschnitt mit mehreren Optional-Verwendungen. Ist Optional an allen Stellen sinnvoll?</li>
+<li>Schreibe eine Methode, die Optional als Feld oder Collection-Element verwendet – was passiert bei der Serialisierung?</li>
+<li>Vergleiche die Lesbarkeit einer API mit und ohne Optional als Rückgabetyp.</li>
+<li>Überlege für deine Projekte, wo Optionals wirklich einen Mehrwert bringen – und wo sie evtl. zu Overhead führen.</li>
+</ol>
+<hr>
+<h2 id="6-merksätze">6. Merksätze</h2>
+<ul>
+<li><strong>Optional ist für Rückgabewerte von Methoden – nicht für Felder, Parameter oder Collections!</strong></li>
+<li><strong>Bei Serialisierung, Datenmodellen und Frameworks kann Optional Probleme bereiten.</strong></li>
+<li><strong>Leere Collections sind fast immer besser als Collections mit leeren Optionals.</strong></li>
+<li><strong>Optional macht APIs sicherer, aber zu viele Optionals verschlechtern die Lesbarkeit.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praktische &Uuml;bungen und Beispiele zu Enums</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praktische-übungen-und-beispiele-zu-enums">Handout: Praktische Übungen und Beispiele zu Enums</h1>
+<hr>
+<h2 id="1-eigenes-enum-definieren-und-verwenden">1. Eigenes Enum definieren und verwenden</h2>
+<h3 id="aufgabe-1">Aufgabe 1</h3>
+<p><strong>Definiere ein Enum <code>AmpelPhase</code> mit den Werten <code>ROT</code>, <code>GELB</code>, <code>GRUEN</code>. Verwende es in einer Methode, die einen Hinweis ausgibt.</strong></p>
+<h4 id="musterlösung">Musterlösung</h4>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">AmpelPhase</span> {
+    ROT, GELB, GRUEN
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">AmpelTest</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">AmpelPhase</span> <span class="hljs-variable">phase</span> <span class="hljs-operator">=</span> AmpelPhase.ROT;
+        printHinweis(phase);
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printHinweis</span><span class="hljs-params">(AmpelPhase phase)</span> {
+        <span class="hljs-keyword">if</span> (phase == AmpelPhase.ROT) {
+            System.out.println(<span class="hljs-string">&quot;Stehen bleiben!&quot;</span>);
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (phase == AmpelPhase.GELB) {
+            System.out.println(<span class="hljs-string">&quot;Gleich geht&#x27;s weiter.&quot;</span>);
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (phase == AmpelPhase.GRUEN) {
+            System.out.println(<span class="hljs-string">&quot;Losfahren!&quot;</span>);
+        }
+    }
+}
+</code></pre>
+<hr>
+<h2 id="2-enum-mit-attributen-und-methoden-implementieren">2. Enum mit Attributen und Methoden implementieren</h2>
+<h3 id="aufgabe-2">Aufgabe 2</h3>
+<p><strong>Erweitere das Enum <code>AmpelPhase</code> um eine Zeichenkettenbeschreibung (z. B. „Stop“, „Achtung“, „Fahren“) und eine Methode, die diese Beschreibung zurückgibt.</strong></p>
+<h4 id="musterlösung-1">Musterlösung</h4>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">AmpelPhase</span> {
+    ROT(<span class="hljs-string">&quot;Stop&quot;</span>),
+    GELB(<span class="hljs-string">&quot;Achtung&quot;</span>),
+    GRUEN(<span class="hljs-string">&quot;Fahren&quot;</span>);
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String beschreibung;
+
+    AmpelPhase(String beschreibung) {
+        <span class="hljs-built_in">this</span>.beschreibung = beschreibung;
+    }
+
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getBeschreibung</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> beschreibung;
+    }
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">AmpelTest</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-keyword">for</span> (AmpelPhase phase : AmpelPhase.values()) {
+            System.out.println(phase + <span class="hljs-string">&quot;: &quot;</span> + phase.getBeschreibung());
+        }
+    }
+}
+</code></pre>
+<p><strong>Ausgabe:</strong></p>
+<pre><code>ROT: Stop
+GELB: Achtung
+GRUEN: Fahren
+</code></pre>
+<hr>
+<h2 id="3-anwendung-von-enums-in-einem-switch">3. Anwendung von Enums in einem <code>switch</code></h2>
+<h3 id="aufgabe-3">Aufgabe 3</h3>
+<p><strong>Schreibe eine Methode, die für jeden Wochentag eine kurze Nachricht im <code>switch</code>-Statement ausgibt.</strong></p>
+<h4 id="musterlösung-2">Musterlösung</h4>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Wochentag</span> {
+    MONTAG, DIENSTAG, MITTWOCH, DONNERSTAG, FREITAG, SAMSTAG, SONNTAG
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">WochentagTest</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printMessage</span><span class="hljs-params">(Wochentag tag)</span> {
+        <span class="hljs-keyword">switch</span> (tag) {
+            <span class="hljs-keyword">case</span> MONTAG:
+                System.out.println(<span class="hljs-string">&quot;Wochenstart!&quot;</span>);
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> FREITAG:
+                System.out.println(<span class="hljs-string">&quot;Bald Wochenende!&quot;</span>);
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> SAMSTAG:
+            <span class="hljs-keyword">case</span> SONNTAG:
+                System.out.println(<span class="hljs-string">&quot;Wochenende!&quot;</span>);
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">default</span>:
+                System.out.println(<span class="hljs-string">&quot;Ein gewöhnlicher Tag.&quot;</span>);
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-keyword">for</span> (Wochentag tag : Wochentag.values()) {
+            printMessage(tag);
+        }
+    }
+}
+</code></pre>
+<hr>
+<h2 id="4-refactoring-ersetze-klassische-konstanten-durch-ein-enum">4. Refactoring: Ersetze klassische Konstanten durch ein Enum</h2>
+<h3 id="aufgabe-4">Aufgabe 4</h3>
+<p><strong>Gegeben ist folgender (veralteter) Code:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FarbenAlt</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">ROT</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">BLAU</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">GRUEN</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>;
+}
+</code></pre>
+<p><strong>Refactore das Beispiel so, dass ein Enum verwendet wird.</strong></p>
+<h4 id="musterlösung-3">Musterlösung</h4>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Farbe</span> {
+    ROT, BLAU, GRUEN
+}
+
+<span class="hljs-comment">// Verwendung:</span>
+<span class="hljs-type">Farbe</span> <span class="hljs-variable">farbe</span> <span class="hljs-operator">=</span> Farbe.ROT;
+<span class="hljs-keyword">if</span> (farbe == Farbe.BLAU) {
+    System.out.println(<span class="hljs-string">&quot;Die Farbe ist Blau!&quot;</span>);
+}
+</code></pre>
+<hr>
+<h2 id="5-reflexionsfragen-selbststudium">5. Reflexionsfragen (Selbststudium)</h2>
+<ol>
+<li>Welche Vorteile ergeben sich durch den Einsatz von Enums im Vergleich zu klassischen Konstanten?</li>
+<li>Wie kannst du einem Enum zusätzliche Eigenschaften geben? Wo ist das sinnvoll?</li>
+<li>Wann ist die Verwendung eines Enums im Code besser als die Arbeit mit Zahlen oder Strings?</li>
+</ol>
+<hr>
+<h2 id="6-zusammenfassung">6. Zusammenfassung</h2>
+<ul>
+<li><strong>Enums</strong> bieten eine saubere, sichere und erweiterbare Möglichkeit, feste Wertemengen zu repräsentieren.</li>
+<li>Du kannst Enums mit Attributen, Methoden und Konstruktoren anreichern.</li>
+<li>Die Verwendung von Enums im <code>switch</code>-Statement sorgt für klaren, wartbaren Code.</li>
+<li>Das Refactoring von klassischen Konstanten zu Enums steigert die Typsicherheit und Lesbarkeit deines Programms.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

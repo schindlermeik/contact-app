@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Mapping von Java-Klassen auf Datenbanktabellen &lpar;ORM-Grundlagen&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-mapping-von-java-klassen-auf-datenbanktabellen-orm-grundlagen">Handout: Mapping von Java-Klassen auf Datenbanktabellen (ORM-Grundlagen)</h3>
+<p>Dieses Handout erklärt dir die wichtigsten Konzepte, wie du mit JPA deine Java-Objekte auf eine relationale Datenbank abbildest.</p>
+<h4 id="41-entities-und-annotationen-entity-id-etc">4.1 Entities und Annotationen (<code>@Entity</code>, <code>@Id</code>, etc.)</h4>
+<p>Der Kern des Object-Relationalen Mappings (ORM) in JPA sind <strong>Annotationen</strong>. Sie sind wie spezielle Marker, die du in deinem Java-Code verwendest, um JPA zu sagen, wie es deine Klassen und deren Felder mit den Datenbanktabellen und Spalten verknüpfen soll.</p>
+<ul>
+<li>
+<p><strong><code>@Entity</code></strong>: Diese Annotation ist die wichtigste. Du platzierst sie über der Klasse, die eine Datenbanktabelle repräsentieren soll. Sie macht aus einer normalen Java-Klasse eine <strong>JPA-Entität</strong>. JPA weiß dann, dass es diese Klasse verwalten und in der Datenbank speichern muss.</p>
+</li>
+<li>
+<p><strong><code>@Table</code></strong>: Standardmäßig leitet JPA den Namen der Datenbanktabelle vom Klassennamen ab (z. B. <code>Kunde</code> -&gt; <code>Kunde</code>). Mit <code>@Table</code> kannst du explizit den Namen der Tabelle festlegen. Das ist nützlich, wenn der Tabellenname vom Klassennamen abweicht.</p>
+<pre><code class="language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-meta">@Table(name = &quot;kunden&quot;)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Kunde</span> { ... }
+</code></pre>
+</li>
+<li>
+<p><strong><code>@Id</code></strong>: Jede Entität muss einen eindeutigen Primärschlüssel haben. Mit dieser Annotation markierst du das Feld, das als Primärschlüssel dient.</p>
+</li>
+<li>
+<p><strong><code>@GeneratedValue</code></strong>: Diese Annotation wird meist zusammen mit <code>@Id</code> verwendet. Sie teilt JPA mit, wie der Wert für den Primärschlüssel generiert werden soll.</p>
+<ul>
+<li><strong><code>GenerationType.AUTO</code></strong>: Der Provider wählt eine Strategie, die am besten zur Datenbank passt. Dies ist oft die einfachste Wahl.</li>
+<li><strong><code>GenerationType.IDENTITY</code></strong>: Die Datenbank erzeugt den Wert (z. B. eine <code>AUTO_INCREMENT</code>-Spalte in MySQL oder eine <code>SERIAL</code>-Spalte in PostgreSQL).</li>
+<li><strong><code>GenerationType.SEQUENCE</code></strong>: Der Wert wird über eine Datenbank-Sequenz generiert.</li>
+<li><strong><code>GenerationType.TABLE</code></strong>: Der Wert wird über eine spezielle Hilfstabelle generiert.</li>
+</ul>
+<!-- end list -->
+<pre><code class="language-java"><span class="hljs-meta">@Id</span>
+<span class="hljs-meta">@GeneratedValue(strategy = GenerationType.IDENTITY)</span>
+<span class="hljs-keyword">private</span> Long id;
+</code></pre>
+</li>
+</ul>
+<hr>
+<h4 id="42-attribut-mapping-column-datentypen-constraints">4.2 Attribut-Mapping (<code>@Column</code>, Datentypen, Constraints)</h4>
+<p>Jedes Feld deiner Entität wird standardmäßig einer Spalte in der Datenbank zugeordnet. Du kannst dieses Mapping jedoch präzise steuern.</p>
+<ul>
+<li>
+<p><strong><code>@Column</code></strong>: Diese Annotation wird über einem Feld platziert, um das Mapping zu einer Datenbankspalte anzupassen.</p>
+<ul>
+<li><strong><code>name</code></strong>: Mit diesem Attribut kannst du einen anderen Spaltennamen festlegen, falls er vom Feldnamen abweicht (z. B. <code>firstName</code> -&gt; <code>vorname</code>).</li>
+<li><strong><code>nullable</code></strong>: Wenn auf <code>false</code> gesetzt, kann die Spalte keine <code>NULL</code>-Werte enthalten (JPA fügt dann einen <code>NOT NULL</code>-Constraint hinzu).</li>
+<li><strong><code>unique</code></strong>: Wenn auf <code>true</code> gesetzt, wird sichergestellt, dass alle Werte in dieser Spalte einzigartig sind.</li>
+<li><strong><code>length</code></strong>: Definiert die Länge einer Zeichenkette (<code>VARCHAR</code>).</li>
+</ul>
+<!-- end list -->
+<pre><code class="language-java"><span class="hljs-meta">@Column(name = &quot;email_adresse&quot;, nullable = false, unique = true, length = 100)</span>
+<span class="hljs-keyword">private</span> String email;
+</code></pre>
+</li>
+<li>
+<p><strong><code>@Transient</code></strong>: Manchmal hast du Felder in deiner Entitätsklasse, die du <strong>nicht</strong> in der Datenbank speichern möchtest (z. B. ein temporäres Hilfsfeld). Mit <code>@Transient</code> sagst du JPA, dass es dieses Feld ignorieren soll.</p>
+</li>
+<li>
+<p><strong>Datentypen</strong>: JPA kann die meisten Java-Datentypen automatisch auf die entsprechenden SQL-Typen mappen.</p>
+<ul>
+<li><code>String</code> -&gt; <code>VARCHAR</code></li>
+<li><code>int</code>, <code>Integer</code>, <code>long</code>, <code>Long</code> -&gt; <code>INTEGER</code>, <code>BIGINT</code></li>
+<li><code>double</code>, <code>Double</code> -&gt; <code>DOUBLE PRECISION</code></li>
+<li><code>Date</code>, <code>LocalDate</code>, <code>LocalDateTime</code> -&gt; <code>DATE</code>, <code>TIMESTAMP</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="43-beziehungen-zwischen-entitäten">4.3 Beziehungen zwischen Entitäten</h4>
+<p>Relationale Datenbanken sind so konzipiert, dass sie Beziehungen zwischen Tabellen verwalten. JPA bietet Annotationen, um diese Beziehungen zwischen deinen Entitäten abzubilden. Die Annotationen beschreiben die Beziehung aus Sicht der jeweiligen Entität.</p>
+<hr>
+<h5 id="431-one-to-one">4.3.1 One-to-One</h5>
+<p>Eine <strong>One-to-One</strong>-Beziehung bedeutet, dass eine Entität genau einer anderen Entität zugeordnet ist, und umgekehrt (z. B. ein <code>Mitarbeiter</code> hat eine <code>Parkkarte</code>).</p>
+<ul>
+<li>
+<p><strong><code>@OneToOne</code></strong>: Diese Annotation markiert die One-to-One-Beziehung.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Klasse Mitarbeiter</span>
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Mitarbeiter</span> {
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-meta">@OneToOne(cascade = CascadeType.ALL)</span>
+    <span class="hljs-meta">@JoinColumn(name = &quot;parkkarte_id&quot;)</span>
+    <span class="hljs-keyword">private</span> Parkkarte parkkarte;
+}
+
+<span class="hljs-comment">// Klasse Parkkarte</span>
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Parkkarte</span> {
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-meta">@OneToOne(mappedBy = &quot;parkkarte&quot;)</span>
+    <span class="hljs-keyword">private</span> Mitarbeiter mitarbeiter;
+}
+</code></pre>
+<ul>
+<li><strong><code>@JoinColumn</code></strong>: Definiert die Fremdschlüsselspalte in der <code>Mitarbeiter</code>-Tabelle (<code>parkkarte_id</code>), die auf die <code>Parkkarte</code>-Tabelle verweist. Die Entität, die das <code>@JoinColumn</code> hat, ist die &quot;besitzende&quot; Seite der Beziehung.</li>
+<li><strong><code>mappedBy</code></strong>: Die &quot;inverse&quot; Seite der Beziehung verwendet <code>mappedBy</code>, um anzuzeigen, dass das Mapping bereits von der anderen Entität verwaltet wird. Du gibst hier den Namen des Feldes an, das die Beziehung auf der anderen Seite definiert.</li>
+<li><strong><code>cascade</code></strong>: Das <code>CascadeType.ALL</code> sorgt dafür, dass Operationen (wie <code>persist</code>, <code>remove</code>) auf der <code>Mitarbeiter</code>-Entität automatisch auch auf der verknüpften <code>Parkkarte</code>-Entität ausgeführt werden.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h5 id="432-one-to-many">4.3.2 One-to-Many</h5>
+<p>Eine <strong>One-to-Many</strong>-Beziehung bedeutet, dass eine Entität mit vielen anderen Entitäten verbunden sein kann (z. B. ein <code>Kunde</code> kann viele <code>Bestellungen</code> haben).</p>
+<ul>
+<li>
+<p><strong><code>@OneToMany</code></strong>: Wird auf der &quot;einen&quot; Seite der Beziehung verwendet (in diesem Fall bei <code>Kunde</code>).</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Klasse Kunde</span>
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Kunde</span> {
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-meta">@OneToMany(mappedBy = &quot;kunde&quot;, cascade = CascadeType.ALL, orphanRemoval = true)</span>
+    <span class="hljs-keyword">private</span> List&lt;Bestellung&gt; bestellungen;
+}
+
+<span class="hljs-comment">// Klasse Bestellung</span>
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Bestellung</span> {
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-meta">@ManyToOne</span>
+    <span class="hljs-meta">@JoinColumn(name = &quot;kunde_id&quot;)</span>
+    <span class="hljs-keyword">private</span> Kunde kunde;
+}
+</code></pre>
+<ul>
+<li>Hier ist die <code>Bestellung</code>-Tabelle die &quot;besitzende&quot; Seite, da sie den Fremdschlüssel (<code>kunde_id</code>) zur <code>Kunde</code>-Tabelle enthält.</li>
+<li><strong><code>orphanRemoval = true</code></strong>: Dies ist eine nützliche Option, die dafür sorgt, dass eine <code>Bestellung</code> automatisch gelöscht wird, wenn sie aus der <code>bestellungen</code>-Liste des <code>Kunde</code>-Objekts entfernt wird.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h5 id="433-many-to-one">4.3.3 Many-to-One</h5>
+<p>Eine <strong>Many-to-One</strong>-Beziehung ist die Umkehrung einer One-to-Many-Beziehung. Viele Entitäten sind mit einer einzigen anderen Entität verbunden (z. B. viele <code>Bestellungen</code> gehören zu einem <code>Kunde</code>).</p>
+<ul>
+<li>
+<p><strong><code>@ManyToOne</code></strong>: Wird auf der &quot;vielen&quot; Seite der Beziehung verwendet (in diesem Fall bei <code>Bestellung</code>). Sie ist immer die &quot;besitzende&quot; Seite und enthält das <code>@JoinColumn</code> für den Fremdschlüssel.</p>
+<p><strong>Beispiel:</strong> Siehe das obige Beispiel der <code>Bestellung</code>-Klasse.</p>
+</li>
+</ul>
+<hr>
+<h5 id="434-many-to-many">4.3.4 Many-to-Many</h5>
+<p>Eine <strong>Many-to-Many</strong>-Beziehung bedeutet, dass viele Entitäten mit vielen anderen Entitäten verbunden sein können (z. B. viele <code>Studenten</code> können viele <code>Kurse</code> belegen).</p>
+<ul>
+<li>
+<p><strong><code>@ManyToMany</code></strong>: Wird auf beiden Seiten der Beziehung verwendet. In der Datenbank wird diese Beziehung durch eine <strong>Hilfstabelle</strong> aufgelöst, die die Primärschlüssel beider Entitäten enthält.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Klasse Student</span>
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Student</span> {
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-meta">@ManyToMany</span>
+    <span class="hljs-meta">@JoinTable(
+        name = &quot;student_kurs&quot;,
+        joinColumns = @JoinColumn(name = &quot;student_id&quot;),
+        inverseJoinColumns = @JoinColumn(name = &quot;kurs_id&quot;)
+    )</span>
+    <span class="hljs-keyword">private</span> List&lt;Kurs&gt; kurse;
+}
+
+<span class="hljs-comment">// Klasse Kurs</span>
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Kurs</span> {
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-meta">@ManyToMany(mappedBy = &quot;kurse&quot;)</span>
+    <span class="hljs-keyword">private</span> List&lt;Student&gt; studenten;
+}
+</code></pre>
+<ul>
+<li><strong><code>@JoinTable</code></strong>: Diese Annotation ist bei Many-to-Many-Beziehungen notwendig, um die Hilfstabelle zu definieren.</li>
+<li><code>name</code>: Der Name der Hilfstabelle (<code>student_kurs</code>).</li>
+<li><code>joinColumns</code>: Definiert die Spalte, die auf die eigene Entität verweist (<code>student_id</code>).</li>
+<li><code>inverseJoinColumns</code>: Definiert die Spalte, die auf die andere Entität verweist (<code>kurs_id</code>).</li>
+<li>Auch hier gibt es wieder eine &quot;besitzende&quot; Seite (die <code>@JoinTable</code> verwendet) und eine &quot;inverse&quot; Seite (die <code>mappedBy</code> verwendet).</li>
+</ul>
+</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Syntax und Grundlagen von Enums</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-syntax-und-grundlagen-von-enums">Handout: Syntax und Grundlagen von Enums</h1>
+<hr>
+<h2 id="1-definition-eines-enums">1. Definition eines Enums</h2>
+<h3 id="a-grundaufbau-enum-wochentag---">a) Grundaufbau (<code>enum Wochentag { ... }</code>)</h3>
+<p>Ein Enum wird mit dem Schlüsselwort <code>enum</code> definiert und enthält eine durch Kommas getrennte Liste möglicher Werte.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Wochentag</span> {
+    MONTAG, DIENSTAG, MITTWOCH, DONNERSTAG, FREITAG, SAMSTAG, SONNTAG
+}
+</code></pre>
+<ul>
+<li>Jeder Wert (<code>MONTAG</code>, <code>DIENSTAG</code> …) ist ein <strong>Enum-Konstantenwert</strong>.</li>
+<li>Du kannst so viele Werte angeben, wie für deinen Anwendungsfall nötig sind.</li>
+<li>Die Definition erfolgt typischerweise <strong>außerhalb</strong> oder <strong>als eigene Datei</strong> (wie bei einer Klasse), kann aber auch als <code>static</code> innerhalb einer anderen Klasse stehen.</li>
+</ul>
+<hr>
+<h3 id="b-werte-und-großschreibung">b) Werte und Großschreibung</h3>
+<ul>
+<li><strong>Konvention:</strong> Enum-Konstanten werden <strong>in Großbuchstaben</strong> geschrieben, einzelne Wörter werden mit <code>_</code> getrennt (z. B. <code>NICHT_VERFUEGBAR</code>).</li>
+<li>Das ist keine Pflicht, aber gängige Praxis und erhöht die Lesbarkeit.</li>
+</ul>
+<p><strong>Beispiele:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Status</span> {
+    AKTIV, INAKTIV, GESPERRT
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Richtung</span> {
+    NORD, SUED, OST, WEST
+}
+</code></pre>
+<hr>
+<h2 id="2-verwendung-eines-enums-im-code">2. Verwendung eines Enums im Code</h2>
+<p>Enums können wie jeder andere Typ in Variablen, Methodenparametern und Rückgabewerten verwendet werden.</p>
+<hr>
+<h3 id="a-zuweisung">a) Zuweisung</h3>
+<p>Um einer Variable einen Enum-Wert zuzuweisen, nutzt du den Enum-Namen und den gewünschten Wert mit Punktnotation:</p>
+<pre><code class="language-java"><span class="hljs-type">Wochentag</span> <span class="hljs-variable">heute</span> <span class="hljs-operator">=</span> Wochentag.DIENSTAG;
+<span class="hljs-type">Status</span> <span class="hljs-variable">benutzerStatus</span> <span class="hljs-operator">=</span> Status.AKTIV;
+</code></pre>
+<hr>
+<h3 id="b-vergleich">b) Vergleich</h3>
+<p>Enums werden immer mit <code>==</code> oder <code>equals()</code> verglichen – beide Möglichkeiten funktionieren gleich sicher, da es garantiert immer nur eine Instanz jedes Enum-Wertes gibt.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">if</span> (heute == Wochentag.DIENSTAG) {
+    System.out.println(<span class="hljs-string">&quot;Heute ist Dienstag!&quot;</span>);
+}
+</code></pre>
+<ul>
+<li><strong>Vorteil gegenüber Strings:</strong> Tippfehler beim Wert werden sofort vom Compiler erkannt.</li>
+</ul>
+<hr>
+<h3 id="c-ausgabe">c) Ausgabe</h3>
+<p>Enums können direkt ausgegeben werden, z. B. mit <code>System.out.println()</code>:</p>
+<pre><code class="language-java">System.out.println(heute); <span class="hljs-comment">// Gibt &quot;DIENSTAG&quot; aus</span>
+</code></pre>
+<ul>
+<li>
+<p>Standardmäßig wird der Name der Enum-Konstanten als String ausgegeben.</p>
+</li>
+<li>
+<p>Mit <code>.name()</code> kannst du den Namen als String bekommen:</p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">tagName</span> <span class="hljs-operator">=</span> heute.name(); <span class="hljs-comment">// &quot;DIENSTAG&quot;</span>
+</code></pre>
+</li>
+</ul>
+<hr>
+<h3 id="d-enum-als-typ-für-variablen-und-parameter">d) Enum als Typ für Variablen und Parameter</h3>
+<p>Enums eignen sich hervorragend, um Methoden klar zu typisieren und Fehler zu vermeiden:</p>
+<p><strong>Beispiel – Methode mit Enum-Parameter:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> druckeFeiertagsgruß(Wochentag tag) {
+    <span class="hljs-keyword">if</span> (tag == Wochentag.SONNTAG) {
+        System.out.println(<span class="hljs-string">&quot;Schönen Sonntag!&quot;</span>);
+    }
+}
+</code></pre>
+<p><strong>Beispiel – Enum als Rückgabewert:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> Wochentag <span class="hljs-title function_">naechsterTag</span><span class="hljs-params">(Wochentag tag)</span> {
+    <span class="hljs-keyword">switch</span> (tag) {
+        <span class="hljs-keyword">case</span> MONTAG: <span class="hljs-keyword">return</span> Wochentag.DIENSTAG;
+        <span class="hljs-keyword">case</span> DIENSTAG: <span class="hljs-keyword">return</span> Wochentag.MITTWOCH;
+        <span class="hljs-comment">// ...</span>
+        <span class="hljs-keyword">case</span> SONNTAG: <span class="hljs-keyword">return</span> Wochentag.MONTAG;
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; <span class="hljs-comment">// Sollte eigentlich nicht passieren!</span>
+}
+</code></pre>
+<hr>
+<h2 id="3-übungen-zum-selbststudium">3. Übungen zum Selbststudium</h2>
+<ol>
+<li>Definiere ein Enum <code>AmpelPhase</code> mit den Werten <code>ROT</code>, <code>GELB</code>, <code>GRUEN</code>.
+Lege eine Variable an und weise ihr einen Wert zu.</li>
+<li>Schreibe eine Methode, die einen Gruß passend zur aktuellen <code>AmpelPhase</code> ausgibt.</li>
+<li>Probiere aus, wie der Compiler reagiert, wenn du einen Wert verwendest, der im Enum nicht existiert.</li>
+</ol>
+<hr>
+<h2 id="4-merksätze">4. Merksätze</h2>
+<ul>
+<li><strong>Enums werden mit <code>enum</code> definiert und Werte stehen in Großbuchstaben.</strong></li>
+<li><strong>Zuweisung, Vergleich und Ausgabe sind einfach und sicher.</strong></li>
+<li><strong>Enums machen Code klarer, typischer und weniger fehleranfällig als Zahlen oder Strings.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

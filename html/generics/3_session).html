@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>3&period; Generics in der Java-Standardbibliothek</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="3-generics-in-der-java-standardbibliothek">3. Generics in der Java-Standardbibliothek</h3>
+<hr>
+<h1 id="handout-generics-in-der-java-standardbibliothek">Handout: Generics in der Java-Standardbibliothek</h1>
+<hr>
+<h2 id="1-verwendung-von-generics-in-collections">1. Verwendung von Generics in Collections</h2>
+<p>Mit der Einführung von Generics in Java 5 wurden die wichtigsten Datenstrukturen der Standardbibliothek – die sogenannten <strong>Collections</strong> – vollständig überarbeitet. Seitdem ist es möglich, Listen, Mengen und Maps typsicher zu verwenden. Das erhöht die Sicherheit, Lesbarkeit und Wartbarkeit deines Codes deutlich.</p>
+<hr>
+<h3 id="a-listen-listt">a) Listen (<code>List&lt;T&gt;</code>)</h3>
+<p>Listen sind geordnete Sammlungen von Elementen. Das bekannteste Beispiel ist <code>ArrayList</code>.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+namen.add(<span class="hljs-string">&quot;Anna&quot;</span>);
+namen.add(<span class="hljs-string">&quot;Bernd&quot;</span>);
+<span class="hljs-comment">// namen.add(42); // Compilerfehler: 42 ist kein String!</span>
+
+<span class="hljs-keyword">for</span> (String name : namen) {
+    System.out.println(name.toUpperCase());
+}
+</code></pre>
+<ul>
+<li><strong>Ohne Generics:</strong> Es wäre möglich, beliebige Typen einzufügen, und ein Fehler würde erst zur Laufzeit auffallen.</li>
+<li><strong>Mit Generics:</strong> Der Compiler verhindert, dass falsche Typen eingefügt werden.</li>
+</ul>
+<hr>
+<h3 id="b-sets-sett">b) Sets (<code>Set&lt;T&gt;</code>)</h3>
+<p>Sets sind ungeordnete Sammlungen von eindeutigen Elementen.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Set&lt;Integer&gt; zahlen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;&gt;();
+zahlen.add(<span class="hljs-number">1</span>);
+zahlen.add(<span class="hljs-number">2</span>);
+zahlen.add(<span class="hljs-number">2</span>); <span class="hljs-comment">// Wird ignoriert, weil schon vorhanden</span>
+<span class="hljs-comment">// zahlen.add(&quot;Text&quot;); // Compilerfehler!</span>
+
+<span class="hljs-keyword">for</span> (Integer zahl : zahlen) {
+    System.out.println(zahl * <span class="hljs-number">2</span>);
+}
+</code></pre>
+<ul>
+<li>Auch hier sorgt der Compiler dafür, dass nur <code>Integer</code>-Werte eingefügt werden.</li>
+</ul>
+<hr>
+<h3 id="c-maps-mapk-v">c) Maps (<code>Map&lt;K, V&gt;</code>)</h3>
+<p>Maps sind Sammlungen von Schlüssel-Wert-Paaren.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Map&lt;Integer, String&gt; idToName = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+idToName.put(<span class="hljs-number">1</span>, <span class="hljs-string">&quot;Tina&quot;</span>);
+idToName.put(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Markus&quot;</span>);
+<span class="hljs-comment">// idToName.put(&quot;Drei&quot;, &quot;Julia&quot;); // Compilerfehler: Schlüssel muss Integer sein!</span>
+
+<span class="hljs-keyword">for</span> (Map.Entry&lt;Integer, String&gt; entry : idToName.entrySet()) {
+    System.out.println(<span class="hljs-string">&quot;ID: &quot;</span> + entry.getKey() + <span class="hljs-string">&quot;, Name: &quot;</span> + entry.getValue());
+}
+</code></pre>
+<ul>
+<li>Die Typen für Schlüssel und Werte werden festgelegt und vom Compiler kontrolliert.</li>
+</ul>
+<hr>
+<h2 id="2-vorteile-der-typsicherheit-am-beispiel-von-collections">2. Vorteile der Typsicherheit am Beispiel von Collections</h2>
+<h3 id="a-früherkennung-von-fehlern">a) <strong>Früherkennung von Fehlern</strong></h3>
+<p>Mit Generics werden Fehler <strong>bereits beim Kompilieren erkannt</strong> – nicht erst zur Laufzeit.
+<strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;Integer&gt; zahlen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+zahlen.add(<span class="hljs-number">5</span>);
+zahlen.add(<span class="hljs-string">&quot;Text&quot;</span>); <span class="hljs-comment">// Compilerfehler: &quot;Text&quot; ist kein Integer!</span>
+</code></pre>
+<p>Ohne Generics würde der Fehler hier erst auftreten, wenn das Element später falsch verwendet wird.</p>
+<hr>
+<h3 id="b-keine-casts-notwendig">b) <strong>Keine Casts notwendig</strong></h3>
+<p>Mit Generics entfällt das explizite Casten beim Zugriff auf Elemente.</p>
+<p><strong>Vor Java 5:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">List</span> <span class="hljs-variable">namen</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>();
+namen.add(<span class="hljs-string">&quot;Lisa&quot;</span>);
+<span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> (String) namen.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// Cast notwendig!</span>
+</code></pre>
+<p><strong>Mit Generics:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+<span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> namen.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// Kein Cast notwendig!</span>
+</code></pre>
+<hr>
+<h3 id="c-verbesserte-lesbarkeit-und-wartbarkeit">c) <strong>Verbesserte Lesbarkeit und Wartbarkeit</strong></h3>
+<p>Wenn du deklarierst</p>
+<pre><code class="language-java">List&lt;Double&gt; preise = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+</code></pre>
+<p>kann jeder im Team sofort erkennen, welche Art von Daten in der Liste steckt.</p>
+<hr>
+<h3 id="d-kombination-verschiedener-collections-mit-typkontrolle">d) <strong>Kombination verschiedener Collections mit Typkontrolle</strong></h3>
+<p>Auch verschachtelte Collections sind möglich und sicher:</p>
+<pre><code class="language-java">List&lt;List&lt;String&gt;&gt; wortListen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+List&lt;String&gt; tiere = Arrays.asList(<span class="hljs-string">&quot;Hund&quot;</span>, <span class="hljs-string">&quot;Katze&quot;</span>);
+List&lt;String&gt; farben = Arrays.asList(<span class="hljs-string">&quot;Rot&quot;</span>, <span class="hljs-string">&quot;Blau&quot;</span>);
+wortListen.add(tiere);
+wortListen.add(farben);
+</code></pre>
+<ul>
+<li>Der Compiler prüft, dass in <code>wortListen</code> wirklich nur Listen von Strings gespeichert werden.</li>
+</ul>
+<hr>
+<h3 id="e-vermeidung-von-laufzeitfehlern">e) <strong>Vermeidung von Laufzeitfehlern</strong></h3>
+<p><strong>Beispiel – ohne Generics:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">List</span> <span class="hljs-variable">namen</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>();
+namen.add(<span class="hljs-string">&quot;Kai&quot;</span>);
+namen.add(<span class="hljs-number">123</span>); <span class="hljs-comment">// Wird akzeptiert</span>
+
+<span class="hljs-keyword">for</span> (Object obj : namen) {
+    <span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> (String) obj; <span class="hljs-comment">// Beim zweiten Element: ClassCastException!</span>
+}
+</code></pre>
+<p><strong>Mit Generics:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+namen.add(<span class="hljs-string">&quot;Kai&quot;</span>);
+<span class="hljs-comment">// namen.add(123); // Compilerfehler!</span>
+</code></pre>
+<p>Fehler werden <strong>frühzeitig entdeckt</strong>, und dein Programm ist robuster.</p>
+<hr>
+<h2 id="3-übungen-zum-selbststudium">3. Übungen zum Selbststudium</h2>
+<ol>
+<li>
+<p><strong>Aufgabe:</strong>
+Lege eine <code>List&lt;Double&gt;</code> an, füge ein paar Werte hinzu und berechne den Durchschnitt aller Werte.</p>
+</li>
+<li>
+<p><strong>Aufgabe:</strong>
+Erstelle eine <code>Map&lt;String, Integer&gt;</code>, in der als Schlüssel die Namen von Produkten und als Wert deren Lagerbestand gespeichert wird. Gib alle Produkte mit Bestand größer als 10 aus.</p>
+</li>
+<li>
+<p><strong>Aufgabe:</strong>
+Überlege: Was passiert, wenn du versuchst, einen <code>String</code> in eine <code>List&lt;Integer&gt;</code> einzufügen? Probiere es aus!</p>
+</li>
+</ol>
+<hr>
+<h2 id="4-merksätze">4. Merksätze</h2>
+<ul>
+<li>Mit Generics werden alle wichtigen Collections <strong>typsicher</strong>.</li>
+<li>Falsche Typen werden schon beim Kompilieren verhindert.</li>
+<li>Generics machen deinen Code <strong>klarer, sicherer und leichter zu warten</strong>.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

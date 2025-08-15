@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Variablen und Speicher inspizieren im IntelliJ Debugger</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-variablen-und-speicher-inspizieren-im-intellij-debugger">Handout: Variablen und Speicher inspizieren im IntelliJ Debugger</h1>
+<hr>
+<h2 id="1-ansehen-und-überwachen-von-variablenwerten">1. Ansehen und Überwachen von Variablenwerten</h2>
+<ul>
+<li>
+<p><strong>Während des Debuggens</strong> hält dein Programm an einem Breakpoint oder bei einem Schritt an.</p>
+</li>
+<li>
+<p>Im <strong>Debugger-Fenster</strong> (meist unten oder seitlich) siehst du sofort:</p>
+<ul>
+<li>Alle <strong>lokalen Variablen</strong> der aktuellen Methode</li>
+<li>Parameter und Rückgabewerte</li>
+</ul>
+</li>
+<li>
+<p><strong>Wie:</strong></p>
+<ul>
+<li>Werte werden in einer Baumstruktur dargestellt (Name, Typ, aktueller Wert).</li>
+<li>Klick auf das kleine Dreieck vor einer Variable zeigt bei Objekten deren Felder/Unterobjekte.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Praxisbeispiel:</strong>
+Nach <code>int result = add(x, y);</code>
+→ Im Debugger-Fenster stehen jetzt:
+<code>x = 10</code>, <code>y = 5</code>, <code>result = 15</code></p>
+<p><strong>Tipp:</strong>
+Hebe im Code eine Variable hervor – sie wird auch im Debugger sichtbar hervorgehoben.</p>
+<hr>
+<h2 id="2-werte-on-the-fly-verändern">2. Werte „on the fly“ verändern</h2>
+<ul>
+<li>
+<p><strong>Oft hilfreich</strong>, um gezielt zu testen, wie sich ein anderer Wert auf den weiteren Ablauf auswirkt – <strong>ohne</strong> den Code zu ändern.</p>
+</li>
+<li>
+<p><strong>So geht’s:</strong></p>
+<ol>
+<li>Im Debugger-Fenster auf die Variable rechtsklicken → „Set Value…“</li>
+<li>Neuen Wert eingeben (z. B. <code>result = 100</code>)</li>
+<li>Das Programm läuft ab jetzt mit dem neuen Wert weiter.</li>
+</ol>
+</li>
+</ul>
+<p><strong>Anwendungsfälle:</strong></p>
+<ul>
+<li>Fehler nachstellen, die im Normalfall schwer zu erreichen sind.</li>
+<li>Effekte von Variablenänderungen sofort beobachten.</li>
+</ul>
+<hr>
+<h2 id="3-watches-und-expressions-hinzufügen">3. Watches und Expressions hinzufügen</h2>
+<h3 id="a-watches-überwachte-ausdrücke">a) <strong>Watches (Überwachte Ausdrücke)</strong></h3>
+<ul>
+<li>
+<p>Mit <strong>Watches</strong> kannst du beliebige Variablen oder Ausdrücke dauerhaft im Blick behalten – selbst wenn sie nicht mehr im aktuellen Scope sind.</p>
+</li>
+<li>
+<p><strong>So geht’s:</strong></p>
+<ol>
+<li>Im Debugger-Fenster auf den Reiter „Watches“ klicken (oder Rechtsklick → „Add to Watches“).</li>
+<li>Ausdruck eintragen (z. B. <code>x + y</code>, <code>myObject.getStatus()</code>).</li>
+<li>Watch bleibt erhalten, bis du sie entfernst.</li>
+</ol>
+</li>
+<li>
+<p>Sehr nützlich bei komplexen Ausdrücken oder über mehrere Methodenaufrufe hinweg!</p>
+</li>
+</ul>
+<h3 id="b-evaluate-expression">b) <strong>Evaluate Expression</strong></h3>
+<ul>
+<li>Siehe voriges Handout: Drücke <code>Alt + F8</code> oder wähle im Debug-Fenster „Evaluate Expression“.</li>
+<li>Gibt dir das Ergebnis <strong>einmalig</strong> zurück, ohne Watch zu setzen.</li>
+</ul>
+<hr>
+<h2 id="4-anzeigen-von-call-stack-und-thread-übersicht">4. Anzeigen von Call Stack und Thread-Übersicht</h2>
+<h3 id="a-call-stack">a) <strong>Call Stack</strong></h3>
+<ul>
+<li>
+<p>Der <strong>Call Stack</strong> zeigt, wie das Programm zur aktuellen Stelle gelangt ist – also die „Kette“ aller Methodenaufrufe bis hierher.</p>
+</li>
+<li>
+<p>Im Debug-Fenster (Reiter „Frames“ oder „Call Stack“):</p>
+<ul>
+<li>Jede Zeile zeigt eine Methode und ihre Position im Code.</li>
+<li>Klick auf einen Eintrag bringt dich direkt an die jeweilige Stelle im Code.</li>
+</ul>
+</li>
+<li>
+<p><strong>Wofür?</strong></p>
+<ul>
+<li>Rückverfolgung, <em>wer</em> eine Methode aufgerufen hat.</li>
+<li>Ursachen für Fehler/Exceptions leichter finden.</li>
+</ul>
+</li>
+</ul>
+<h3 id="b-thread-übersicht">b) <strong>Thread-Übersicht</strong></h3>
+<ul>
+<li>Programme können mit mehreren <strong>Threads</strong> (Nebenläufigkeit) laufen.</li>
+<li>Im Debugger werden <strong>alle laufenden Threads</strong> angezeigt.</li>
+<li>Du kannst zwischen Threads wechseln, Breakpoints thread-spezifisch setzen oder analysieren, ob Threads „hängen“ (z. B. bei Deadlocks).</li>
+</ul>
+<hr>
+<h2 id="5-objekt-inspektion-struktur-felder-werte">5. Objekt-Inspektion (Struktur, Felder, Werte)</h2>
+<ul>
+<li>
+<p><strong>Bei komplexen Objekten</strong> kannst du die Struktur aufklappen und alle Felder, Unterobjekte und deren Werte sehen.</p>
+</li>
+<li>
+<p>Unterstützt auch verschachtelte Strukturen und Sammlungen (Listen, Maps, Sets).</p>
+</li>
+<li>
+<p>Klick auf das Dreieck vor dem Objektnamen → Unterelemente werden angezeigt.</p>
+</li>
+<li>
+<p>Mit Rechtsklick auf ein Objekt:</p>
+<ul>
+<li>„View as…“ (z. B. Hexadezimal, Dezimal, String etc.)</li>
+<li>„Copy Value“ oder „Set Value“</li>
+</ul>
+</li>
+</ul>
+<p><strong>Praxis:</strong>
+Beispiel:
+Ein Breakpoint in einer Methode, die ein <code>User</code>-Objekt verarbeitet
+→ Im Debugger kannst du <code>user.getName()</code>, <code>user.getId()</code>, und alle weiteren Felder einsehen.</p>
+<hr>
+<h2 id="6-praxis-tipps">6. Praxis-Tipps</h2>
+<ul>
+<li>Nutze Watches für wiederkehrende, komplexe Ausdrücke.</li>
+<li>Verändere Werte „on the fly“, um Bedingungen gezielt zu testen.</li>
+<li>Überwache Call Stack und Threads besonders bei komplexen Fehlern, Exceptions oder Multithreading.</li>
+<li>Verwende die Objekt-Inspektion, um Datenmodelle oder verdächtige Werte zu analysieren.</li>
+<li>Notiere dir während des Debuggens auffällige Werte und Abläufe, um den Fehler schneller einzugrenzen.</li>
+</ul>
+<hr>
+<h2 id="7-weiterführende-ressourcen">7. Weiterführende Ressourcen</h2>
+<ul>
+<li><a href="https://www.jetbrains.com/help/idea/debug-tool-window-variables.html">IntelliJ IDEA Doku: Variablen und Speicher im Debugger</a></li>
+<li><a href="https://www.youtube.com/watch?v=KIK5S_6kUA8">Video: Objekt- und Variableninspektion in IntelliJ (YouTube, englisch)</a></li>
+<li>IntelliJ Reference Card: <a href="https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf">Keymap (PDF)</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

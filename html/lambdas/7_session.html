@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices und Fallstricke bei Lambda-Ausdr&uuml;cken</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-und-fallstricke-bei-lambda-ausdrücken">Handout: Best Practices und Fallstricke bei Lambda-Ausdrücken</h1>
+<hr>
+<h2 id="1-lesbarkeit-und-verständlichkeit-von-lambdas">1. Lesbarkeit und Verständlichkeit von Lambdas</h2>
+<h3 id="a-klarheit-geht-vor-kürze">a) <strong>Klarheit geht vor Kürze</strong></h3>
+<ul>
+<li>Schreibe Lambda-Ausdrücke <strong>so einfach und lesbar wie möglich</strong>.</li>
+<li>Nutze <strong>aussagekräftige Parameternamen</strong>, besonders bei komplexeren Ausdrücken.</li>
+<li>Halte Lambdas <strong>kurz</strong>: Ideal sind <strong>einzeilige</strong> Ausdrücke. Bei mehr Logik lieber einen Block <code>{ ... }</code> verwenden – oder in eine Methode auslagern.</li>
+</ul>
+<p><strong>Schlecht:</strong></p>
+<pre><code class="language-java">list.forEach(x -&gt; { <span class="hljs-keyword">if</span> (x &gt; <span class="hljs-number">0</span>) System.out.println(x); <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (x == <span class="hljs-number">0</span>) System.out.println(<span class="hljs-string">&quot;Null&quot;</span>); <span class="hljs-keyword">else</span> ... });
+</code></pre>
+<p><strong>Besser:</strong></p>
+<pre><code class="language-java">list.forEach(x -&gt; System.out.println(x));
+</code></pre>
+<p>Oder für komplexere Fälle:</p>
+<pre><code class="language-java">list.forEach(MyClass::druckeMitInfo);
+</code></pre>
+<h3 id="b-verwende-methodenreferenzen-wo-sinnvoll">b) <strong>Verwende Methodenreferenzen, wo sinnvoll</strong></h3>
+<p>Wenn der Lambda-Ausdruck einfach nur eine vorhandene Methode aufruft, ist eine Methodenreferenz oft <strong>noch lesbarer</strong>:</p>
+<pre><code class="language-java">namen.forEach(System.out::println);
+</code></pre>
+<hr>
+<h2 id="2-typkompatibilität-und-fehlerquellen">2. Typkompatibilität und Fehlerquellen</h2>
+<h3 id="a-functional-interface-erforderlich">a) <strong>Functional Interface erforderlich</strong></h3>
+<ul>
+<li>Lambdas können <strong>nur</strong> verwendet werden, wo ein <strong>Functional Interface</strong> erwartet wird (also ein Interface mit <strong>genau einer abstrakten Methode</strong>).</li>
+<li>Sonst: Compilerfehler!</li>
+</ul>
+<p><strong>Fehlerbeispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">MehrereMethoden</span> { <span class="hljs-keyword">void</span> <span class="hljs-title function_">a</span><span class="hljs-params">()</span>; <span class="hljs-keyword">void</span> <span class="hljs-title function_">b</span><span class="hljs-params">()</span>; }
+<span class="hljs-comment">// MehrereMethoden f = () -&gt; System.out.println(&quot;Test&quot;); // Compilerfehler!</span>
+</code></pre>
+<h3 id="b-typinferenz-und-explizite-typen">b) <strong>Typinferenz und explizite Typen</strong></h3>
+<ul>
+<li>Der Compiler erkennt den Typ der Lambda-Parameter meist automatisch (<strong>Typinferenz</strong>).</li>
+<li>Manchmal ist der Typ <strong>mehrdeutig</strong> – dann musst du ihn explizit angeben.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Comparator&lt;String&gt; cmp = (a, b) -&gt; a.length() - b.length();
+<span class="hljs-comment">// Wenn nicht klar: (String a, String b) -&gt; ...</span>
+</code></pre>
+<h3 id="c-zugriff-auf-variablen-effectively-final">c) <strong>Zugriff auf Variablen (effectively final)</strong></h3>
+<ul>
+<li>Lambdas dürfen <strong>nur auf lokale Variablen zugreifen</strong>, die „effectively final“ sind, also nach der Zuweisung nicht mehr geändert werden.</li>
+</ul>
+<p><strong>Fehlerbeispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">int</span> <span class="hljs-variable">faktor</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>;
+list.forEach(x -&gt; System.out.println(x * faktor));
+faktor = <span class="hljs-number">3</span>; <span class="hljs-comment">// Compilerfehler!</span>
+</code></pre>
+<p><strong>Lösung:</strong> Wert vor dem Lambda festlegen und nicht mehr ändern.</p>
+<h3 id="d-checked-exceptions">d) <strong>Checked Exceptions</strong></h3>
+<ul>
+<li>Lambda-Ausdrücke können <strong>nur solche Ausnahmen werfen</strong>, die das Functional Interface zulässt.</li>
+<li>Viele Standard-Functional-Interfaces deklarieren <strong>keine checked Exceptions</strong>.</li>
+</ul>
+<p><strong>Fehlerbeispiel:</strong></p>
+<pre><code class="language-java">Consumer&lt;String&gt; saver = s -&gt; {
+    <span class="hljs-keyword">try</span> { writeToFile(s); }
+    <span class="hljs-keyword">catch</span> (IOException e) { ... } <span class="hljs-comment">// Muss im Lambda gefangen werden</span>
+};
+</code></pre>
+<hr>
+<h2 id="3-wann-lambda-ausdrücke-und-wann-klassische-methoden-verwenden">3. Wann Lambda-Ausdrücke und wann klassische Methoden verwenden?</h2>
+<h3 id="a-lambdas-einsetzen-wenn-">a) <strong>Lambdas einsetzen, wenn ...</strong></h3>
+<ul>
+<li>Das Verhalten <strong>kurz und einfach</strong> beschreibbar ist.</li>
+<li>Die Funktion <strong>an eine andere Methode übergeben</strong> werden soll (z. B. <code>forEach</code>, <code>filter</code>, <code>sort</code>).</li>
+<li>Es um eine <strong>einzelne, überschaubare Aktion</strong> geht.</li>
+</ul>
+<h3 id="b-klassische-methoden-oder-methodenreferenzen-nutzen-wenn-">b) <strong>Klassische Methoden oder Methodenreferenzen nutzen, wenn ...</strong></h3>
+<ul>
+<li>Der Code <strong>länger oder kompliziert</strong> ist (mehr als 1–2 Zeilen Logik).</li>
+<li>Du den Code <strong>mehrmals</strong> oder an <strong>verschiedenen Stellen</strong> brauchst.</li>
+<li>Die Funktion <strong>benannt, dokumentiert oder getestet</strong> werden soll.</li>
+<li>Die Funktion <strong>Zustand oder mehrere Schritte</strong> enthält.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Für einfache Filter:</span>
+list.stream().filter(s -&gt; s.length() &gt; <span class="hljs-number">5</span>);
+
+<span class="hljs-comment">// Für komplexe Filter besser:</span>
+list.stream().filter(MyClass::aufwendigeFilterLogik);
+</code></pre>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>Schreibe einen Lambda-Ausdruck, der mehrere Bedingungen prüft. Lagere diese Bedingungen dann in eine separate Methode aus und vergleiche Lesbarkeit.</li>
+<li>Experimentiere mit einer lokalen Variable, die du im Lambda verwendest und dann ändern willst. Was passiert?</li>
+<li>Probiere einen Lambda-Ausdruck mit einem Interface, das mehr als eine abstrakte Methode hat – was sagt der Compiler?</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li><strong>Lesbarkeit geht vor Kürze:</strong> Nicht jeder Einzeiler ist besser als eine Methode!</li>
+<li><strong>Nur Functional Interfaces können mit Lambdas genutzt werden.</strong></li>
+<li><strong>Typinferenz ist praktisch, aber manchmal muss der Typ explizit genannt werden.</strong></li>
+<li><strong>Komplexere Logik lieber in Methoden auslagern und per Methodenreferenz nutzen.</strong></li>
+<li><strong>Sei vorsichtig beim Zugriff auf lokale Variablen und bei Checked Exceptions.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

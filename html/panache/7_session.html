@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices und Fallstricke bei Panache</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-und-fallstricke-bei-panache">Handout: Best Practices und Fallstricke bei Panache</h1>
+<hr>
+<h2 id="71-wann-lohnt-sich-panache--wann-ist-plain-jpa-besser">7.1 Wann lohnt sich Panache – wann ist „plain JPA“ besser?</h2>
+<h3 id="panache-eignet-sich-besonders-wenn"><strong>Panache eignet sich besonders, wenn…</strong></h3>
+<ul>
+<li>Du ein <strong>Microservice- oder CRUD-zentriertes Projekt</strong> mit Quarkus umsetzt.</li>
+<li><strong>Schnelle Entwicklung</strong> und <strong>Produktivität</strong> im Vordergrund stehen („Rapid Prototyping“).</li>
+<li>Du <strong>Standard-Operationen</strong> (Create, Read, Update, Delete) häufig brauchst.</li>
+<li>Du eine <strong>einfache Domänenlogik</strong> hast – also wenig komplexe Beziehungen, wenig Spezialfälle.</li>
+<li>Deine Anwendung <strong>Cloud-native</strong> sein und möglichst wenig Overhead im Code haben soll.</li>
+</ul>
+<h3 id="klassisches-jpa-ist-besser-geeignet-wenn"><strong>Klassisches JPA ist besser geeignet, wenn…</strong></h3>
+<ul>
+<li>Dein Projekt ein <strong>großes, komplexes Domänenmodell</strong> mit sehr speziellen Persistenzanforderungen besitzt.</li>
+<li>Du auf <strong>portablen Code</strong> angewiesen bist, der auch unabhängig von Quarkus funktionieren muss (z. B. bei Migrationen, verschiedenen Frameworks).</li>
+<li>Du <strong>vollständige Kontrolle</strong> über den EntityManager, die Lebenszyklen der Entities und deren Mappings benötigst.</li>
+<li>Du auf <strong>sehr spezielle JPA-Features</strong> angewiesen bist, die Panache abstrahiert oder einschränkt.</li>
+<li>Du bereits eine umfangreiche, stabile <strong>JPA-Codebasis</strong> hast, die nur schwer auf Panache umzustellen wäre.</li>
+</ul>
+<hr>
+<h2 id="72-lesbarkeit-vs-kontrolle-komplexe-queries-und-performance">7.2 Lesbarkeit vs. Kontrolle: Komplexe Queries und Performance</h2>
+<h3 id="lesbarkeit-und-produktivität-durch-panache"><strong>Lesbarkeit und Produktivität durch Panache</strong></h3>
+<ul>
+<li>Panache setzt auf „Konvention statt Konfiguration“: Vieles funktioniert sofort ohne großen Setup-Aufwand.</li>
+<li><strong>Standard-Queries</strong> sind lesbar und deklarativ (<code>User.find(&quot;name&quot;, &quot;Anna&quot;).list()</code>).</li>
+<li><strong>Paging und Sortierung</strong> sind eingebaut und gut lesbar.</li>
+</ul>
+<h3 id="aber-weniger-kontrolle-bei-sehr-komplexen-anforderungen"><strong>Aber: Weniger Kontrolle bei sehr komplexen Anforderungen</strong></h3>
+<ul>
+<li><strong>Komplexe Abfragen:</strong>
+Für anspruchsvolle, performante SQL-Queries mit mehreren Joins, Subselects oder aggregierten Auswertungen ist „plain JPA“ oft flexibler (Criteria API, Named Queries, nativer SQL-Zugriff).</li>
+<li><strong>Optimierungspotenzial:</strong>
+Panache abstrahiert viele Details, das ist meist gut – aber: Bei Performance-Problemen musst du wissen, was im Hintergrund passiert (Lazy Loading, FetchType, Transaktionsgrenzen).</li>
+<li><strong>Feinsteuerung:</strong>
+Für Feintuning (Cachen, explizite Locking-Strategien, spezielle Mapping-Eigenschaften) kann reines JPA mehr Freiheiten bieten.</li>
+</ul>
+<h4 id="empfehlung"><strong>Empfehlung:</strong></h4>
+<ul>
+<li>Nutze Panache dort, wo du einfache bis mittlere Anforderungen hast.</li>
+<li>Für sehr komplexe Queries kannst du Panache mit nativen SQL-Queries oder Named Queries ergänzen – oder gezielt auf JPA/EntityManager ausweichen.</li>
+</ul>
+<hr>
+<h2 id="73-migration-von-klassischen-jpa-entitäten-zu-panache">7.3 Migration von klassischen JPA-Entitäten zu Panache</h2>
+<h3 id="typisches-migrationsvorgehen"><strong>Typisches Migrationsvorgehen</strong></h3>
+<ol>
+<li>
+<p><strong>Analyse:</strong>
+Welche Entities, Repositories und Query-Methoden gibt es?</p>
+</li>
+<li>
+<p><strong>Anpassen der Entities:</strong></p>
+<ul>
+<li>Statt <code>@Entity public class User { ... }</code>
+jetzt <code>@Entity public class User extends PanacheEntity { ... }</code>
+oder <code>extends PanacheEntityBase</code>, falls du die ID explizit steuern willst.</li>
+<li>Getter/Setter können optional entfallen, Public Fields sind erlaubt (Panache-Stil).</li>
+</ul>
+</li>
+<li>
+<p><strong>Repository-Migration:</strong></p>
+<ul>
+<li>Methoden wie <code>save()</code>, <code>findAll()</code>, <code>delete()</code> entfallen – Panache stellt die wichtigsten Methoden bereit.</li>
+<li>Custom Queries kannst du meist direkt als <code>find(&quot;feld = ?1&quot;, wert)</code> übernehmen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Query-Anpassungen:</strong></p>
+<ul>
+<li>Prüfe, ob du spezielle JPQL oder Named Queries nutzt, und passe sie ggf. in Panache-Methoden um.</li>
+</ul>
+</li>
+<li>
+<p><strong>Testen:</strong></p>
+<ul>
+<li>Schreibe oder überarbeite Tests für die neuen Panache-Methoden.</li>
+<li>Integrationstests sicherstellen (z. B. mit Testcontainers).</li>
+</ul>
+</li>
+<li>
+<p><strong>Code-Cleanup:</strong></p>
+<ul>
+<li>Entferne alten Boilerplate-Code (EntityManager, Repository-Impls), der durch Panache-Standardmethoden ersetzt wird.</li>
+</ul>
+</li>
+</ol>
+<h3 id="mögliche-fallstricke-bei-der-migration"><strong>Mögliche Fallstricke bei der Migration</strong></h3>
+<ul>
+<li><strong>Custom Getter/Setter:</strong>
+Panache erlaubt Public Fields, JPA bevorzugt Getter/Setter – prüfe, ob das für dein Modell okay ist.</li>
+<li><strong>ID-Felder:</strong>
+Wenn du eigene IDs nutzt, nicht von <code>PanacheEntity</code>, sondern von <code>PanacheEntityBase</code> erben!</li>
+<li><strong>Komplexe Geschäftslogik:</strong>
+Bleibt besser in Service-Klassen und nicht in Entities – das Active Record Pattern eignet sich sonst nur für einfache Modelle.</li>
+<li><strong>Transaktionen:</strong>
+Stelle sicher, dass Methoden, die Daten ändern, im <code>@Transactional</code>-Kontext laufen.</li>
+<li><strong>Named Queries/Criteria API:</strong>
+Komplexe Query-Logik musst du ggf. anpassen oder teilweise im alten Stil lassen.</li>
+</ul>
+<h3 id="best-practice-schrittweise-migrieren"><strong>Best Practice: Schrittweise migrieren!</strong></h3>
+<ul>
+<li>Fange mit weniger kritischen Modellen/Modulen an.</li>
+<li>Nutze Parallelbetrieb von Panache und klassischem JPA, falls nötig.</li>
+<li>Behalte Tests für Regressionen bei!</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung--panache-best-practices"><strong>Zusammenfassung – Panache Best Practices</strong></h2>
+<ul>
+<li><strong>Nutze Panache</strong> für produktive, lesbare und schnelle Entwicklung in Quarkus, vor allem bei einfachen bis mittelkomplexen Anwendungen.</li>
+<li><strong>Behalte klassisches JPA</strong> für sehr komplexe Anforderungen oder wenn maximale Kontrolle nötig ist.</li>
+<li><strong>Beachte Migrationsdetails</strong> (Active Record vs. Repository, Getter/Setter, Query-Logik).</li>
+<li><strong>Teste Migrationen gründlich</strong> – und achte auf Lesbarkeit und Verständlichkeit des Codes für dein Team.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

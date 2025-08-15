@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Parallele Streams in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-parallele-streams-in-java">Handout: Parallele Streams in Java</h1>
+<hr>
+<h2 id="1-was-sind-parallele-streams">1. Was sind parallele Streams?</h2>
+<p>Ein <strong>paralleler Stream</strong> verarbeitet seine Elemente <strong>gleichzeitig auf mehreren CPU-Kernen</strong>.
+Java teilt die Stream-Operationen intern in „Aufgabenpakete“ auf, die von verschiedenen Threads parallel abgearbeitet werden.</p>
+<p><strong>Wie werden parallele Streams erzeugt?</strong></p>
+<ul>
+<li>
+<p>Aus Collections:</p>
+<pre><code class="language-java">List&lt;String&gt; daten = Arrays.asList(<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;C&quot;</span>);
+Stream&lt;String&gt; parallel = daten.parallelStream();
+</code></pre>
+</li>
+<li>
+<p>Aus jedem bestehenden Stream:</p>
+<pre><code class="language-java">Stream&lt;String&gt; stream = daten.stream();
+Stream&lt;String&gt; parallel = stream.parallel();
+</code></pre>
+</li>
+</ul>
+<p><strong>Erkennungsmerkmal:</strong></p>
+<ul>
+<li>Parallele Streams nutzen intern das „ForkJoinPool“-Framework.</li>
+</ul>
+<hr>
+<h2 id="2-vorteile-und-fallstricke-bei-der-parallelisierung">2. Vorteile und Fallstricke bei der Parallelisierung</h2>
+<h3 id="a-vorteile">a) Vorteile</h3>
+<ul>
+<li><strong>Geschwindigkeit:</strong> Kann auf <strong>mehreren Kernen</strong> viel schneller sein, besonders bei sehr großen Datenmengen oder aufwändigen Operationen.</li>
+<li><strong>Einfachheit:</strong> Nur ein Methodenaufruf (<code>parallelStream()</code> oder <code>parallel()</code>), kein eigenes Thread-Handling nötig.</li>
+</ul>
+<h3 id="b-fallstricke-und-risiken">b) Fallstricke und Risiken</h3>
+<ul>
+<li><strong>Nebenläufigkeit &amp; Seiteneffekte:</strong>
+Methoden mit Seiteneffekten (z. B. <code>forEach(x -&gt; liste.add(x))</code>) können zu <strong>falschen Ergebnissen</strong> oder Fehlern führen, da mehrere Threads gleichzeitig zugreifen.</li>
+<li><strong>Overhead:</strong>
+Bei kleinen Datenmengen ist der Verwaltungsaufwand der Parallelisierung oft <strong>größer als der Nutzen</strong> – die Ausführung kann sogar langsamer sein als sequentiell.</li>
+<li><strong>Reihenfolge:</strong>
+Parallele Streams garantieren <strong>nicht immer die Reihenfolge</strong> der Verarbeitung.</li>
+<li><strong>Nicht alle Operationen skalieren gut:</strong>
+Manche Operationen (z. B. <code>collect()</code> mit nicht-thread-sicheren Collections) sind nicht automatisch sicher.</li>
+</ul>
+<h3 id="best-practice"><strong>Best Practice:</strong></h3>
+<ul>
+<li>Nutze parallele Streams <strong>nur</strong>, wenn die Aufgaben groß und unabhängig voneinander sind <strong>und</strong> die Operationen keine geteilten Zustände/Seiteneffekte haben.</li>
+</ul>
+<hr>
+<h2 id="3-anwendungsbeispiele-und-performance-überlegungen">3. Anwendungsbeispiele und Performance-Überlegungen</h2>
+<h3 id="a-anwendung">a) Anwendung</h3>
+<p><strong>Beispiel: Verarbeitung einer großen Liste</strong></p>
+<pre><code class="language-java">List&lt;Integer&gt; zahlen = IntStream.range(<span class="hljs-number">1</span>, <span class="hljs-number">1_000_000</span>).boxed().collect(Collectors.toList());
+
+<span class="hljs-type">long</span> <span class="hljs-variable">start</span> <span class="hljs-operator">=</span> System.currentTimeMillis();
+<span class="hljs-type">long</span> <span class="hljs-variable">summe</span> <span class="hljs-operator">=</span> zahlen.parallelStream()
+    .mapToLong(x -&gt; x * <span class="hljs-number">2</span>)
+    .sum();
+<span class="hljs-type">long</span> <span class="hljs-variable">dauer</span> <span class="hljs-operator">=</span> System.currentTimeMillis() - start;
+System.out.println(<span class="hljs-string">&quot;Summe: &quot;</span> + summe + <span class="hljs-string">&quot; in &quot;</span> + dauer + <span class="hljs-string">&quot;ms&quot;</span>);
+</code></pre>
+<ul>
+<li>Probiere den Vergleich mit <code>.stream()</code> und <code>.parallelStream()</code> – bei großen Listen ist oft der parallele Stream schneller.</li>
+</ul>
+<h3 id="b-seiteneffekt-falle">b) Seiteneffekt-Falle</h3>
+<p><strong>Schlecht (NICHT machen!):</strong></p>
+<pre><code class="language-java">List&lt;Integer&gt; ergebnisse = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+zahlen.parallelStream().forEach(x -&gt; ergebnisse.add(x * <span class="hljs-number">2</span>)); <span class="hljs-comment">// Fehleranfällig!</span>
+</code></pre>
+<p><strong>Besser:</strong></p>
+<pre><code class="language-java">List&lt;Integer&gt; ergebnisse = zahlen.parallelStream()
+    .map(x -&gt; x * <span class="hljs-number">2</span>)
+    .collect(Collectors.toList());
+</code></pre>
+<ul>
+<li><strong>Sammler wie <code>Collectors.toList()</code> sind thread-sicher konzipiert.</strong></li>
+</ul>
+<h3 id="c-reihenfolge-beachten">c) Reihenfolge beachten</h3>
+<ul>
+<li>
+<p>Bei parallelen Streams ist die <strong>Reihenfolge der Ergebnisse oft beliebig</strong>. Wenn Reihenfolge wichtig ist, lieber <code>.forEachOrdered()</code> verwenden:</p>
+<pre><code class="language-java">zahlen.parallelStream().forEachOrdered(System.out::println);
+</code></pre>
+</li>
+</ul>
+<h3 id="d-performance-tipp">d) Performance-Tipp</h3>
+<ul>
+<li>
+<p>Parallele Streams lohnen sich <strong>vor allem</strong> bei:</p>
+<ul>
+<li><strong>großen Datenmengen</strong></li>
+<li><strong>CPU-lastigen</strong> Berechnungen (nicht bei IO/Netzwerk)</li>
+<li><strong>keinen oder wenig geteilten Ressourcen</strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>Miss die Ausführungszeit für eine aufwändige Berechnung einmal mit <code>.stream()</code> und einmal mit <code>.parallelStream()</code>. Was fällt auf?</li>
+<li>Erzeuge absichtlich einen Seiteneffekt in einer parallelen Stream-Pipeline und beobachte das Ergebnis.</li>
+<li>Welche Stream-Operationen sind für Parallelisierung besonders geeignet? Wann lieber nicht?</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li><strong>Parallele Streams beschleunigen große, unabhängige Aufgaben, können bei kleinen Datenmengen aber sogar langsamer sein.</strong></li>
+<li><strong>Seiteneffekte und gemeinsame Datenstrukturen vermeiden – sonst drohen Fehler!</strong></li>
+<li><strong>Nicht alle Aufgaben profitieren von Parallelisierung – immer testen und messen!</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

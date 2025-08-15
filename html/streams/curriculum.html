@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Curriculum&colon; Datenverarbeitung mit der Streams API</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h2 id="curriculum-datenverarbeitung-mit-der-streams-api">Curriculum: Datenverarbeitung mit der Streams API</h2>
+<h3 id="1-einführung-in-streams">1. Einführung in Streams</h3>
+<ul>
+<li>Was sind Streams?</li>
+<li>Unterschiede zwischen Collections und Streams</li>
+<li>Motivation: Warum Streams nutzen?</li>
+</ul>
+<h3 id="2-erzeugung-von-streams">2. Erzeugung von Streams</h3>
+<ul>
+<li>Streams aus Collections erzeugen (<code>.stream()</code>, <code>.parallelStream()</code>)</li>
+<li>Streams aus Arrays (<code>Arrays.stream()</code>)</li>
+<li>Streams mit Fabrikmethoden (<code>Stream.of()</code>, <code>Stream.generate()</code>, <code>Stream.iterate()</code>)</li>
+</ul>
+<h3 id="3-grundlegende-stream-operationen">3. Grundlegende Stream-Operationen</h3>
+<ul>
+<li>
+<p><strong>Intermediäre (zwischenliegende) Operationen:</strong></p>
+<ul>
+<li><code>filter()</code></li>
+<li><code>map()</code></li>
+<li><code>flatMap()</code></li>
+<li><code>distinct()</code></li>
+<li><code>sorted()</code></li>
+<li><code>limit()</code>, <code>skip()</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Terminal-Operationen:</strong></p>
+<ul>
+<li><code>forEach()</code></li>
+<li><code>collect()</code></li>
+<li><code>reduce()</code></li>
+<li><code>count()</code></li>
+<li><code>anyMatch()</code>, <code>allMatch()</code>, <code>noneMatch()</code></li>
+<li><code>findFirst()</code>, <code>findAny()</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="4-funktionsweise-von-streams">4. Funktionsweise von Streams</h3>
+<ul>
+<li>Lazy Evaluation und Pipeline-Prinzip</li>
+<li>Reihenfolge und Kurzschluss-Operationen</li>
+<li>Unterschied zwischen intermediären und terminalen Operationen</li>
+</ul>
+<h3 id="5-arbeiten-mit-komplexen-datenstrukturen">5. Arbeiten mit komplexen Datenstrukturen</h3>
+<ul>
+<li>Streams von Objekten (z. B. Listen von Klassen)</li>
+<li>Gruppieren und Partitionieren (<code>Collectors.groupingBy()</code>, <code>Collectors.partitioningBy()</code>)</li>
+<li>Mapping und Reduktion auf komplexe Typen</li>
+</ul>
+<h3 id="6-parallele-streams">6. Parallele Streams</h3>
+<ul>
+<li>Was sind parallele Streams?</li>
+<li>Vorteile und Fallstricke bei der Parallelisierung</li>
+<li>Anwendungsbeispiele und Performance-Überlegungen</li>
+</ul>
+<h3 id="7-best-practices-und-fallstricke">7. Best Practices und Fallstricke</h3>
+<ul>
+<li>Lesbarkeit und Nachvollziehbarkeit von Stream-Pipelines</li>
+<li>Nebenläufigkeit und Seiteneffekte vermeiden</li>
+<li>Ressourcenverbrauch und Performance</li>
+<li>Wann Streams – wann herkömmliche Schleifen?</li>
+</ul>
+<h3 id="8-praktische-übungen-und-beispiele">8. Praktische Übungen und Beispiele</h3>
+<ul>
+<li>Filter-, Map- und Reduce-Operationen auf Listen von Zahlen und Strings</li>
+<li>Komplexe Datentransformationen mit Streams</li>
+<li>Vergleich: Lösung mit Schleife vs. Lösung mit Streams</li>
+<li>Anwendung von Gruppierung und Partitionierung</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

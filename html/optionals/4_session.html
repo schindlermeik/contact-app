@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Wert aus Optional auslesen</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-wert-aus-optional-auslesen">Handout: Wert aus Optional auslesen</h1>
+<hr>
+<h2 id="1-get-ispresent-isempty">1. <code>get()</code>, <code>isPresent()</code>, <code>isEmpty()</code></h2>
+<h3 id="a-get">a) <code>.get()</code></h3>
+<ul>
+<li>Gibt den Wert im Optional zurück – <strong>wenn</strong> einer vorhanden ist.</li>
+<li><strong>Achtung:</strong> Wenn kein Wert enthalten ist (leeres Optional), wird eine <strong>NoSuchElementException</strong> geworfen!</li>
+<li><strong>Empfehlung:</strong> Immer nur zusammen mit <code>.isPresent()</code> verwenden oder besser die sichereren Alternativen (<code>orElse</code>, <code>orElseGet</code>, etc.).</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Optional&lt;String&gt; opt = Optional.of(<span class="hljs-string">&quot;Anna&quot;</span>);
+System.out.println(opt.get()); <span class="hljs-comment">// Anna</span>
+
+Optional&lt;String&gt; leer = Optional.empty();
+<span class="hljs-comment">// leer.get(); // → NoSuchElementException!</span>
+</code></pre>
+<h3 id="b-ispresent-und-isempty">b) <code>.isPresent()</code> und <code>.isEmpty()</code></h3>
+<ul>
+<li><code>.isPresent()</code> gibt <strong>true</strong> zurück, wenn ein Wert vorhanden ist, sonst <strong>false</strong>.</li>
+<li><code>.isEmpty()</code> gibt <strong>true</strong> zurück, wenn <strong>kein</strong> Wert vorhanden ist (ab Java 11).</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">if</span> (opt.isPresent()) {
+    System.out.println(opt.get());
+}
+<span class="hljs-keyword">if</span> (opt.isEmpty()) {
+    System.out.println(<span class="hljs-string">&quot;Kein Wert enthalten!&quot;</span>);
+}
+</code></pre>
+<hr>
+<h2 id="2-wert-mit-default-orelse-orelseget">2. Wert mit Default: <code>orElse()</code>, <code>orElseGet()</code></h2>
+<h3 id="a-orelset-other">a) <code>.orElse(T other)</code></h3>
+<ul>
+<li>Gibt den Wert im Optional zurück – oder den angegebenen Standardwert, <strong>falls das Optional leer ist</strong>.</li>
+</ul>
+<pre><code class="language-java">Optional&lt;String&gt; opt = Optional.empty();
+<span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> opt.orElse(<span class="hljs-string">&quot;Standardwert&quot;</span>);
+System.out.println(name); <span class="hljs-comment">// Standardwert</span>
+</code></pre>
+<h3 id="b-orelsegetsupplier-extends-t">b) <code>.orElseGet(Supplier&lt;? extends T&gt;)</code></h3>
+<ul>
+<li>Wie <code>.orElse()</code>, aber der Standardwert wird <strong>erst berechnet, wenn nötig</strong> (also nur, wenn das Optional leer ist). Praktisch für rechenintensive oder komplexe Standardwerte.</li>
+</ul>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> opt.orElseGet(() -&gt; <span class="hljs-string">&quot;Wert per Supplier&quot;</span>);
+System.out.println(name); <span class="hljs-comment">// Wert per Supplier</span>
+</code></pre>
+<p><strong>Unterschied:</strong></p>
+<ul>
+<li><code>.orElse()</code> berechnet immer seinen Wert – auch wenn er nicht gebraucht wird.</li>
+<li><code>.orElseGet()</code> ruft den Supplier <strong>nur auf, wenn das Optional leer ist</strong>.</li>
+</ul>
+<hr>
+<h2 id="3-wert-bei-fehlen-orelsethrow">3. Wert bei Fehlen: <code>orElseThrow()</code></h2>
+<ul>
+<li>Löst eine Exception aus, <strong>wenn kein Wert im Optional enthalten ist</strong>.</li>
+<li>Seit Java 10 ohne Argument möglich (wirft dann <code>NoSuchElementException</code>), aber auch mit Supplier für eigene Exceptiontypen nutzbar.</li>
+</ul>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">wert</span> <span class="hljs-operator">=</span> opt.orElseThrow(); <span class="hljs-comment">// NoSuchElementException, wenn leer</span>
+
+<span class="hljs-type">String</span> <span class="hljs-variable">wert2</span> <span class="hljs-operator">=</span> opt.orElseThrow(() -&gt; <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<span class="hljs-string">&quot;Kein Wert da!&quot;</span>));
+</code></pre>
+<p><strong>Nützlich</strong>, um Fehler gezielt zu behandeln oder bei Pflichtwerten.</p>
+<hr>
+<h2 id="4-beispielhafte-fehlerquellen-bei-der-verwendung">4. Beispielhafte Fehlerquellen bei der Verwendung</h2>
+<ul>
+<li><strong><code>get()</code> ohne vorherigen Check:</strong>
+Wer unbedacht <code>optional.get()</code> nutzt, riskiert wieder Laufzeitfehler – besser Alternativen verwenden!</li>
+<li><strong>Zu häufiger Einsatz von <code>.isPresent()</code>/<code>.isEmpty()</code>:</strong>
+Verleitet dazu, Optional wie einen Nullwert zu behandeln – nutze besser die funktionalen Methoden von Optional (<code>ifPresent</code>, <code>map</code>, <code>flatMap</code>, …).</li>
+<li><strong>Vergessen, mit leerem Optional zu rechnen:</strong>
+Immer davon ausgehen, dass ein Optional auch <strong>leer sein kann</strong>!</li>
+<li><strong>Mit <code>null</code> als Default-Wert arbeiten:</strong>
+<code>orElse(null)</code> widerspricht dem Sinn von Optional – besser sinnvolle Werte oder gezielte Fehlerbehandlung nutzen.</li>
+</ul>
+<hr>
+<h2 id="5-praxis-tipp">5. Praxis-Tipp</h2>
+<ul>
+<li>Für ein Optional <strong>niemals</strong> <code>null</code> als Standardwert verwenden.</li>
+<li>Nutze möglichst die Methoden <code>orElse</code>, <code>orElseGet</code>, <code>orElseThrow</code> für sauberen Code.</li>
+<li>Moderne Streams und Optional-Methoden erlauben es, fast ganz ohne Null- oder Vorhandenheitsprüfungen auszukommen.</li>
+</ul>
+<hr>
+<h2 id="6-übungen-zum-selbststudium">6. Übungen zum Selbststudium</h2>
+<ol>
+<li>Erzeuge ein leeres Optional und rufe darauf <code>get()</code> auf. Was passiert?</li>
+<li>Schreibe eine Methode, die ein Optional zurückgibt und bei Fehlen des Werts eine eigene Exception wirft.</li>
+<li>Ersetze im eigenen Code alle <code>if (obj != null)</code>-Prüfungen durch <code>Optional</code> und nutze <code>orElse</code>/<code>orElseGet</code>.</li>
+</ol>
+<hr>
+<h2 id="7-merksätze">7. Merksätze</h2>
+<ul>
+<li><strong><code>get()</code> nur verwenden, wenn sicher ein Wert vorhanden ist – ansonsten Alternativen nutzen!</strong></li>
+<li><strong>Mit <code>orElse</code>, <code>orElseGet</code> und <code>orElseThrow</code> werden Standardwerte und Fehlerbehandlung elegant geregelt.</strong></li>
+<li><strong>Nie mit <code>null</code> als Default arbeiten – das ist gerade das Problem, das Optional löst!</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

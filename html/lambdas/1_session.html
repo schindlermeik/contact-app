@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in funktionale Programmierung in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-funktionale-programmierung-in-java">Handout: Einführung in funktionale Programmierung in Java</h1>
+<hr>
+<h2 id="1-was-ist-funktionale-programmierung">1. Was ist funktionale Programmierung?</h2>
+<p><strong>Funktionale Programmierung</strong> ist ein Programmierparadigma, bei dem das Arbeiten mit <strong>Funktionen</strong> im Mittelpunkt steht – Funktionen gelten hier als „erste Bürger“ („First-Class Citizens“), das heißt, sie können wie Werte behandelt, übergeben, zurückgegeben und in Variablen gespeichert werden.</p>
+<p><strong>Merkmale funktionaler Programmierung:</strong></p>
+<ul>
+<li><strong>Funktionen als Werte:</strong> Funktionen können an Methoden übergeben und von Methoden zurückgegeben werden.</li>
+<li><strong>Immutabilität:</strong> Daten werden möglichst nicht verändert, sondern neue erzeugt.</li>
+<li><strong>Keine Seiteneffekte:</strong> Funktionen sollen (nach Möglichkeit) nur Eingaben in Ausgaben verwandeln, ohne den Zustand außerhalb zu beeinflussen.</li>
+<li><strong>Höhere Ordnung:</strong> Es gibt sogenannte „Higher-Order Functions“, also Funktionen, die andere Funktionen als Argumente oder Rückgabewert nutzen.</li>
+</ul>
+<p><strong>Beispiel (pseudocode):</strong></p>
+<pre><code class="language-text">Ergebnis = berechne(x -&gt; x * 2)
+</code></pre>
+<p>Hier wird eine Funktion als Argument übergeben.</p>
+<hr>
+<h2 id="2-unterschiede-zur-objektorientierten-programmierung">2. Unterschiede zur objektorientierten Programmierung</h2>
+<p>Java ist traditionell <strong>objektorientiert</strong> – dort stehen <strong>Objekte</strong> im Mittelpunkt, also Daten + Verhalten in einer Einheit.</p>
+<h3 id="vergleich">Vergleich:</h3>
+<table>
+<thead>
+<tr>
+<th>Aspekt</th>
+<th>Objektorientiert (OOP)</th>
+<th>Funktional</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zentrale Bausteine</td>
+<td>Objekte (Klassen, Instanzen)</td>
+<td>Funktionen</td>
+</tr>
+<tr>
+<td>Fokus</td>
+<td>Zustände, Methoden, Attribute</td>
+<td>Datenfluss, Funktionskomposition</td>
+</tr>
+<tr>
+<td>Typische Aktion</td>
+<td>Methode auf Objekt ausführen: <code>obj.methode()</code></td>
+<td>Funktion auf Wert anwenden: <code>funktion(wert)</code></td>
+</tr>
+<tr>
+<td>Datenänderung</td>
+<td>Oft: Objektzustand ändern (mutabel)</td>
+<td>Möglichst keine Zustandsänderung (immutable)</td>
+</tr>
+<tr>
+<td>Vererbung/Polymorphie</td>
+<td>Häufig</td>
+<td>Seltener, Funktionen im Vordergrund</td>
+</tr>
+</tbody>
+</table>
+<p><strong>OOP Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">Auto</span> <span class="hljs-variable">auto</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Auto</span>();
+auto.fahren(<span class="hljs-number">100</span>);
+</code></pre>
+<p><strong>Funktional Beispiel (mit Lambda):</strong></p>
+<pre><code class="language-java">List&lt;Integer&gt; zahlen = Arrays.asList(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>);
+zahlen.forEach(x -&gt; System.out.println(x * <span class="hljs-number">2</span>));
+</code></pre>
+<p>Hier wird eine Funktion als Argument übergeben.</p>
+<hr>
+<h2 id="3-motivation-warum-funktionale-konzepte-in-java">3. Motivation: Warum funktionale Konzepte in Java?</h2>
+<ul>
+<li><strong>Moderne Anwendungen:</strong> Immer mehr Aufgaben verlangen nach kompaktem, flexiblem, nebenläufigem und leicht testbarem Code.</li>
+<li><strong>Lesbarkeit &amp; Wartbarkeit:</strong> Viele Aufgaben lassen sich als Funktionsfolgen (Transformationen) viel kürzer und verständlicher ausdrücken.</li>
+<li><strong>Parallelisierung:</strong> Funktionaler Stil (ohne Seiteneffekte) lässt sich leichter parallelisieren – z. B. mit der Streams-API.</li>
+<li><strong>Java 8 und neuer:</strong> Seit Java 8 sind Lambda-Ausdrücke und funktionale Interfaces Teil der Sprache. Damit können Entwickler viele Vorteile funktionaler Programmierung nutzen, ohne Java zu verlassen.</li>
+<li><strong>Trends aus anderen Sprachen:</strong> Viele populäre Sprachen (JavaScript, Scala, Python, Haskell) haben funktionale Konzepte – Entwickler sind diese Arbeitsweise gewohnt.</li>
+</ul>
+<p><strong>Praxisbeispiel:</strong></p>
+<ul>
+<li>
+<p>Eine Liste filtern und verarbeiten – klassisch (OOP):</p>
+<pre><code class="language-java">List&lt;String&gt; ergebnis = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+<span class="hljs-keyword">for</span> (String s : namen) {
+    <span class="hljs-keyword">if</span> (s.length() &gt; <span class="hljs-number">4</span>) {
+        ergebnis.add(s.toUpperCase());
+    }
+}
+</code></pre>
+</li>
+<li>
+<p>Funktional (ab Java 8):</p>
+<pre><code class="language-java">List&lt;String&gt; ergebnis = namen.stream()
+    .filter(s -&gt; s.length() &gt; <span class="hljs-number">4</span>)
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+</code></pre>
+</li>
+</ul>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Kürzerer, prägnanterer Code</li>
+<li>Besser testbar</li>
+<li>Weniger Fehler durch „nebenläufigen“ Zustand</li>
+</ul>
+<hr>
+<h2 id="4-reflexionsfragen-selbststudium">4. Reflexionsfragen (Selbststudium)</h2>
+<ol>
+<li>Was fällt dir beim Vergleich von OOP- und funktionalem Code auf?</li>
+<li>Wo könntest du in deinem bisherigen Java-Code von funktionalen Konzepten profitieren?</li>
+<li>Welche Vor- und Nachteile siehst du bei der Arbeit mit Funktionen als Werte?</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li>Funktionale Programmierung setzt auf <strong>Funktionen als Werte</strong>, Immutabilität und Datenfluss.</li>
+<li>In Java ergänzt sie die Objektorientierung und ist seit Java 8 fest integriert.</li>
+<li>Sie ermöglicht prägnanten, modularen und oft weniger fehleranfälligen Code.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

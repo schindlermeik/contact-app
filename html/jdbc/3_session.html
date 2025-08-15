@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Arbeiten mit SQL-Befehlen &uuml;ber JDBC</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-arbeiten-mit-sql-befehlen-über-jdbc">Handout: Arbeiten mit SQL-Befehlen über JDBC</h1>
+<p>Um aus einer Java-Anwendung heraus mit einer Datenbank zu interagieren, nutzen wir <strong>JDBC (Java Database Connectivity)</strong>. JDBC ist eine API, die eine einheitliche Schnittstelle zu verschiedenen Datenbanksystemen bietet. Im Kern geht es darum, eine Verbindung zur Datenbank herzustellen und dann über spezielle Objekte SQL-Befehle auszuführen.</p>
+<h2 id="31-verwenden-von-statement-und-preparedstatement">3.1 Verwenden von <code>Statement</code> und <code>PreparedStatement</code></h2>
+<p>In JDBC gibt es mehrere Möglichkeiten, SQL-Befehle an die Datenbank zu senden. Die gängigsten sind <code>Statement</code> und <code>PreparedStatement</code>.</p>
+<h3 id="das-statement-objekt">Das <code>Statement</code>-Objekt</h3>
+<p>Das <code>Statement</code>-Objekt ist die einfachste Form, einen SQL-Befehl auszuführen. Du erstellst es direkt aus dem <code>Connection</code>-Objekt.</p>
+<pre><code class="language-java"><span class="hljs-comment">// Annahme: &#x27;connection&#x27; ist ein aktives Connection-Objekt</span>
+<span class="hljs-type">Statement</span> <span class="hljs-variable">statement</span> <span class="hljs-operator">=</span> connection.createStatement();
+</code></pre>
+<p>Mit einem <code>Statement</code> sendest du den kompletten SQL-Befehl als einen einzigen String an die Datenbank. Das bedeutet, wenn du dynamische Werte (z.B. aus Benutzereingaben) in den Befehl einfügen möchtest, musst du diese direkt in den String einbetten.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Max Mustermann&quot;</span>;
+<span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;INSERT INTO user (name) VALUES (&#x27;&quot;</span> + name + <span class="hljs-string">&quot;&#x27;)&quot;</span>;
+statement.executeUpdate(sql);
+</code></pre>
+<p><strong>Nachteile von <code>Statement</code>:</strong></p>
+<ul>
+<li><strong>Sicherheitsrisiko (SQL-Injection):</strong> Dies ist der größte Nachteil. Wenn der Wert <code>name</code> von einem Benutzer kommt, könnte dieser bösartigen Code wie <code>''); DROP TABLE user;--</code> eingeben. Die Datenbank würde versuchen, diesen Code auszuführen, was zu ernsthaften Sicherheitsproblemen führen kann.</li>
+<li><strong>Performance:</strong> Bei wiederholter Ausführung desselben Befehls mit nur unterschiedlichen Werten muss die Datenbank den Befehl jedes Mal neu parsen und kompilieren. Dies ist ineffizient.</li>
+</ul>
+<h3 id="das-preparedstatement-objekt">Das <code>PreparedStatement</code>-Objekt</h3>
+<p><code>PreparedStatement</code> ist die bevorzugte Methode, um SQL-Befehle auszuführen. Auch dieses Objekt erstellst du aus dem <code>Connection</code>-Objekt, allerdings über einen anderen Mechanismus.</p>
+<pre><code class="language-java"><span class="hljs-comment">// Der SQL-Befehl enthält Platzhalter (?)</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;INSERT INTO user (name) VALUES (?)&quot;</span>;
+<span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">preparedStatement</span> <span class="hljs-operator">=</span> connection.prepareStatement(sql);
+</code></pre>
+<p>Der entscheidende Unterschied ist, dass der SQL-Befehl <strong>Platzhalter</strong> (<code>?</code>) für die dynamischen Werte enthält. Die Werte werden erst <strong>nach</strong> der Erstellung des <code>PreparedStatement</code>-Objekts über sogenannte <strong>Setter-Methoden</strong> (<code>setString</code>, <code>setInt</code>, etc.) eingefügt.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Max Mustermann&quot;</span>;
+<span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;INSERT INTO user (name) VALUES (?)&quot;</span>;
+<span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">preparedStatement</span> <span class="hljs-operator">=</span> connection.prepareStatement(sql);
+
+<span class="hljs-comment">// Setze den Wert für den ersten Platzhalter</span>
+preparedStatement.setString(<span class="hljs-number">1</span>, name); 
+preparedStatement.executeUpdate();
+</code></pre>
+<p><strong>Vorteile von <code>PreparedStatement</code>:</strong></p>
+<ul>
+<li><strong>Sicherheit:</strong> Die Werte werden erst zur Laufzeit an den Befehl gebunden. Die Datenbank behandelt die Werte als reine Daten und nicht als ausführbaren Code, wodurch das Risiko von SQL-Injections eliminiert wird.</li>
+<li><strong>Performance:</strong> Die Datenbank parst und kompiliert den SQL-Befehl nur einmal. Bei wiederholter Ausführung mit neuen Werten muss nur der Datenaustausch erfolgen, was die Performance deutlich verbessert.</li>
+<li><strong>Lesbarkeit:</strong> Der Code ist klarer, da SQL-Befehl und Daten getrennt voneinander behandelt werden.</li>
+</ul>
+<hr>
+<h2 id="32-unterschied-zwischen-statement-preparedstatement-und-callablestatement">3.2 Unterschied zwischen <code>Statement</code>, <code>PreparedStatement</code> und <code>CallableStatement</code></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Feature</th>
+<th style="text-align:left"><code>Statement</code></th>
+<th style="text-align:left"><code>PreparedStatement</code></th>
+<th style="text-align:left"><code>CallableStatement</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Zweck</strong></td>
+<td style="text-align:left">Einfachste Ausführung statischer SQL-Befehle.</td>
+<td style="text-align:left">Ausführung von SQL-Befehlen mit dynamischen Werten (Platzhalter).</td>
+<td style="text-align:left">Aufruf von gespeicherten Prozeduren (Stored Procedures) in der Datenbank.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Sicherheit</strong></td>
+<td style="text-align:left">Unsicher bei dynamischen Werten (anfällig für SQL-Injection).</td>
+<td style="text-align:left"><strong>Sicher</strong> gegen SQL-Injection durch Platzhalter.</td>
+<td style="text-align:left">Sicher.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Performance</strong></td>
+<td style="text-align:left">Ineffizient bei wiederholter Ausführung.</td>
+<td style="text-align:left">Sehr effizient bei wiederholter Ausführung, da der Befehl nur einmal kompiliert wird.</td>
+<td style="text-align:left">Effizient, da die Logik in der Datenbank gespeichert und optimiert ist.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Syntax</strong></td>
+<td style="text-align:left">SQL-Befehl als String mit konkatenierten Werten.</td>
+<td style="text-align:left">SQL-Befehl mit Platzhaltern (<code>?</code>). Werte werden mit Setter-Methoden gebunden.</td>
+<td style="text-align:left">Spezielle Syntax zum Aufruf von Prozeduren: <code>{call my_procedure(?, ?)}</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>CallableStatement</code></strong></p>
+<p><code>CallableStatement</code> ist ein spezialisiertes Objekt, das verwendet wird, um <strong>gespeicherte Prozeduren</strong> und Funktionen in der Datenbank aufzurufen. Gespeicherte Prozeduren sind vorgefertigte Code-Blöcke, die in der Datenbank gespeichert und von dort ausgeführt werden. Sie können Eingabe- (<code>IN</code>), Ausgabe- (<code>OUT</code>) und Ein-/Ausgabeparameter (<code>INOUT</code>) haben.</p>
+<p><strong>Beispiel für ein <code>CallableStatement</code>:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Annahme: Es existiert eine Prozedur `get_user_by_id` in der Datenbank</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;{call get_user_by_id(?, ?)}&quot;</span>;
+<span class="hljs-type">CallableStatement</span> <span class="hljs-variable">callableStatement</span> <span class="hljs-operator">=</span> connection.prepareCall(sql);
+
+<span class="hljs-comment">// Setze den Eingabeparameter</span>
+callableStatement.setInt(<span class="hljs-number">1</span>, <span class="hljs-number">123</span>);
+
+<span class="hljs-comment">// Registriere den Ausgabeparameter</span>
+callableStatement.registerOutParameter(<span class="hljs-number">2</span>, Types.VARCHAR);
+
+<span class="hljs-comment">// Führe die Prozedur aus</span>
+callableStatement.execute();
+
+<span class="hljs-comment">// Lese den Ausgabewert</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">userName</span> <span class="hljs-operator">=</span> callableStatement.getString(<span class="hljs-number">2</span>);
+</code></pre>
+<hr>
+<h2 id="33-ausführen-von-sql-befehlen-executequery-executeupdate">3.3 Ausführen von SQL-Befehlen (<code>executeQuery</code>, <code>executeUpdate</code>)</h2>
+<p>Nachdem du ein <code>Statement</code>- oder <code>PreparedStatement</code>-Objekt erstellt hast, musst du den SQL-Befehl an die Datenbank senden. Dafür gibt es zwei Hauptmethoden:</p>
+<h3 id="executequery"><code>executeQuery()</code></h3>
+<p>Diese Methode wird verwendet, um SQL-Befehle auszuführen, die Daten von der Datenbank abfragen, also typischerweise <strong><code>SELECT</code></strong>-Befehle.</p>
+<ul>
+<li><strong>Rückgabewert:</strong> Ein <code>ResultSet</code>-Objekt.</li>
+<li><strong>Was ist ein <code>ResultSet</code>?</strong> Ein <code>ResultSet</code> ist ein Objekt, das die Daten der Abfrage zeilenweise speichert. Du kannst mit einem Cursor durch die Zeilen iterieren und die Werte der einzelnen Spalten auslesen.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;SELECT id, name FROM user WHERE id = 1&quot;</span>;
+<span class="hljs-type">Statement</span> <span class="hljs-variable">statement</span> <span class="hljs-operator">=</span> connection.createStatement();
+<span class="hljs-type">ResultSet</span> <span class="hljs-variable">resultSet</span> <span class="hljs-operator">=</span> statement.executeQuery(sql);
+
+<span class="hljs-comment">// Durch das ResultSet iterieren</span>
+<span class="hljs-keyword">if</span> (resultSet.next()) {
+    <span class="hljs-type">int</span> <span class="hljs-variable">id</span> <span class="hljs-operator">=</span> resultSet.getInt(<span class="hljs-string">&quot;id&quot;</span>);
+    <span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> resultSet.getString(<span class="hljs-string">&quot;name&quot;</span>);
+    System.out.println(<span class="hljs-string">&quot;ID: &quot;</span> + id + <span class="hljs-string">&quot;, Name: &quot;</span> + name);
+}
+
+resultSet.close();
+</code></pre>
+<p>Die Methode <code>resultSet.next()</code> bewegt den Cursor zur nächsten Zeile und gibt <code>true</code> zurück, solange noch Zeilen vorhanden sind.</p>
+<h3 id="executeupdate"><code>executeUpdate()</code></h3>
+<p>Diese Methode wird für SQL-Befehle verwendet, die die Datenbank <strong>modifizieren</strong>, d.h. <strong><code>INSERT</code></strong>, <strong><code>UPDATE</code></strong> oder <strong><code>DELETE</code></strong>-Befehle.</p>
+<ul>
+<li><strong>Rückgabewert:</strong> Ein <code>int</code>-Wert, der die <strong>Anzahl der betroffenen Zeilen</strong> angibt.</li>
+<li><strong>Wann verwenden?</strong> Immer dann, wenn du Daten hinzufügen, ändern oder löschen möchtest.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;UPDATE user SET name = &#x27;Neue Name&#x27; WHERE id = 1&quot;</span>;
+<span class="hljs-type">Statement</span> <span class="hljs-variable">statement</span> <span class="hljs-operator">=</span> connection.createStatement();
+<span class="hljs-type">int</span> <span class="hljs-variable">affectedRows</span> <span class="hljs-operator">=</span> statement.executeUpdate(sql);
+
+System.out.println(<span class="hljs-string">&quot;Es wurden &quot;</span> + affectedRows + <span class="hljs-string">&quot; Zeilen aktualisiert.&quot;</span>);
+</code></pre>
+<h3 id="die-methode-execute">Die Methode <code>execute()</code></h3>
+<p>Neben den beiden spezifischen Methoden gibt es auch die universelle Methode <code>execute()</code>. Sie kann für jeden SQL-Befehl verwendet werden.</p>
+<ul>
+<li><strong>Rückgabewert:</strong> Ein <code>boolean</code>-Wert.
+<ul>
+<li><code>true</code> wird zurückgegeben, wenn das Ergebnis ein <code>ResultSet</code> ist (z.B. bei einem <code>SELECT</code>).</li>
+<li><code>false</code> wird zurückgegeben, wenn das Ergebnis ein Update-Count (die Anzahl der betroffenen Zeilen) ist (z.B. bei <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>).</li>
+</ul>
+</li>
+<li><strong>Nachteile:</strong> Diese Methode ist weniger intuitiv. Es ist in der Regel besser, <code>executeQuery</code> oder <code>executeUpdate</code> zu verwenden, da der Zweck des Befehls dadurch klarer wird.</li>
+</ul>
+<hr>
+<h3 id="best-practices">Best Practices</h3>
+<ul>
+<li><strong>Ressourcen schließen:</strong> Stelle sicher, dass du <strong>alle JDBC-Ressourcen</strong> (<code>ResultSet</code>, <code>Statement</code>, <code>PreparedStatement</code> und <code>Connection</code>) am Ende immer schließt, um Speicherlecks zu vermeiden. Der beste Weg hierfür ist die Verwendung eines <code>try-with-resources</code>-Blocks.</li>
+<li><strong><code>PreparedStatement</code> verwenden:</strong> Nutze <code>PreparedStatement</code> gegenüber <code>Statement</code> wann immer möglich, um die Sicherheit und Performance deiner Anwendung zu gewährleisten.</li>
+<li><strong>Verbindungs-Pools:</strong> In produktiven Anwendungen solltest du statt einzelner <code>Connection</code>-Objekte einen <strong>Verbindungs-Pool</strong> verwenden, um die Performance zu optimieren.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Arten von Dependency Injection</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-arten-von-dependency-injection">Handout: Arten von Dependency Injection</h1>
+<hr>
+<h2 id="31-constructor-injection-konstruktor-injektion">3.1 Constructor Injection (Konstruktor-Injektion)</h2>
+<h3 id="was-ist-constructor-injection">Was ist Constructor Injection?</h3>
+<ul>
+<li>Die Abhängigkeit(en) einer Klasse werden über den Konstruktor übergeben und dort in einer Instanzvariablen gespeichert.</li>
+<li>Dies ist die am weitesten verbreitete und empfohlene Form der Dependency Injection.</li>
+</ul>
+<h3 id="vorteile">Vorteile</h3>
+<ul>
+<li><strong>Immutability:</strong> Die Abhängigkeiten können nach der Erstellung nicht mehr verändert werden, was für Stabilität sorgt.</li>
+<li><strong>Eindeutigkeit:</strong> Die Klasse kann ohne die notwendigen Abhängigkeiten nicht erzeugt werden – keine „halb-initialisierten“ Objekte.</li>
+<li><strong>Klare Schnittstelle:</strong> Die Abhängigkeiten sind im Konstruktor sofort sichtbar, was den Code lesbarer und verständlicher macht.</li>
+<li><strong>Erleichtert Testbarkeit:</strong> Im Test können gewünschte Abhängigkeiten leicht als Konstruktorparameter übergeben werden.</li>
+</ul>
+<h3 id="typische-anwendungsfälle">Typische Anwendungsfälle</h3>
+<ul>
+<li>Wenn eine Klasse eine oder mehrere zwingende Abhängigkeiten benötigt, ohne die sie nicht sinnvoll funktionieren kann.</li>
+<li>In Anwendungen, in denen die Objekte nach der Erstellung nicht mehr verändert werden sollen.</li>
+</ul>
+<h3 id="beispiel-java">Beispiel (Java)</h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> UserRepository userRepository;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">UserService</span><span class="hljs-params">(UserRepository userRepository)</span> {
+        <span class="hljs-built_in">this</span>.userRepository = userRepository;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">registerUser</span><span class="hljs-params">(User user)</span> {
+        userRepository.save(user);
+    }
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">UserRepository</span> <span class="hljs-variable">repo</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">InMemoryUserRepository</span>();
+<span class="hljs-type">UserService</span> <span class="hljs-variable">service</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UserService</span>(repo);
+</code></pre>
+<hr>
+<h2 id="32-setter-injection-setter-injektion">3.2 Setter Injection (Setter-Injektion)</h2>
+<h3 id="was-ist-setter-injection">Was ist Setter Injection?</h3>
+<ul>
+<li>Die Abhängigkeit(en) werden über spezielle Setter-Methoden nach der Objekterstellung gesetzt („injiziert“).</li>
+<li>Das Objekt kann zunächst ohne alle Abhängigkeiten erstellt werden und erhält sie später.</li>
+</ul>
+<h3 id="vorteile-1">Vorteile</h3>
+<ul>
+<li><strong>Flexibilität:</strong> Abhängigkeiten können auch nach der Instanziierung geändert oder nachgeliefert werden.</li>
+<li><strong>Optionale Abhängigkeiten:</strong> Gut geeignet, wenn manche Abhängigkeiten nicht zwingend notwendig sind.</li>
+<li><strong>Lesbarkeit:</strong> Setter machen explizit, welche Abhängigkeiten veränderbar oder optional sind.</li>
+</ul>
+<h3 id="typische-anwendungsfälle-1">Typische Anwendungsfälle</h3>
+<ul>
+<li>Wenn eine Komponente optionale Abhängigkeiten besitzt.</li>
+<li>Wenn eine Abhängigkeit erst zu einem späteren Zeitpunkt zur Verfügung steht.</li>
+<li>Bei Frameworks, die Objekte instanziieren und erst später konfigurieren (z.B. JavaBeans).</li>
+</ul>
+<h3 id="beispiel-java-1">Beispiel (Java)</h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ReportGenerator</span> {
+    <span class="hljs-keyword">private</span> DataSource dataSource;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setDataSource</span><span class="hljs-params">(DataSource dataSource)</span> {
+        <span class="hljs-built_in">this</span>.dataSource = dataSource;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">generate</span><span class="hljs-params">()</span> {
+        <span class="hljs-comment">// Verwendung von dataSource ...</span>
+    }
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">ReportGenerator</span> <span class="hljs-variable">generator</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReportGenerator</span>();
+generator.setDataSource(<span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSource</span>());
+</code></pre>
+<hr>
+<h2 id="33-interface-injection">3.3 Interface Injection</h2>
+<h3 id="kurzer-überblick">Kurzer Überblick</h3>
+<ul>
+<li>Hier wird ein spezielles Interface verwendet, das eine Methode zum Setzen der Abhängigkeit(en) bereitstellt.</li>
+<li>Der „Injector“ ruft diese Methode auf, um die Abhängigkeit bereitzustellen.</li>
+<li>Wird selten genutzt und ist außerhalb spezieller Frameworks unüblich.</li>
+</ul>
+<h3 id="vorteile-2">Vorteile</h3>
+<ul>
+<li>Macht explizit, dass eine Klasse Abhängigkeiten erwartet.</li>
+<li>Kann für große Systeme sinnvoll sein, in denen bestimmte Abhängigkeitsbeziehungen zentral gesteuert werden.</li>
+</ul>
+<h3 id="nachteile">Nachteile</h3>
+<ul>
+<li>Zusätzliche Interfaces führen zu mehr Komplexität.</li>
+<li>In der Praxis oft weniger lesbar und umständlicher als Constructor- oder Setter-Injection.</li>
+</ul>
+<h3 id="beispiel-java-pseudocode">Beispiel (Java, Pseudocode)</h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">LoggerAware</span> {
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">setLogger</span><span class="hljs-params">(Logger logger)</span>;
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FileProcessor</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">LoggerAware</span> {
+    <span class="hljs-keyword">private</span> Logger logger;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setLogger</span><span class="hljs-params">(Logger logger)</span> {
+        <span class="hljs-built_in">this</span>.logger = logger;
+    }
+
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">FileProcessor</span> <span class="hljs-variable">processor</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FileProcessor</span>();
+processor.setLogger(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FileLogger</span>());
+</code></pre>
+<ul>
+<li>Das Framework erkennt anhand des Interface, dass <code>FileProcessor</code> einen Logger erwartet.</li>
+</ul>
+<hr>
+<h2 id="34-vergleich-und-empfehlungen">3.4 Vergleich und Empfehlungen</h2>
+<table>
+<thead>
+<tr>
+<th>Kriterium</th>
+<th>Constructor Injection</th>
+<th>Setter Injection</th>
+<th>Interface Injection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Zwingende Abhängigkeit</strong></td>
+<td>✔ (erzwingt Abhängigkeit)</td>
+<td>✖ (kann fehlen)</td>
+<td>✖ (optional)</td>
+</tr>
+<tr>
+<td><strong>Immutability</strong></td>
+<td>✔</td>
+<td>✖</td>
+<td>✖</td>
+</tr>
+<tr>
+<td><strong>Optionale Abhängigkeit</strong></td>
+<td>✖</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><strong>Lesbarkeit</strong></td>
+<td>✔ (Abhängigkeit im CTor)</td>
+<td>✔ (explizite Setter)</td>
+<td>✖ (extra Interface nötig)</td>
+</tr>
+<tr>
+<td><strong>Komplexität</strong></td>
+<td>Gering</td>
+<td>Mittel</td>
+<td>Hoch (Spezialfall)</td>
+</tr>
+<tr>
+<td><strong>Testbarkeit</strong></td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<h3 id="wann-welche-variante">Wann welche Variante?</h3>
+<ul>
+<li>
+<p><strong>Constructor Injection</strong></p>
+<ul>
+<li><strong>Empfohlen</strong> für alle zwingenden, nicht veränderbaren Abhängigkeiten.</li>
+<li>Idealer Standardfall.</li>
+</ul>
+</li>
+<li>
+<p><strong>Setter Injection</strong></p>
+<ul>
+<li>Für <strong>optionale</strong> oder nachträglich veränderbare Abhängigkeiten.</li>
+<li>Wenn Frameworks oder Bibliotheken nur parameterlose Konstruktoren unterstützen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Interface Injection</strong></p>
+<ul>
+<li>Nur in Spezialfällen (z.B. spezielle Frameworkanforderungen) sinnvoll.</li>
+<li>Nicht der gängige Ansatz im Alltagsprojekt.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li><strong>Constructor Injection</strong> ist der Standard für feste, zwingende Abhängigkeiten.</li>
+<li><strong>Setter Injection</strong> kommt bei optionalen oder nachträglich änderbaren Abhängigkeiten zum Einsatz.</li>
+<li><strong>Interface Injection</strong> ist selten und meist auf Framework- oder Spezialfälle beschränkt.</li>
+<li>Die Wahl der Methode beeinflusst Wartbarkeit, Testbarkeit und Flexibilität deiner Software.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Warum wird Constructor Injection meist bevorzugt?</li>
+<li>In welchem Fall würdest du Setter Injection verwenden?</li>
+<li>Was ist der Hauptnachteil von Interface Injection?</li>
+<li>Wie würdest du in einem eigenen Beispiel zwei Abhängigkeiten über unterschiedliche Methoden injizieren?</li>
+</ol>
+
+            
+            
+        </body>
+        </html>

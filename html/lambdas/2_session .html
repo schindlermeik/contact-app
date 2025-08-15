@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Was sind Functional Interfaces&quest;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-was-sind-functional-interfaces">Handout: Was sind Functional Interfaces?</h1>
+<hr>
+<h2 id="1-definition-und-eigenschaften-eines-functional-interface">1. Definition und Eigenschaften eines Functional Interface</h2>
+<p>Ein <strong>Functional Interface</strong> (deutsch: funktionales Interface) ist ein Interface, das <strong>genau eine abstrakte Methode</strong> deklariert. Es bildet das Bindeglied zwischen Java und der funktionalen Programmierung, da es damit möglich ist, <strong>Funktionen als Werte</strong> zu behandeln – z. B. durch Lambda-Ausdrücke oder Methodenreferenzen.</p>
+<p><strong>Wichtig:</strong></p>
+<ul>
+<li>Ein Functional Interface kann beliebig viele <code>default</code>- oder <code>static</code>-Methoden enthalten, aber <strong>nur eine</strong> „abstrakte“ (d. h. zu implementierende) Methode.</li>
+<li>Diese eine abstrakte Methode heißt auch <strong>SAM (Single Abstract Method)</strong>.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@FunctionalInterface</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">Rechner</span> {
+    <span class="hljs-type">int</span> <span class="hljs-title function_">berechne</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span>;
+}
+</code></pre>
+<ul>
+<li>Das Interface <code>Rechner</code> ist ein Functional Interface, da es nur eine abstrakte Methode (<code>berechne</code>) besitzt.</li>
+</ul>
+<hr>
+<h2 id="2-die-annotation-functionalinterface">2. Die Annotation <code>@FunctionalInterface</code></h2>
+<p>Mit der Annotation <code>@FunctionalInterface</code> kann (und sollte) explizit markiert werden, dass ein Interface funktional gemeint ist.
+Das ist <strong>keine Pflicht</strong>, aber <strong>gute Praxis</strong>, weil der Compiler dann einen Fehler meldet, falls versehentlich mehr als eine abstrakte Methode vorhanden ist.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@FunctionalInterface</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">Printer</span> {
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">print</span><span class="hljs-params">(String text)</span>;
+
+    <span class="hljs-comment">// default-Methoden sind erlaubt</span>
+    <span class="hljs-keyword">default</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printTwice</span><span class="hljs-params">(String text)</span> {
+        print(text);
+        print(text);
+    }
+}
+</code></pre>
+<ul>
+<li>Der Compiler akzeptiert mehrere <code>default</code>- und <code>static</code>-Methoden, aber <strong>maximal eine</strong> abstrakte Methode.</li>
+</ul>
+<p><strong>Vorteil:</strong>
+Mehr Klarheit, weniger Fehler und bessere Wartbarkeit im Team.</p>
+<hr>
+<h2 id="3-beispiele-aus-der-java-standardbibliothek">3. Beispiele aus der Java-Standardbibliothek</h2>
+<p>Viele Interfaces in der Java-Standardbibliothek sind funktionale Interfaces. Sie sind die Grundlage für Lambda-Ausdrücke und Methodenreferenzen.</p>
+<p>Hier einige der wichtigsten und häufigsten Functional Interfaces aus <code>java.lang</code> und <code>java.util.function</code>:</p>
+<h3 id="a-runnable">a) <code>Runnable</code></h3>
+<ul>
+<li><strong>Deklariert:</strong> <code>void run()</code></li>
+<li>Wird z. B. für Threads verwendet.</li>
+</ul>
+<pre><code class="language-java"><span class="hljs-type">Runnable</span> <span class="hljs-variable">r</span> <span class="hljs-operator">=</span> () -&gt; System.out.println(<span class="hljs-string">&quot;Läuft im Thread!&quot;</span>);
+<span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(r).start();
+</code></pre>
+<hr>
+<h3 id="b-comparatort">b) <code>Comparator&lt;T&gt;</code></h3>
+<ul>
+<li><strong>Deklariert:</strong> <code>int compare(T o1, T o2)</code></li>
+<li>Zum Vergleichen und Sortieren von Objekten.</li>
+</ul>
+<pre><code class="language-java">Comparator&lt;String&gt; cmp = (a, b) -&gt; a.length() - b.length();
+List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bob&quot;</span>, <span class="hljs-string">&quot;Christina&quot;</span>);
+namen.sort(cmp);
+</code></pre>
+<hr>
+<h3 id="c-consumert">c) <code>Consumer&lt;T&gt;</code></h3>
+<ul>
+<li><strong>Deklariert:</strong> <code>void accept(T t)</code></li>
+<li>„Verbraucher“ – nimmt ein Argument und tut etwas damit.</li>
+</ul>
+<pre><code class="language-java">Consumer&lt;String&gt; printer = s -&gt; System.out.println(s.toUpperCase());
+printer.accept(<span class="hljs-string">&quot;Hallo&quot;</span>);
+</code></pre>
+<hr>
+<h3 id="d-functiont-r">d) <code>Function&lt;T, R&gt;</code></h3>
+<ul>
+<li><strong>Deklariert:</strong> <code>R apply(T t)</code></li>
+<li>Wandelt einen Wert von Typ <code>T</code> in einen Wert vom Typ <code>R</code> um.</li>
+</ul>
+<pre><code class="language-java">Function&lt;String, Integer&gt; lengthFunc = s -&gt; s.length();
+<span class="hljs-type">int</span> <span class="hljs-variable">len</span> <span class="hljs-operator">=</span> lengthFunc.apply(<span class="hljs-string">&quot;Lambda&quot;</span>);
+</code></pre>
+<hr>
+<h3 id="e-predicatet">e) <code>Predicate&lt;T&gt;</code></h3>
+<ul>
+<li><strong>Deklariert:</strong> <code>boolean test(T t)</code></li>
+<li>Prüft eine Bedingung für ein Objekt, liefert <code>true</code> oder <code>false</code>.</li>
+</ul>
+<pre><code class="language-java">Predicate&lt;String&gt; lang = s -&gt; s.length() &gt; <span class="hljs-number">5</span>;
+System.out.println(lang.test(<span class="hljs-string">&quot;OpenAI&quot;</span>)); <span class="hljs-comment">// true</span>
+System.out.println(lang.test(<span class="hljs-string">&quot;Java&quot;</span>));   <span class="hljs-comment">// false</span>
+</code></pre>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>Schreibe ein eigenes Functional Interface <code>MatheAktion</code>, das zwei Zahlen als Argumente nimmt und einen Wert zurückliefert.</li>
+<li>Erstelle einen Lambda-Ausdruck, der dieses Interface für eine Addition implementiert.</li>
+<li>Verwende ein <code>Consumer&lt;Integer&gt;</code>, um alle Werte einer Liste zu verdoppeln und auszugeben.</li>
+<li>Finde in der Java-API-Dokumentation weitere Functional Interfaces, z. B. <code>Supplier&lt;T&gt;</code> und <code>UnaryOperator&lt;T&gt;</code>. Wofür könnte man sie nutzen?</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li><strong>Functional Interfaces</strong> sind die Voraussetzung für Lambda-Ausdrücke in Java.</li>
+<li>Sie müssen <strong>genau eine abstrakte Methode</strong> besitzen.</li>
+<li>Die Annotation <code>@FunctionalInterface</code> hilft, Fehler frühzeitig zu erkennen.</li>
+<li>Die Java-Standardbibliothek enthält viele vordefinierte Functional Interfaces – für nahezu alle Anwendungsfälle.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

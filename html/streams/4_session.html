@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Funktionsweise von Streams</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-funktionsweise-von-streams">Handout: Funktionsweise von Streams</h1>
+<hr>
+<h2 id="1-lazy-evaluation-und-pipeline-prinzip">1. Lazy Evaluation und Pipeline-Prinzip</h2>
+<p><strong>Lazy Evaluation</strong> bedeutet:
+Stream-Operationen werden <strong>erst ausgeführt, wenn eine Terminal-Operation</strong> (wie <code>collect()</code>, <code>forEach()</code>, <code>count()</code>) aufgerufen wird. Bis dahin „merkt“ sich Java nur die Kette der Operationen.</p>
+<p><strong>Pipeline-Prinzip:</strong></p>
+<ul>
+<li>Stream-Operationen werden als <strong>Verkettung (Pipeline)</strong> notiert.</li>
+<li>Die Daten „fließen“ von einer Operation zur nächsten – <strong>aber</strong>: Die Verarbeitung startet <strong>erst</strong> mit der Terminal-Operation.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+
+namen.stream()
+    .filter(s -&gt; {
+        System.out.println(<span class="hljs-string">&quot;Filter: &quot;</span> + s);
+        <span class="hljs-keyword">return</span> s.length() &gt; <span class="hljs-number">3</span>;
+    })
+    .map(s -&gt; {
+        System.out.println(<span class="hljs-string">&quot;Map: &quot;</span> + s);
+        <span class="hljs-keyword">return</span> s.toUpperCase();
+    });
+<span class="hljs-comment">// Bis hier passiert GAR NICHTS!</span>
+</code></pre>
+<p><strong>Erst jetzt wird die Pipeline aktiviert:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; ergebnis = namen.stream()
+    .filter(s -&gt; {
+        System.out.println(<span class="hljs-string">&quot;Filter: &quot;</span> + s);
+        <span class="hljs-keyword">return</span> s.length() &gt; <span class="hljs-number">3</span>;
+    })
+    .map(s -&gt; {
+        System.out.println(<span class="hljs-string">&quot;Map: &quot;</span> + s);
+        <span class="hljs-keyword">return</span> s.toUpperCase();
+    })
+    .collect(Collectors.toList());
+</code></pre>
+<ul>
+<li><strong>Ergebnis:</strong>
+Die Ausgaben zeigen, dass Filter und Map erst bei <code>collect()</code> ausgeführt werden.</li>
+</ul>
+<hr>
+<h2 id="2-reihenfolge-und-kurzschluss-operationen">2. Reihenfolge und Kurzschluss-Operationen</h2>
+<h3 id="a-reihenfolge-der-operationen">a) <strong>Reihenfolge der Operationen</strong></h3>
+<ul>
+<li>Die Reihenfolge der Operatoren <strong>beeinflusst das Ergebnis</strong> und die Performance.</li>
+<li><strong>Filter möglichst früh</strong> platzieren, um Folgeoperationen nur für relevante Daten auszuführen.</li>
+</ul>
+<h3 id="b-kurzschluss-operationen-short-circuiting">b) <strong>Kurzschluss-Operationen (Short-circuiting)</strong></h3>
+<p>Manche Terminal-Operationen beenden den Stream <strong>sofort</strong>, wenn das Ergebnis feststeht:</p>
+<ul>
+<li>
+<p><strong><code>anyMatch()</code>, <code>allMatch()</code>, <code>noneMatch()</code></strong></p>
+<ul>
+<li>
+<p>Sobald feststeht, dass die Bedingung erfüllt oder verletzt ist, wird die Verarbeitung gestoppt.</p>
+</li>
+<li>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Stream.of(<span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;b&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>)
+      .anyMatch(s -&gt; s.equals(<span class="hljs-string">&quot;b&quot;</span>)); <span class="hljs-comment">// stoppt nach &quot;b&quot;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code>findFirst()</code>, <code>findAny()</code></strong></p>
+<ul>
+<li>Beenden, sobald ein Element gefunden wurde.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Vorteil:</strong>
+Das spart Rechenzeit, besonders bei großen Datenmengen oder aufwändigen Operationen.</p>
+<hr>
+<h2 id="3-unterschied-zwischen-intermediären-und-terminalen-operationen">3. Unterschied zwischen intermediären und terminalen Operationen</h2>
+<h3 id="a-intermediäre-zwischenliegende-operationen">a) <strong>Intermediäre (zwischenliegende) Operationen</strong></h3>
+<ul>
+<li><strong>Geben wieder einen Stream zurück</strong> (z. B. <code>filter()</code>, <code>map()</code>, <code>sorted()</code>)</li>
+<li><strong>Sind „lazy“</strong>: Werden erst bei Terminal-Operation ausgeführt</li>
+<li>Können beliebig verkettet werden</li>
+</ul>
+<h3 id="b-terminal-operationen">b) <strong>Terminal-Operationen</strong></h3>
+<ul>
+<li><strong>Beenden</strong> die Pipeline und liefern ein Ergebnis (z. B. <code>collect()</code>, <code>forEach()</code>, <code>count()</code>)</li>
+<li>Starten tatsächlich die Verarbeitung</li>
+<li>Können nur <strong>einmal</strong> pro Stream ausgeführt werden (danach ist der Stream „verbraucht“)</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Intermediär:</span>
+Stream&lt;String&gt; stream = namen.stream().filter(s -&gt; s.length() &gt; <span class="hljs-number">4</span>);
+
+<span class="hljs-comment">// Terminal:</span>
+List&lt;String&gt; ergebnis = stream.collect(Collectors.toList());
+</code></pre>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>
+<p>Schreibe eine Stream-Pipeline mit mindestens drei intermediären und einer terminalen Operation.
+Beobachte mit Ausgaben, wann welcher Teil tatsächlich ausgeführt wird.</p>
+</li>
+<li>
+<p>Verwende <code>anyMatch()</code> und prüfe, wie viele Elemente tatsächlich verarbeitet werden, indem du im Lambda einen Zähler erhöhst oder eine Ausgabe machst.</p>
+</li>
+<li>
+<p>Experimentiere mit dem Platzieren von <code>filter()</code> früh oder spät in der Pipeline.
+Was fällt dir auf, wenn du z. B. erst <code>sorted()</code> und dann <code>filter()</code> verwendest – und umgekehrt?</p>
+</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li>
+<p><strong>Streams sind „lazy“:</strong> Nichts passiert ohne Terminal-Operation!</p>
+</li>
+<li>
+<p><strong>Die Reihenfolge der Operationen beeinflusst Effizienz und Ergebnis.</strong></p>
+</li>
+<li>
+<p><strong>Kurzschluss-Operationen können Streams frühzeitig beenden.</strong></p>
+</li>
+<li>
+<p><strong>Unterschied:</strong></p>
+<ul>
+<li><em>Intermediär</em> = Zwischenstopp, gibt wieder einen Stream zurück.</li>
+<li><em>Terminal</em> = Ziel, liefert Ergebnis und beendet den Stream.</li>
+</ul>
+</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

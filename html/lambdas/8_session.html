@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praktische &Uuml;bungen und Beispiele zu Lambdas und Functional Interfaces</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praktische-übungen-und-beispiele-zu-lambdas-und-functional-interfaces">Handout: Praktische Übungen und Beispiele zu Lambdas und Functional Interfaces</h1>
+<hr>
+<h2 id="1-schreibe-eigene-functional-interfaces-und-nutze-sie-mit-lambdas">1. Schreibe eigene Functional Interfaces und nutze sie mit Lambdas</h2>
+<h3 id="aufgabe-1">Aufgabe 1</h3>
+<p><strong>Definiere ein Functional Interface <code>Rechner</code>, das zwei Zahlen als Argumente nimmt und einen Wert zurückgibt. Implementiere es mit einem Lambda für Addition, Subtraktion und Multiplikation.</strong></p>
+<h4 id="musterlösung">Musterlösung:</h4>
+<pre><code class="language-java"><span class="hljs-meta">@FunctionalInterface</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">Rechner</span> {
+    <span class="hljs-type">int</span> <span class="hljs-title function_">berechne</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span>;
+}
+
+<span class="hljs-comment">// Lambdas für verschiedene Operationen:</span>
+<span class="hljs-type">Rechner</span> <span class="hljs-variable">addition</span> <span class="hljs-operator">=</span> (a, b) -&gt; a + b;
+<span class="hljs-type">Rechner</span> <span class="hljs-variable">subtraktion</span> <span class="hljs-operator">=</span> (a, b) -&gt; a - b;
+<span class="hljs-type">Rechner</span> <span class="hljs-variable">multiplikation</span> <span class="hljs-operator">=</span> (a, b) -&gt; a * b;
+
+<span class="hljs-comment">// Verwendung:</span>
+System.out.println(addition.berechne(<span class="hljs-number">4</span>, <span class="hljs-number">2</span>));        <span class="hljs-comment">// 6</span>
+System.out.println(subtraktion.berechne(<span class="hljs-number">4</span>, <span class="hljs-number">2</span>));     <span class="hljs-comment">// 2</span>
+System.out.println(multiplikation.berechne(<span class="hljs-number">4</span>, <span class="hljs-number">2</span>));  <span class="hljs-comment">// 8</span>
+</code></pre>
+<hr>
+<h2 id="2-refactoring-ersetze-anonyme-klassen-durch-lambda-ausdrücke">2. Refactoring: Ersetze anonyme Klassen durch Lambda-Ausdrücke</h2>
+<h3 id="aufgabe-2">Aufgabe 2</h3>
+<p><strong>Der folgende Code nutzt eine anonyme Klasse. Ersetze sie durch einen Lambda-Ausdruck.</strong></p>
+<pre><code class="language-java">Comparator&lt;String&gt; cmp = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Comparator</span>&lt;String&gt;() {
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">compare</span><span class="hljs-params">(String s1, String s2)</span> {
+        <span class="hljs-keyword">return</span> s1.length() - s2.length();
+    }
+};
+</code></pre>
+<h4 id="lösung-mit-lambda">Lösung mit Lambda:</h4>
+<pre><code class="language-java">Comparator&lt;String&gt; cmp = (s1, s2) -&gt; s1.length() - s2.length();
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+namen.sort(cmp);
+System.out.println(namen); <span class="hljs-comment">// Sortiert nach Länge</span>
+</code></pre>
+<hr>
+<h2 id="3-anwenden-von-methodenreferenzen">3. Anwenden von Methodenreferenzen</h2>
+<h3 id="aufgabe-3">Aufgabe 3</h3>
+<p><strong>Wandle den folgenden Lambda-Ausdruck in eine Methodenreferenz um:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+namen.forEach(s -&gt; System.out.println(s));
+</code></pre>
+<h4 id="lösung-mit-methodenreferenz">Lösung mit Methodenreferenz:</h4>
+<pre><code class="language-java">namen.forEach(System.out::println);
+</code></pre>
+<p><strong>Weitere Beispiele:</strong></p>
+<ul>
+<li>
+<p>Umwandeln in Großbuchstaben mit Methodenreferenz:</p>
+<pre><code class="language-java">List&lt;String&gt; upper = namen.stream()
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+</code></pre>
+</li>
+<li>
+<p>Vergleich mit Methodenreferenz:</p>
+<pre><code class="language-java">namen.sort(String::compareToIgnoreCase);
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="4-eigenes-beispiel-für-methoden-als-parameter">4. Eigenes Beispiel für Methoden als Parameter</h2>
+<h3 id="aufgabe-4">Aufgabe 4</h3>
+<p><strong>Schreibe eine Methode, die ein Functional Interface als Parameter nimmt und nutze einen Lambda-Ausdruck und eine Methodenreferenz.</strong></p>
+<h4 id="beispiel">Beispiel:</h4>
+<pre><code class="language-java"><span class="hljs-meta">@FunctionalInterface</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">TextVerarbeiter</span> {
+    String <span class="hljs-title function_">verarbeite</span><span class="hljs-params">(String text)</span>;
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">wendeAnUndGibAus</span><span class="hljs-params">(String eingabe, TextVerarbeiter tv)</span> {
+    System.out.println(tv.verarbeite(eingabe));
+}
+
+<span class="hljs-comment">// Verwendung mit Lambda:</span>
+wendeAnUndGibAus(<span class="hljs-string">&quot;Hallo&quot;</span>, s -&gt; s.toUpperCase());    <span class="hljs-comment">// HALLO</span>
+
+<span class="hljs-comment">// Verwendung mit Methodenreferenz:</span>
+wendeAnUndGibAus(<span class="hljs-string">&quot;Hallo&quot;</span>, String::toLowerCase);     <span class="hljs-comment">// hallo</span>
+</code></pre>
+<hr>
+<h2 id="5-reflexionsfragen-selbststudium">5. Reflexionsfragen (Selbststudium)</h2>
+<ol>
+<li>Wo sind Lambda-Ausdrücke für dich besonders nützlich? Wo sind Methodenreferenzen besser?</li>
+<li>Wie würde ein Codeabschnitt ohne Lambdas/anonyme Klassen im Vergleich aussehen?</li>
+<li>Schreibe ein eigenes Beispiel mit einem Functional Interface, das einen Wert prüft (<code>Predicate&lt;T&gt;</code>).</li>
+</ol>
+<hr>
+<h2 id="6-merksätze">6. Merksätze</h2>
+<ul>
+<li>Eigene Functional Interfaces helfen dir, Funktionen flexibel als Parameter zu nutzen.</li>
+<li>Lambdas machen den Code <strong>kürzer und übersichtlicher</strong> als anonyme Klassen.</li>
+<li>Methodenreferenzen sind <strong>noch kompakter</strong>, wenn sie nur eine bestehende Methode aufrufen.</li>
+<li>Nutze Methoden als Parameter für wiederverwendbaren, flexiblen und modernen Java-Code.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

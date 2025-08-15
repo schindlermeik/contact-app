@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices f&uuml;r Datenkonsistenz und Transaktionen</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-best-practices-für-datenkonsistenz-und-transaktionen">Handout: Best Practices für Datenkonsistenz und Transaktionen</h3>
+<p>Transaktionen sind das Fundament für die Datenkonsistenz in Datenbankanwendungen. Der korrekte Umgang mit ihnen ist entscheidend, um Fehler zu vermeiden und die Leistung zu optimieren. In diesem Handout gehen wir darauf ein, wie du Transaktionen sinnvoll einsetzt, häufige Fehler vermeidest und sie in der Praxis effektiv verwaltest.</p>
+<h4 id="71-wann-sind-transaktionen-sinnvoll-wann-nicht">7.1 Wann sind Transaktionen sinnvoll, wann nicht?</h4>
+<p>Das Grundprinzip einer Transaktion ist die <strong>ACID-Eigenschaft</strong> (Atomicity, Consistency, Isolation, Durability). Du brauchst eine Transaktion, wann immer du mehrere zusammengehörige Datenbankoperationen als eine einzige, unteilbare Einheit behandeln musst.</p>
+<p><strong>Wann Transaktionen sinnvoll sind:</strong></p>
+<ul>
+<li><strong>Logisch zusammenhängende Operationen:</strong> Wenn eine Operation aus mehreren Schritten besteht, die alle erfolgreich sein müssen, um einen gültigen Zustand zu gewährleisten. Ein klassisches Beispiel ist die <strong>Überweisung von Geld</strong> von einem Konto auf ein anderes. Hier müssen das Abbuchen und das Einzahlen in derselben Transaktion ablaufen.</li>
+<li><strong>Änderung mehrerer Entitäten:</strong> Wenn eine Aktion mehrere Entitäten gleichzeitig ändert, um die Konsistenz zu wahren. Zum Beispiel das Erstellen einer Bestellung, das gleichzeitige Anlegen von Bestellpositionen und das Aktualisieren des Lagerbestands – all das sollte in einer einzigen Transaktion passieren.</li>
+<li><strong>Vermeidung von Race Conditions:</strong> Wenn mehrere Benutzer oder Threads gleichzeitig auf dieselben Daten zugreifen könnten. Transaktionen isolieren diese Zugriffe und verhindern, dass sich die Operationen gegenseitig stören.</li>
+</ul>
+<p><strong>Wann Transaktionen nicht sinnvoll sind:</strong></p>
+<ul>
+<li><strong>Nur-Lese-Operationen:</strong> Wenn du nur Daten ausliest und sie nicht änderst, ist eine Transaktion oft unnötig. Das Starten und Abschließen einer Transaktion erzeugt einen gewissen Overhead, den du dir bei einfachen <code>SELECT</code>-Abfragen sparen kannst.</li>
+<li><strong>Langlaufende Geschäftslogik:</strong> Transaktionen sollten so kurz wie möglich sein. Wenn deine Geschäftslogik komplexe Berechnungen oder externe Service-Aufrufe (z.B. REST-APIs) umfasst, die lange dauern, sollte die Transaktion nur den eigentlichen Datenbankteil umfassen. Externe Aufrufe innerhalb einer Transaktion zu platzieren, kann die Transaktion unnötig verlängern und das Risiko von Deadlocks erhöhen.</li>
+<li><strong>Statische Daten:</strong> Daten, die sich nie oder nur sehr selten ändern, müssen nicht über eine Transaktion gelesen werden.</li>
+</ul>
+<hr>
+<h4 id="72-typische-fehler">7.2 Typische Fehler</h4>
+<p>Die unsachgemäße Verwendung von Transaktionen kann zu schwerwiegenden Problemen führen. Hier sind die häufigsten Fallstricke:</p>
+<ul>
+<li>
+<p><strong>Zu lange Transaktionen:</strong> Lange Transaktionen führen zu Sperren (Locks) auf den betroffenen Datensätzen. Das verhindert, dass andere Transaktionen auf dieselben Daten zugreifen können. Die Folge sind Performance-Probleme und Deadlocks.</p>
+<ul>
+<li><strong>Best Practice:</strong> Die Transaktion sollte nur die unbedingt notwendigen Datenbankoperationen enthalten. Externe Aufrufe oder zeitaufwendige Berechnungen sollten außerhalb der Transaktion stattfinden.</li>
+</ul>
+</li>
+<li>
+<p><strong>Deadlocks:</strong> Ein Deadlock tritt auf, wenn zwei oder mehr Transaktionen sich gegenseitig blockieren. Zum Beispiel: Transaktion A sperrt Ressource X und wartet auf Ressource Y. Transaktion B sperrt Ressource Y und wartet auf Ressource X. Keine der Transaktionen kann fortfahren.</p>
+<ul>
+<li><strong>Best Practice:</strong>
+<ul>
+<li>Stelle sicher, dass du auf Ressourcen immer in der gleichen Reihenfolge zugreifst.</li>
+<li>Halte die Transaktionen kurz.</li>
+<li>Wenn Deadlocks auftreten, konfiguriere deine Anwendung so, dass sie die Transaktion wiederholt (<code>retry</code>).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Offene Verbindungen und Transaktionen:</strong> Wenn ein <strong><code>EntityManager</code></strong> eine Transaktion startet, aber nicht abschließt, bleibt die Datenbankverbindung offen. Das führt dazu, dass Ressourcen blockiert werden und es kann zu einer Erschöpfung des Verbindungspools kommen.</p>
+<ul>
+<li><strong>Best Practice:</strong> Verwende <code>try-catch-finally</code>-Blöcke, um sicherzustellen, dass die Transaktion immer korrekt gehandhabt wird (entweder durch <code>commit</code> oder <code>rollback</code>) und die Verbindung geschlossen wird, selbst wenn eine Exception auftritt.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="73-transaktionsmanagement-in-der-praxis-logging-monitoring-fehlerfall-strategien">7.3 Transaktionsmanagement in der Praxis: Logging, Monitoring, Fehlerfall-Strategien</h4>
+<p>Transaktionsmanagement ist in der Praxis mehr als nur <code>begin()</code> und <code>commit()</code>. Es geht darum, die Abläufe zu verstehen und auf Fehler vorbereitet zu sein.</p>
+<ul>
+<li>
+<p><strong>Logging und Monitoring:</strong></p>
+<ul>
+<li><strong>Protokollierung:</strong> Protokolliere den Start und das Ende von Transaktionen. Logge auch, welche Transaktion von einem Deadlock betroffen war oder einen Rollback verursacht hat. Das hilft dir, Fehler im Nachhinein zu analysieren.</li>
+<li><strong>Monitoring:</strong> Nutze Monitoring-Tools, um die Dauer von Transaktionen zu verfolgen. Lange Laufzeiten sind oft ein Indikator für Performance-Probleme.</li>
+</ul>
+</li>
+<li>
+<p><strong>Fehlerfall-Strategien:</strong></p>
+<ul>
+<li><strong>Rollback bei Fehlern:</strong> Alle Datenänderungen, die innerhalb einer Transaktion gemacht wurden, müssen bei einem Fehler verworfen werden. Stelle sicher, dass du immer eine <code>rollback()</code>-Anweisung ausführst, wenn eine Ausnahme auftritt.</li>
+<li><strong>Wiederholung (Retry):</strong> Bei transienten Fehlern, die nur kurzzeitig auftreten (wie einem Deadlock oder einem temporären Verbindungsabbruch), ist die beste Strategie, die Transaktion nach einer kurzen Wartezeit erneut zu versuchen.</li>
+<li><strong>Idempotenz:</strong> Wenn deine Transaktion wiederholt werden muss, ist es wichtig, dass sie <strong>idempotent</strong> ist. Das bedeutet, dass die Ausführung der Transaktion mehrmals dasselbe Ergebnis liefert wie eine einmalige Ausführung. Das ist besonders in verteilten Systemen und bei Wiederholungsstrategien wichtig.</li>
+</ul>
+</li>
+</ul>
+<p>Durch die Einhaltung dieser Best Practices kannst du sicherstellen, dass deine Anwendung zuverlässig mit Daten umgeht und auch unter hoher Last stabil bleibt.</p>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praktische &Uuml;bungen und Beispiele zur Streams API</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praktische-übungen-und-beispiele-zur-streams-api">Handout: Praktische Übungen und Beispiele zur Streams API</h1>
+<hr>
+<h2 id="1-filter--map--und-reduce-operationen-auf-listen-von-zahlen-und-strings">1. Filter-, Map- und Reduce-Operationen auf Listen von Zahlen und Strings</h2>
+<h3 id="a-filtern-nur-gerade-zahlen-herausfiltern">a) <strong>Filtern</strong>: Nur gerade Zahlen herausfiltern</h3>
+<pre><code class="language-java">List&lt;Integer&gt; zahlen = Arrays.asList(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>);
+
+List&lt;Integer&gt; gerade = zahlen.stream()
+    .filter(x -&gt; x % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>)
+    .collect(Collectors.toList());
+
+System.out.println(gerade); <span class="hljs-comment">// [2, 4, 6]</span>
+</code></pre>
+<hr>
+<h3 id="b-map-alle-strings-in-großbuchstaben-umwandeln">b) <strong>Map</strong>: Alle Strings in Großbuchstaben umwandeln</h3>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+
+List&lt;String&gt; upper = namen.stream()
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+
+System.out.println(upper); <span class="hljs-comment">// [ANNA, BERND, CLARA]</span>
+</code></pre>
+<hr>
+<h3 id="c-reduce-summe-aller-zahlen-berechnen">c) <strong>Reduce</strong>: Summe aller Zahlen berechnen</h3>
+<pre><code class="language-java"><span class="hljs-type">int</span> <span class="hljs-variable">summe</span> <span class="hljs-operator">=</span> zahlen.stream()
+    .reduce(<span class="hljs-number">0</span>, (a, b) -&gt; a + b);
+
+System.out.println(summe); <span class="hljs-comment">// 21</span>
+</code></pre>
+<hr>
+<h2 id="2-komplexe-datentransformationen-mit-streams">2. Komplexe Datentransformationen mit Streams</h2>
+<h3 id="beispiel-aus-einer-liste-von-personen-die-namen-aller-erwachsenen-ab-18-in-kleinbuchstaben-extrahieren">Beispiel: Aus einer Liste von Personen die Namen aller Erwachsenen (ab 18) in Kleinbuchstaben extrahieren</h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Person</span> {
+    <span class="hljs-keyword">private</span> String name;
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> alter;
+    <span class="hljs-comment">// Konstruktor, Getter, Setter...</span>
+}
+
+List&lt;Person&gt; personen = Arrays.asList(
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-number">20</span>),
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>(<span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-number">17</span>),
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Person</span>(<span class="hljs-string">&quot;Clara&quot;</span>, <span class="hljs-number">22</span>)
+);
+
+List&lt;String&gt; erwachseneNamen = personen.stream()
+    .filter(p -&gt; p.getAlter() &gt;= <span class="hljs-number">18</span>)
+    .map(p -&gt; p.getName().toLowerCase())
+    .collect(Collectors.toList());
+
+System.out.println(erwachseneNamen); <span class="hljs-comment">// [anna, clara]</span>
+</code></pre>
+<hr>
+<h2 id="3-vergleich-lösung-mit-schleife-vs-lösung-mit-streams">3. Vergleich: Lösung mit Schleife vs. Lösung mit Streams</h2>
+<p><strong>Aufgabe:</strong> Aus einer Liste alle Zahlen &gt; 3 quadrieren und aufsummieren.</p>
+<h3 id="a-mit-schleife">a) Mit Schleife</h3>
+<pre><code class="language-java">List&lt;Integer&gt; zahlen = Arrays.asList(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>);
+<span class="hljs-type">int</span> <span class="hljs-variable">summe</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> x : zahlen) {
+    <span class="hljs-keyword">if</span> (x &gt; <span class="hljs-number">3</span>) {
+        summe += x * x;
+    }
+}
+System.out.println(summe); <span class="hljs-comment">// 41</span>
+</code></pre>
+<h3 id="b-mit-stream">b) Mit Stream</h3>
+<pre><code class="language-java"><span class="hljs-type">int</span> <span class="hljs-variable">summe</span> <span class="hljs-operator">=</span> zahlen.stream()
+    .filter(x -&gt; x &gt; <span class="hljs-number">3</span>)
+    .map(x -&gt; x * x)
+    .reduce(<span class="hljs-number">0</span>, Integer::sum);
+
+System.out.println(summe); <span class="hljs-comment">// 41</span>
+</code></pre>
+<hr>
+<h2 id="4-anwendung-von-gruppierung-und-partitionierung">4. Anwendung von Gruppierung und Partitionierung</h2>
+<h3 id="a-gruppieren-personen-nach-alter-gruppieren">a) Gruppieren: Personen nach Alter gruppieren</h3>
+<pre><code class="language-java">Map&lt;Integer, List&lt;Person&gt;&gt; nachAlter = personen.stream()
+    .collect(Collectors.groupingBy(Person::getAlter));
+</code></pre>
+<h3 id="b-partitionieren-in-erwachsen-und-minderjährig-aufteilen">b) Partitionieren: In erwachsen und minderjährig aufteilen</h3>
+<pre><code class="language-java">Map&lt;Boolean, List&lt;Person&gt;&gt; partition = personen.stream()
+    .collect(Collectors.partitioningBy(p -&gt; p.getAlter() &gt;= <span class="hljs-number">18</span>));
+</code></pre>
+<h3 id="c-durchschnittsalter-berechnen">c) Durchschnittsalter berechnen</h3>
+<pre><code class="language-java"><span class="hljs-type">double</span> <span class="hljs-variable">durchschnitt</span> <span class="hljs-operator">=</span> personen.stream()
+    .collect(Collectors.averagingInt(Person::getAlter));
+System.out.println(durchschnitt);
+</code></pre>
+<hr>
+<h2 id="5-übungen-zum-selbststudium">5. Übungen zum Selbststudium</h2>
+<ol>
+<li>Finde mit Streams alle Strings aus einer Liste, die länger als 4 Zeichen sind, und gib sie sortiert aus.</li>
+<li>Multipliziere alle ungeraden Zahlen einer Liste miteinander (Tipp: <code>reduce()</code> mit Startwert 1).</li>
+<li>Gruppiere eine Liste von Personen nach dem Anfangsbuchstaben des Namens.</li>
+<li>Partitioniere eine Liste von Zahlen in gerade und ungerade Zahlen.</li>
+<li>Berechne mit Streams das längste Wort in einer Liste von Strings.</li>
+</ol>
+<hr>
+<h2 id="6-merksätze">6. Merksätze</h2>
+<ul>
+<li><strong>Streams sind ideal für komplexe Datenverarbeitung in wenig Codezeilen.</strong></li>
+<li><strong>Viele typische Aufgaben (Filtern, Transformieren, Aggregieren, Gruppieren) werden so viel übersichtlicher und leichter wartbar.</strong></li>
+<li><strong>Vergleiche deine Lösungen regelmäßig mit klassischen Schleifen – so erkennst du Vorteile und Grenzen.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Hands-On &ndash; &Uuml;bungen und Beispiele in Java &lpar;Multithreading&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-hands-on--übungen-und-beispiele-in-java-multithreading">Handout: Hands-On – Übungen und Beispiele in Java (Multithreading)</h1>
+<hr>
+<h2 id="81-schreibe-einen-einfachen-multi-threaded-counter-mit-synchronisation">8.1 Schreibe einen einfachen Multi-Threaded Counter mit Synchronisation</h2>
+<p><strong>Ziel:</strong>
+Mehrere Threads sollen denselben Zähler inkrementieren, ohne dass Daten verloren gehen.</p>
+<h3 id="schritt-1-unsicherer-counter-ohne-synchronisation">Schritt 1: Unsicherer Counter (ohne Synchronisation)</h3>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Counter</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+        count++;
+    }
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getCount</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> count;
+    }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CounterTest</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException {
+        <span class="hljs-type">Counter</span> <span class="hljs-variable">counter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Counter</span>();
+
+        <span class="hljs-type">Runnable</span> <span class="hljs-variable">task</span> <span class="hljs-operator">=</span> () -&gt; {
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">1000</span>; i++) {
+                counter.increment();
+            }
+        };
+
+        <span class="hljs-type">Thread</span> <span class="hljs-variable">t1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(task);
+        <span class="hljs-type">Thread</span> <span class="hljs-variable">t2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(task);
+        t1.start(); t2.start();
+        t1.join(); t2.join();
+
+        System.out.println(<span class="hljs-string">&quot;Endstand (ohne Synchronisation): &quot;</span> + counter.getCount());
+    }
+}
+</code></pre>
+<p><strong>Ergebnis:</strong>
+Meistens weniger als 2000 → Race Condition!</p>
+<h3 id="schritt-2-sicherer-counter-mit-synchronisation">Schritt 2: Sicherer Counter (mit Synchronisation)</h3>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">SafeCounter</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+        count++;
+    }
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getCount</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> count;
+    }
+}
+
+<span class="hljs-comment">// Ersetze Counter durch SafeCounter in obigem Test.</span>
+</code></pre>
+<p><strong>Jetzt:</strong> Immer genau 2000.</p>
+<hr>
+<h2 id="82-simuliere-ein-race-condition-problem-und-behebe-es-durch-synchronisation">8.2 Simuliere ein Race Condition-Problem und behebe es durch Synchronisation</h2>
+<p><strong>Beispielproblem:</strong>
+Zwei Threads heben gleichzeitig von einem gemeinsamen Bankkonto ab.</p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">BankAccount</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">balance</span> <span class="hljs-operator">=</span> <span class="hljs-number">1000</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">withdraw</span><span class="hljs-params">(<span class="hljs-type">int</span> amount)</span> {
+        <span class="hljs-keyword">if</span> (balance &gt;= amount) {
+            balance -= amount;
+        }
+    }
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getBalance</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> balance;
+    }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BankTest</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException {
+        <span class="hljs-type">BankAccount</span> <span class="hljs-variable">account</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BankAccount</span>();
+
+        <span class="hljs-type">Runnable</span> <span class="hljs-variable">task</span> <span class="hljs-operator">=</span> () -&gt; {
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">1000</span>; i++) {
+                account.withdraw(<span class="hljs-number">1</span>);
+            }
+        };
+
+        <span class="hljs-type">Thread</span> <span class="hljs-variable">t1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(task);
+        <span class="hljs-type">Thread</span> <span class="hljs-variable">t2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(task);
+        t1.start(); t2.start();
+        t1.join(); t2.join();
+
+        System.out.println(<span class="hljs-string">&quot;Endstand (ohne Synchronisation): &quot;</span> + account.getBalance());
+    }
+}
+</code></pre>
+<p><strong>Ergebnis:</strong>
+Oft negativer Kontostand oder mehr als null übrig → Race Condition.</p>
+<p><strong>Lösung:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">SafeBankAccount</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">balance</span> <span class="hljs-operator">=</span> <span class="hljs-number">1000</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">withdraw</span><span class="hljs-params">(<span class="hljs-type">int</span> amount)</span> {
+        <span class="hljs-keyword">if</span> (balance &gt;= amount) {
+            balance -= amount;
+        }
+    }
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getBalance</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> balance;
+    }
+}
+</code></pre>
+<p><strong>Jetzt:</strong> Niemals negativer Kontostand.</p>
+<hr>
+<h2 id="83-setze-einen-producer-consumer-mit-waitnotify-um">8.3 Setze einen Producer-Consumer mit <code>wait()</code>/<code>notify()</code> um</h2>
+<p><strong>Problem:</strong>
+Ein Producer erzeugt Daten und legt sie in einen Puffer, ein Consumer entnimmt sie – beide laufen in eigenen Threads.</p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Buffer</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> value;
+    <span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">available</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">put</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span> <span class="hljs-keyword">throws</span> InterruptedException {
+        <span class="hljs-keyword">while</span> (available) wait();
+        value = v;
+        available = <span class="hljs-literal">true</span>;
+        notifyAll();
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-type">int</span> <span class="hljs-title function_">get</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException {
+        <span class="hljs-keyword">while</span> (!available) wait();
+        available = <span class="hljs-literal">false</span>;
+        notifyAll();
+        <span class="hljs-keyword">return</span> value;
+    }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ProducerConsumerDemo</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">Buffer</span> <span class="hljs-variable">buffer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Buffer</span>();
+
+        <span class="hljs-comment">// Producer</span>
+        <span class="hljs-type">Thread</span> <span class="hljs-variable">producer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; {
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++) {
+                    buffer.put(i);
+                    System.out.println(<span class="hljs-string">&quot;Produced: &quot;</span> + i);
+                }
+            } <span class="hljs-keyword">catch</span> (InterruptedException ignored) {}
+        });
+
+        <span class="hljs-comment">// Consumer</span>
+        <span class="hljs-type">Thread</span> <span class="hljs-variable">consumer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; {
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++) {
+                    <span class="hljs-type">int</span> <span class="hljs-variable">val</span> <span class="hljs-operator">=</span> buffer.get();
+                    System.out.println(<span class="hljs-string">&quot;Consumed: &quot;</span> + val);
+                }
+            } <span class="hljs-keyword">catch</span> (InterruptedException ignored) {}
+        });
+
+        producer.start();
+        consumer.start();
+    }
+}
+</code></pre>
+<ul>
+<li>Producer und Consumer greifen sicher synchronisiert auf den Puffer zu.</li>
+</ul>
+<hr>
+<h2 id="84-verwende-einen-thread-pool-executorservice-für-parallele-aufgabenbearbeitung">8.4 Verwende einen Thread Pool (<code>ExecutorService</code>) für parallele Aufgabenbearbeitung</h2>
+<p><strong>Beispiel: 10 Aufgaben werden parallel in einem Thread Pool bearbeitet</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.concurrent.ExecutorService;
+<span class="hljs-keyword">import</span> java.util.concurrent.Executors;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ThreadPoolExample</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">ExecutorService</span> <span class="hljs-variable">pool</span> <span class="hljs-operator">=</span> Executors.newFixedThreadPool(<span class="hljs-number">4</span>); <span class="hljs-comment">// 4 Threads</span>
+
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) {
+            <span class="hljs-type">int</span> <span class="hljs-variable">taskId</span> <span class="hljs-operator">=</span> i;
+            pool.submit(() -&gt; {
+                System.out.println(<span class="hljs-string">&quot;Task &quot;</span> + taskId + <span class="hljs-string">&quot; läuft im Thread &quot;</span> + Thread.currentThread().getName());
+                <span class="hljs-keyword">try</span> { Thread.sleep(<span class="hljs-number">500</span>); } <span class="hljs-keyword">catch</span> (InterruptedException ignored) {}
+            });
+        }
+
+        pool.shutdown(); <span class="hljs-comment">// Nach Aufgabenende sauber beenden</span>
+    }
+}
+</code></pre>
+<ul>
+<li>Aufgaben werden automatisch auf Threads im Pool verteilt.</li>
+</ul>
+<hr>
+<h2 id="85-optional-implementiere-einen-deadlock-und-löse-ihn">8.5 Optional: Implementiere einen Deadlock und löse ihn</h2>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">DeadlockDemo</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Object</span> <span class="hljs-variable">lock1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>();
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Object</span> <span class="hljs-variable">lock2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>();
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">methodA</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">synchronized</span> (lock1) {
+            <span class="hljs-keyword">try</span> { Thread.sleep(<span class="hljs-number">50</span>); } <span class="hljs-keyword">catch</span> (InterruptedException ignored) {}
+            <span class="hljs-keyword">synchronized</span> (lock2) {
+                System.out.println(<span class="hljs-string">&quot;Method A fertig&quot;</span>);
+            }
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">methodB</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">synchronized</span> (lock2) {
+            <span class="hljs-keyword">try</span> { Thread.sleep(<span class="hljs-number">50</span>); } <span class="hljs-keyword">catch</span> (InterruptedException ignored) {}
+            <span class="hljs-keyword">synchronized</span> (lock1) {
+                System.out.println(<span class="hljs-string">&quot;Method B fertig&quot;</span>);
+            }
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">DeadlockDemo</span> <span class="hljs-variable">demo</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DeadlockDemo</span>();
+        <span class="hljs-type">Thread</span> <span class="hljs-variable">t1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(demo::methodA);
+        <span class="hljs-type">Thread</span> <span class="hljs-variable">t2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(demo::methodB);
+        t1.start(); t2.start();
+    }
+}
+</code></pre>
+<p><strong>Ergebnis:</strong></p>
+<ul>
+<li>Beide Threads blockieren sich gegenseitig – das Programm hängt.</li>
+</ul>
+<p><strong>Lösung:</strong></p>
+<ul>
+<li>Immer gleiche Reihenfolge der Locks erzwingen (z.B. beide Methoden: erst <code>lock1</code>, dann <code>lock2</code>).</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Warum ist das Ergebnis beim unsynchronisierten Counter oft zu klein?</li>
+<li>Wie löst Synchronisation das Race Condition-Problem beim Bankkonto?</li>
+<li>Wie funktioniert die Kommunikation zwischen Producer und Consumer über <code>wait()</code>/<code>notify()</code>?</li>
+<li>Welche Vorteile hat die Aufgabenverteilung über einen Thread Pool?</li>
+<li>Wie entsteht ein Deadlock und wie kann man ihn vermeiden?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Multithreading in Java erfordert die korrekte Synchronisation gemeinsam genutzter Ressourcen.</li>
+<li>Producer-Consumer-Modelle und Thread Pools gehören zu den wichtigsten Mustern im Alltag.</li>
+<li>Race Conditions und Deadlocks lassen sich mit geeignetem Code-Design und Disziplin vermeiden.</li>
+<li>Übe diese Konzepte mit eigenen Beispielen und Experimenten, um ein sicheres Verständnis zu entwickeln!</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

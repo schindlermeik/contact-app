@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundlagen der Verbindung zu einer Datenbank mit JDBC</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundlagen-der-verbindung-zu-einer-datenbank-mit-jdbc">Handout: Grundlagen der Verbindung zu einer Datenbank mit JDBC</h1>
+<hr>
+<h2 id="21-aufbau-einer-datenbankverbindung-connection">2.1 Aufbau einer Datenbankverbindung (<code>Connection</code>)</h2>
+<p>Der Zugriff auf eine relationale Datenbank mit Java erfolgt über die JDBC-API. Der wichtigste Schritt ist das Herstellen einer Verbindung – dies geschieht mit dem <code>Connection</code>-Objekt aus dem Paket <code>java.sql</code>.</p>
+<h3 id="ablauf">Ablauf:</h3>
+<ol>
+<li>
+<p><strong>JDBC-Treiber sicherstellen:</strong>
+Der PostgreSQL-Treiber muss im Projekt (über Maven) eingebunden sein.</p>
+</li>
+<li>
+<p><strong>Datenbankverbindung herstellen:</strong>
+Mit <code>DriverManager.getConnection(...)</code> erzeugst du ein <code>Connection</code>-Objekt, das die Verbindung zur Datenbank kapselt.</p>
+</li>
+</ol>
+<h4 id="beispielcode">Beispielcode:</h4>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.sql.Connection;
+<span class="hljs-keyword">import</span> java.sql.DriverManager;
+<span class="hljs-keyword">import</span> java.sql.SQLException;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DBConnectionExample</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">String</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;jdbc:postgresql://localhost:5432/meine_datenbank&quot;</span>;
+        <span class="hljs-type">String</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_benutzer&quot;</span>;
+        <span class="hljs-type">String</span> <span class="hljs-variable">password</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_passwort&quot;</span>;
+
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> DriverManager.getConnection(url, user, password);
+            System.out.println(<span class="hljs-string">&quot;Verbindung erfolgreich!&quot;</span>);
+            <span class="hljs-comment">// Weiterverarbeitung ...</span>
+            conn.close(); <span class="hljs-comment">// Wichtig: Verbindung wieder schließen!</span>
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p><strong>Hinweis:</strong>
+Ab Java 6 (und mit JDBC 4.0-konformen Treibern) ist kein explizites <code>Class.forName(&quot;org.postgresql.Driver&quot;)</code> mehr nötig.</p>
+<hr>
+<h2 id="22-typischer-verbindungsstring-url-benutzername-passwort">2.2 Typischer Verbindungsstring (URL, Benutzername, Passwort)</h2>
+<h3 id="jdbc-verbindungs-url-für-postgresql">JDBC-Verbindungs-URL für PostgreSQL</h3>
+<p>Das Format:</p>
+<pre><code>jdbc:postgresql://[host]:[port]/[datenbank]
+</code></pre>
+<ul>
+<li><strong>host:</strong> z. B. <code>localhost</code> (oder IP-Adresse, wenn extern)</li>
+<li><strong>port:</strong> Standardmäßig <code>5432</code></li>
+<li><strong>datenbank:</strong> Name deiner Datenbank</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;jdbc:postgresql://localhost:5432/meine_datenbank&quot;</span>;
+<span class="hljs-type">String</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_benutzer&quot;</span>;
+<span class="hljs-type">String</span> <span class="hljs-variable">password</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_passwort&quot;</span>;
+</code></pre>
+<h4 id="weitere-parameter">Weitere Parameter</h4>
+<p>Du kannst in der URL auch weitere Einstellungen setzen, z. B.:</p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;jdbc:postgresql://localhost:5432/meine_datenbank?ssl=false&amp;currentSchema=public&quot;</span>;
+</code></pre>
+<p><strong>Tipp:</strong>
+Speichere sensible Zugangsdaten nie im Klartext im Quellcode! Nutze ggf. Umgebungsvariablen oder externe Konfigurationsdateien (z. B. <code>.env</code>, <code>application.properties</code>).</p>
+<hr>
+<h2 id="23-ressourcenverwaltung-öffnen-und-schließen-von-verbindungen">2.3 Ressourcenverwaltung (Öffnen und Schließen von Verbindungen)</h2>
+<h3 id="warum-ist-ressourcenverwaltung-wichtig">Warum ist Ressourcenverwaltung wichtig?</h3>
+<ul>
+<li><strong>Verbindungen verbrauchen Ressourcen:</strong> Jede offene Verbindung belegt Speicher und Netzwerk-Ressourcen.</li>
+<li><strong>Leckende Verbindungen:</strong> Werden Verbindungen nicht sauber geschlossen, kann die Datenbank keine neuen Verbindungen mehr annehmen (“Connection Leak”).</li>
+<li><strong>Fehlervermeidung:</strong> Unsachgemäße Verwaltung kann zu schwer nachvollziehbaren Fehlern führen.</li>
+</ul>
+<h3 id="verbindungen-schließen">Verbindungen schließen</h3>
+<p><strong>Faustregel:</strong>
+Jede geöffnete Verbindung (<code>Connection</code>), jedes Statement (<code>Statement</code>, <code>PreparedStatement</code>) und jedes Ergebnis (<code>ResultSet</code>) muss wieder explizit geschlossen werden!</p>
+<h3 id="ab-java-7-try-with-resources">Ab Java 7: Try-with-Resources</h3>
+<p>Das <strong>try-with-resources</strong>-Statement sorgt automatisch dafür, dass alle Ressourcen am Ende des Blocks geschlossen werden – auch bei Fehlern.</p>
+<h4 id="beispiel-mit-try-with-resources">Beispiel mit Try-with-Resources:</h4>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.sql.Connection;
+<span class="hljs-keyword">import</span> java.sql.DriverManager;
+<span class="hljs-keyword">import</span> java.sql.SQLException;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">TryWithResourcesExample</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">String</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;jdbc:postgresql://localhost:5432/meine_datenbank&quot;</span>;
+        <span class="hljs-type">String</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_benutzer&quot;</span>;
+        <span class="hljs-type">String</span> <span class="hljs-variable">password</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_passwort&quot;</span>;
+
+        <span class="hljs-comment">// try-with-resources schließt die Verbindung automatisch</span>
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> DriverManager.getConnection(url, user, password)) {
+            System.out.println(<span class="hljs-string">&quot;Verbindung hergestellt!&quot;</span>);
+            <span class="hljs-comment">// ... Datenbankoperationen ...</span>
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+        <span class="hljs-comment">// conn wird hier automatisch geschlossen</span>
+    }
+}
+</code></pre>
+<p><strong>Wichtig:</strong></p>
+<ul>
+<li>Das try-with-resources-Konstrukt funktioniert für alle Objekte, die das Interface <code>AutoCloseable</code> implementieren – dazu gehören alle JDBC-Ressourcen (<code>Connection</code>, <code>Statement</code>, <code>ResultSet</code>).</li>
+<li>Immer möglichst früh und in <strong>umgekehrter Reihenfolge</strong> zum Öffnen schließen: Erst <code>ResultSet</code>, dann <code>Statement</code>, zuletzt <code>Connection</code>.</li>
+</ul>
+<hr>
+<h2 id="checkliste-verbindung-zu-postgresql-mit-jdbc-herstellen">Checkliste: Verbindung zu PostgreSQL mit JDBC herstellen</h2>
+<ol>
+<li>
+<p><strong>PostgreSQL läuft und akzeptiert Verbindungen.</strong></p>
+</li>
+<li>
+<p><strong>JDBC-Treiber in der <code>pom.xml</code> eingebunden:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>42.7.3<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+<li>
+<p><strong>Connection String, Benutzername, Passwort bereit.</strong></p>
+</li>
+<li>
+<p><strong>Verbindung mit try-with-resources öffnen.</strong></p>
+</li>
+<li>
+<p><strong>Nach Benutzung alle Ressourcen schließen (am besten automatisch).</strong></p>
+</li>
+</ol>
+<hr>
+<h2 id="aufgaben-für-die-praxis">Aufgaben für die Praxis</h2>
+<ol>
+<li>
+<p><strong>Stelle eine Verbindung zu deiner PostgreSQL-Datenbank her.</strong></p>
+<ul>
+<li>Ändere den Connection String so, dass er zu deinem Setup passt.</li>
+</ul>
+</li>
+<li>
+<p><strong>Probiere aus, was passiert, wenn du absichtlich einen falschen Benutzernamen oder ein falsches Passwort einträgst.</strong></p>
+<ul>
+<li>Was steht in der Fehlermeldung?</li>
+</ul>
+</li>
+<li>
+<p><strong>Überlege, wie du Zugangsdaten sicher speichern kannst.</strong></p>
+<ul>
+<li>Lies dich ggf. zu Umgebungsvariablen oder Properties-Files ein.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="weitere-nützliche-ressourcen">Weitere nützliche Ressourcen</h2>
+<ul>
+<li><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/package-summary.html">JDBC API JavaDoc (Oracle)</a></li>
+<li><a href="https://jdbc.postgresql.org/documentation/">Offizielle Dokumentation PostgreSQL JDBC Driver</a></li>
+<li><a href="https://www.baeldung.com/java-connect-to-postgresql">How-To: Java und PostgreSQL auf Baeldung</a></li>
+</ul>
+<hr>
+<h3 id="zusammenfassung">Zusammenfassung</h3>
+<ul>
+<li><strong>Verbindungen werden mit <code>DriverManager.getConnection(...)</code> aufgebaut.</strong></li>
+<li><strong>Connection String, Benutzername, Passwort sind erforderlich.</strong></li>
+<li><strong>Ressourcen wie Connection müssen immer geschlossen werden – am besten per try-with-resources.</strong></li>
+<li><strong>Mit Maven kannst du den PostgreSQL-Treiber einfach einbinden.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

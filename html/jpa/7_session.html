@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Umgang mit Transaktionen</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-umgang-mit-transaktionen">Handout: Umgang mit Transaktionen</h3>
+<p>Transaktionen sind ein grundlegendes Konzept im Umgang mit Datenbanken. Sie sorgen dafür, dass deine Daten konsistent und zuverlässig bleiben. In JPA hast du verschiedene Möglichkeiten, Transaktionen zu verwalten.</p>
+<h4 id="71-was-sind-transaktionen-im-jpa-kontext">7.1 Was sind Transaktionen im JPA-Kontext?</h4>
+<p>Eine Transaktion ist eine Folge von Datenbankoperationen (z. B. ein <code>INSERT</code>, gefolgt von einem <code>UPDATE</code>), die als eine einzige, unteilbare Einheit ausgeführt werden.</p>
+<p>Stell dir vor, du überweist Geld von einem Konto auf ein anderes. Das sind zwei Schritte:</p>
+<ol>
+<li>Geld vom Quellkonto abziehen (<code>UPDATE konto1 SET guthaben = guthaben - 100</code>).</li>
+<li>Geld auf das Zielkonto einzahlen (<code>UPDATE konto2 SET guthaben = guthaben + 100</code>).</li>
+</ol>
+<p>Wenn der erste Schritt erfolgreich ist, der zweite aber fehlschlägt (z. B. durch einen Serverabsturz), wäre dein Geld weg. Eine <strong>Transaktion</strong> stellt sicher, dass <strong>entweder beide Schritte erfolgreich sind oder keiner von ihnen</strong>. Dieses Prinzip wird durch die <strong>ACID-Eigenschaften</strong> (Atomicity, Consistency, Isolation, Durability) gewährleistet.</p>
+<p>Im JPA-Kontext sind alle Änderungen, die du an Entitäten vornimmst (wie <code>persist()</code>, <code>remove()</code> oder das Ändern von Attributen), an eine aktive Transaktion gebunden. Die tatsächlichen SQL-Befehle werden erst dann an die Datenbank gesendet, wenn die Transaktion <strong>gecommittet</strong> wird.</p>
+<hr>
+<h4 id="72-manuelles-vs-automatisches-transaktionsmanagement">7.2 Manuelles vs. automatisches Transaktionsmanagement</h4>
+<p>JPA bietet dir zwei Hauptwege, um Transaktionen zu verwalten. Die Wahl hängt stark davon ab, in welcher Umgebung deine Anwendung läuft.</p>
+<p><strong>1. Manuelles Transaktionsmanagement (Resource-Local)</strong></p>
+<p>Diese Methode verwendest du in einfachen Standalone-Anwendungen, Desktop-Applikationen oder wenn du kein Container-Framework wie Spring oder Jakarta EE nutzt. Du musst die Transaktionen explizit im Code starten, committen und bei Fehlern zurückrollen.</p>
+<ul>
+<li><strong>Starten</strong>: Du holst dir ein <code>EntityTransaction</code>-Objekt und rufst dessen <code>begin()</code>-Methode auf.</li>
+<li><strong>Commit</strong>: Nach den Änderungen rufst du <code>commit()</code> auf, um die Transaktion abzuschließen und die Daten zu speichern.</li>
+<li><strong>Rollback</strong>: Bei Fehlern musst du die Transaktion mit <code>rollback()</code> explizit zurückrollen, um alle Änderungen zu verwerfen.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">EntityTransaction</span> <span class="hljs-variable">transaction</span> <span class="hljs-operator">=</span> entityManager.getTransaction();
+transaction.begin(); <span class="hljs-comment">// Transaktion starten</span>
+
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-comment">// Hier finden deine CRUD-Operationen statt</span>
+    <span class="hljs-type">Kunde</span> <span class="hljs-variable">kunde</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Kunde</span>();
+    kunde.setName(<span class="hljs-string">&quot;Max Mustermann&quot;</span>);
+    entityManager.persist(kunde);
+
+    transaction.commit(); <span class="hljs-comment">// Bei Erfolg speichern</span>
+} <span class="hljs-keyword">catch</span> (Exception e) {
+    <span class="hljs-keyword">if</span> (transaction.isActive()) {
+        transaction.rollback(); <span class="hljs-comment">// Bei Fehler zurückrollen</span>
+    }
+    <span class="hljs-keyword">throw</span> e;
+} <span class="hljs-keyword">finally</span> {
+    entityManager.close();
+}
+</code></pre>
+<p><strong>2. Automatisches Transaktionsmanagement (JTA - Java Transaction API)</strong></p>
+<p>In Enterprise-Anwendungen, die in einem Application Server oder einem Container wie Spring laufen, übernimmst du das Transaktionsmanagement nicht selbst. Der Container verwaltet die Transaktionen für dich. Dieses Modell wird als <strong>JTA</strong> (Java Transaction API) bezeichnet.</p>
+<p>Du markierst einfach die Methoden in deiner Geschäftslogik mit der Annotation <strong><code>@Transactional</code></strong> (Spring) oder der entsprechenden Jakarta EE-Annotation. Der Container fängt den Aufruf ab, startet eine Transaktion, führt deine Methode aus und committet die Transaktion, wenn die Methode erfolgreich abgeschlossen wird. Wenn eine Exception auftritt, rollt der Container die Transaktion automatisch zurück.</p>
+<p><strong>Beispiel (Spring Boot):</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Service</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KundenService</span> {
+
+    <span class="hljs-meta">@Autowired</span>
+    <span class="hljs-keyword">private</span> EntityManager entityManager;
+
+    <span class="hljs-meta">@Transactional</span> <span class="hljs-comment">// Der Container verwaltet die Transaktion</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">neuerKundeAnlegen</span><span class="hljs-params">(String name)</span> {
+        <span class="hljs-type">Kunde</span> <span class="hljs-variable">kunde</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Kunde</span>();
+        kunde.setName(name);
+        entityManager.persist(kunde);
+        <span class="hljs-comment">// Bei erfolgreichem Abschluss der Methode wird automatisch commit() aufgerufen</span>
+    }
+}
+</code></pre>
+<p>Die <code>persistence.xml</code>-Datei muss für dieses Vorgehen mit <code>transaction-type=&quot;JTA&quot;</code> konfiguriert sein.</p>
+<hr>
+<h4 id="73-fehler--und-rollback-strategien">7.3 Fehler- und Rollback-Strategien</h4>
+<p>Die korrekte Fehlerbehandlung in Transaktionen ist entscheidend, um Datenkorruption zu vermeiden.</p>
+<p><strong>Manuelles Management:</strong></p>
+<ul>
+<li>Verwende <code>try-catch-finally</code>-Blöcke, um sicherzustellen, dass die Transaktion bei einer Exception zurückgerollt wird (<code>rollback()</code>).</li>
+<li>Im <code>finally</code>-Block solltest du immer den <code>EntityManager</code> schließen, um Ressourcen freizugeben.</li>
+<li>Wenn deine Transaktion bereits als <code>rollback-only</code> markiert ist (weil ein Fehler aufgetreten ist), wird ein Aufruf von <code>commit()</code> eine <code>RollbackException</code> auslösen. Überprüfe den Status der Transaktion mit <code>transaction.isActive()</code> vor dem <code>rollback()</code>.</li>
+</ul>
+<p><strong>Automatisches Management (JTA):</strong></p>
+<ul>
+<li>Bei den meisten Frameworks (wie Spring) werden <strong>ungeprüfte Exceptions</strong> (RuntimeExceptions) standardmäßig als <code>rollback</code>-Auslöser behandelt.</li>
+<li><strong>Geprüfte Exceptions</strong> (z. B. <code>IOException</code>) führen standardmäßig nicht zu einem Rollback. Du kannst dieses Verhalten aber anpassen, indem du die <code>@Transactional</code>-Annotation konfigurierst (<code>rollbackFor = ...</code>).</li>
+<li>Wenn eine Methode im JTA-Kontext eine Ausnahme auslöst, kümmert sich der Container darum, die Transaktion automatisch zurückzusetzen. Das vereinfacht deinen Code erheblich, da du dich nicht mehr um die manuelle Fehlerbehandlung kümmern musst.</li>
+</ul>
+<p>Die Beherrschung des Transaktionsmanagements ist ein Schlüssel, um robuste und zuverlässige JPA-Anwendungen zu schreiben. Wähle die Strategie, die am besten zu deiner Anwendungsumgebung passt.</p>
+
+            
+            
+        </body>
+        </html>

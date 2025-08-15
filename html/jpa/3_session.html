@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>3&bsol;&period; Konfiguration von JPA</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="3-konfiguration-von-jpa">3. Konfiguration von JPA</h3>
+<p>Dieses Handout führt Sie durch die praktischen Schritte, um JPA in ein Projekt zu integrieren und zu konfigurieren. Wir verwenden <strong>Maven</strong> zur Projektverwaltung und <strong>PostgreSQL</strong> als Beispieldatenbank.</p>
+<hr>
+<h4 id="31-integration-von-jpa-in-ein-maven-projekt">3.1 Integration von JPA in ein Maven-Projekt</h4>
+<p>Um JPA in Ihrer Anwendung zu nutzen, müssen Sie die notwendigen Abhängigkeiten in Ihrer <strong><code>pom.xml</code></strong>-Datei deklarieren. Sie benötigen mindestens zwei Hauptabhängigkeiten: den JPA-Provider (in diesem Fall Hibernate) und den JDBC-Treiber für Ihre Datenbank.</p>
+<p><strong>Schritt 1: Hinzufügen des JPA-Providers (Hibernate)</strong></p>
+<p>Fügen Sie die Hibernate-Implementierung von JPA zu den <code>dependencies</code> Ihres Maven-Projekts hinzu.</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.hibernate<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>hibernate-core<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.6.15.Final<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
+</code></pre>
+<ul>
+<li><code>hibernate-core</code> ist die Kernbibliothek von Hibernate und enthält die JPA-Implementierung.</li>
+</ul>
+<p><strong>Schritt 2: Hinzufügen des JDBC-Treibers für PostgreSQL</strong></p>
+<p>Damit Hibernate eine Verbindung zu Ihrer PostgreSQL-Datenbank aufbauen kann, benötigt es den passenden JDBC-Treiber.</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>42.5.4<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
+</code></pre>
+<ul>
+<li>Der Treiber stellt die Kommunikationsschicht zwischen Java und der PostgreSQL-Datenbank dar.</li>
+</ul>
+<p><strong>Hinweis:</strong> Achten Sie darauf, die Versionsnummern regelmäßig zu überprüfen und auf dem neuesten Stand zu halten.</p>
+<hr>
+<h4 id="32-konfiguration-der-datenquelle-postgres-als-beispiel">3.2 Konfiguration der Datenquelle (Postgres als Beispiel)</h4>
+<p>Die Details zur Verbindung mit der Datenbank werden in der <code>persistence.xml</code>-Datei festgelegt. Dies geschieht über eine Reihe von Eigenschaften.</p>
+<p>Hier sind die wichtigsten Eigenschaften, die für eine PostgreSQL-Datenbank konfiguriert werden müssen:</p>
+<ul>
+<li><strong><code>javax.persistence.jdbc.driver</code></strong>: Der Name der Treiberklasse. Für PostgreSQL ist dies <code>org.postgresql.Driver</code> (oder <code>org.postgresql.jdbc.Driver</code> in älteren Versionen).</li>
+<li><strong><code>javax.persistence.jdbc.url</code></strong>: Die JDBC-Verbindungs-URL. Sie folgt dem Muster <code>jdbc:postgresql://&lt;host&gt;:&lt;port&gt;/&lt;datenbankname&gt;</code>.</li>
+<li><strong><code>javax.persistence.jdbc.user</code></strong>: Der Benutzername, um sich bei der Datenbank anzumelden.</li>
+<li><strong><code>javax.persistence.jdbc.password</code></strong>: Das Passwort für den Benutzer.</li>
+</ul>
+<p><strong>Beispiel für die Eigenschaften in der <code>persistence.xml</code></strong>:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">properties</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.url&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;jdbc:postgresql://localhost:5432/meine_jpa_db&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.user&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;mein_benutzer&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.password&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;mein_passwort&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.driver&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;org.postgresql.Driver&quot;</span>/&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.dialect&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;org.hibernate.dialect.PostgreSQLDialect&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.hbm2ddl.auto&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;update&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.show_sql&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.format_sql&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">properties</span>&gt;</span>
+</code></pre>
+<p><strong>Erläuterung der zusätzlichen Hibernate-Eigenschaften:</strong></p>
+<ul>
+<li><strong><code>hibernate.dialect</code></strong>: Informiert Hibernate über den genauen Dialekt Ihrer Datenbank (PostgreSQL). Dies ermöglicht es Hibernate, datenbankspezifische SQL-Optimierungen vorzunehmen.</li>
+<li><strong><code>hibernate.hbm2ddl.auto</code></strong>: Dies ist eine sehr nützliche, aber in der Produktion mit Vorsicht zu verwendende Eigenschaft. Sie steuert, wie Hibernate das Datenbankschema verwaltet:
+<ul>
+<li><code>create</code>: Erstellt das Schema bei jedem Start neu und löscht alle alten Daten. (Nur für Entwicklung und Tests)</li>
+<li><code>create-drop</code>: Erstellt das Schema bei jedem Start und löscht es beim Beenden der Anwendung wieder. (Ideal für Unit-Tests)</li>
+<li><code>update</code>: Aktualisiert das Schema basierend auf den Entitäten. Fügt neue Tabellen/Spalten hinzu, löscht aber keine. (Praktisch in der Entwicklung)</li>
+<li><code>validate</code>: Überprüft, ob das Schema mit den Entitäten übereinstimmt, nimmt aber keine Änderungen vor. (Empfohlen für die Produktion)</li>
+<li><code>none</code>: Ignoriert das Schema komplett. (Manuelle Verwaltung)</li>
+</ul>
+</li>
+<li><strong><code>hibernate.show_sql</code></strong>: Gibt alle SQL-Befehle, die Hibernate ausführt, auf der Konsole aus. Sehr nützlich für das Debugging.</li>
+<li><strong><code>hibernate.format_sql</code></strong>: Formatiert die ausgegebenen SQL-Befehle, um sie besser lesbar zu machen.</li>
+</ul>
+<hr>
+<h4 id="33-aufbau-und-inhalt-der-persistencexml">3.3 Aufbau und Inhalt der <code>persistence.xml</code></h4>
+<p>Die <strong><code>persistence.xml</code></strong> ist die zentrale Konfigurationsdatei für JPA und muss sich im Verzeichnis <strong><code>src/main/resources/META-INF</code></strong> befinden. Sie definiert eine oder mehrere <strong>Persistence Units</strong>.</p>
+<p><strong>Struktur einer <code>persistence.xml</code>:</strong></p>
+<pre><code class="language-xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;UTF-8&quot;</span>?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">persistence</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://xmlns.jcp.org/xml/ns/persistence&quot;</span>
+             <span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+             <span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">&quot;http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd&quot;</span>
+             <span class="hljs-attr">version</span>=<span class="hljs-string">&quot;2.1&quot;</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">persistence-unit</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;meinePU&quot;</span> <span class="hljs-attr">transaction-type</span>=<span class="hljs-string">&quot;RESOURCE_LOCAL&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">provider</span>&gt;</span>org.hibernate.jpa.HibernatePersistenceProvider<span class="hljs-tag">&lt;/<span class="hljs-name">provider</span>&gt;</span>
+
+        <span class="hljs-tag">&lt;<span class="hljs-name">class</span>&gt;</span>com.example.projekt.entity.Kunde<span class="hljs-tag">&lt;/<span class="hljs-name">class</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">class</span>&gt;</span>com.example.projekt.entity.Bestellung<span class="hljs-tag">&lt;/<span class="hljs-name">class</span>&gt;</span>
+
+        <span class="hljs-tag">&lt;<span class="hljs-name">properties</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">properties</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">persistence-unit</span>&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-name">persistence</span>&gt;</span>
+</code></pre>
+<p><strong>Erläuterung der Schlüssel-Elemente:</strong></p>
+<ul>
+<li><strong><code>&lt;persistence&gt;</code></strong>: Das Wurzelelement. Es enthält eine oder mehrere <code>&lt;persistence-unit&gt;</code>-Definitionen.</li>
+<li><strong><code>&lt;persistence-unit name=&quot;...&gt;</code></strong>: Definiert eine logische Gruppe von Entitäten und deren Konfiguration. Der <code>name</code> ist der Schlüssel, mit dem Sie später im Code auf diese Konfiguration zugreifen.</li>
+<li><strong><code>transaction-type=&quot;RESOURCE_LOCAL&quot;</code></strong>: Dies gibt an, wie Transaktionen verwaltet werden.
+<ul>
+<li><strong><code>RESOURCE_LOCAL</code></strong>: Sie verwalten Transaktionen manuell im Code (mit <code>entityManager.getTransaction().begin()</code> und <code>commit()</code>). Dies ist typisch für Standalone- oder Desktop-Anwendungen.</li>
+<li><strong><code>JTA</code></strong>: Die Transaktionen werden von einem externen Container (z.B. einem Application Server wie WildFly oder Payara) verwaltet. Dies ist der Standard für Jakarta EE-Webanwendungen.</li>
+</ul>
+</li>
+<li><strong><code>&lt;provider&gt;</code></strong>: Spezifiziert die konkrete Implementierung von JPA. In unserem Fall ist es der Hibernate-Provider.</li>
+<li><strong><code>&lt;class&gt;</code></strong>: Listet jede einzelne Entitätsklasse auf, die zu dieser Persistenzeinheit gehört. Alternativ kann man den Provider auch so konfigurieren, dass er den Classpath nach Entitäten scannt, aber die explizite Auflistung ist oft übersichtlicher.</li>
+<li><strong><code>&lt;properties&gt;</code></strong>: Enthält alle Konfigurationseigenschaften, wie die Datenbankverbindung und das Verhalten des JPA-Providers.</li>
+</ul>
+<p>Indem Sie diese Schritte befolgen, haben Sie ein funktionierendes JPA-Setup, das bereit ist, Ihre Entitäten zu verwalten.</p>
+
+            
+            
+        </body>
+        </html>

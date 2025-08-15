@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Typsichere Programmierung mit Generics</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-typsichere-programmierung-mit-generics">Handout: Typsichere Programmierung mit Generics</h1>
+<hr>
+<h2 id="1-definition-und-bedeutung-der-typsicherheit">1. Definition und Bedeutung der Typsicherheit</h2>
+<p><strong>Typsicherheit</strong> bedeutet, dass im Code garantiert wird, dass Variablen, Objekte, Methoden etc. <strong>nur mit den erlaubten Datentypen</strong> arbeiten.
+Das Ziel: <strong>Fehler vermeiden</strong>, die entstehen, wenn ein Wert einen anderen Typ hat als erwartet.</p>
+<p><strong>Beispiele für typsicheren Code:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">int</span> <span class="hljs-variable">zahl</span> <span class="hljs-operator">=</span> <span class="hljs-number">5</span>;             <span class="hljs-comment">// Nur ganze Zahlen erlaubt</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">text</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Hallo&quot;</span>;    <span class="hljs-comment">// Nur Text erlaubt</span>
+</code></pre>
+<p>Hier ist ausgeschlossen, dass z. B. <code>zahl = &quot;abc&quot;;</code> funktioniert – der Compiler verhindert das.</p>
+<h3 id="warum-ist-typsicherheit-wichtig">Warum ist Typsicherheit wichtig?</h3>
+<ul>
+<li><strong>Fehlervermeidung:</strong> Viele Programmierfehler entstehen durch falsche Typen.</li>
+<li><strong>Klarer und wartbarer Code:</strong> Andere (und du selbst später) wissen sofort, welche Typen erwartet werden.</li>
+<li><strong>Früherkennung:</strong> Fehler werden früh entdeckt, oft schon beim Schreiben, spätestens beim Kompilieren.</li>
+</ul>
+<hr>
+<h2 id="2-wie-generics-typsicherheit-fördern">2. Wie Generics Typsicherheit fördern</h2>
+<p>Vor der Einführung von Generics (Java 5) waren viele Methoden und Collections auf den Typ <code>Object</code> ausgelegt. Dadurch konnten Fehler erst zur Laufzeit auffallen, weil alles zu allem konvertiert werden konnte.</p>
+<p><strong>Beispiel – ohne Generics:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">List</span> <span class="hljs-variable">namen</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>(); <span class="hljs-comment">// &quot;raw type&quot;</span>
+namen.add(<span class="hljs-string">&quot;Anna&quot;</span>);
+namen.add(<span class="hljs-number">123</span>); <span class="hljs-comment">// Erlaubt – aber unsinnig!</span>
+
+<span class="hljs-keyword">for</span> (Object o : namen) {
+    <span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> (String) o; <span class="hljs-comment">// ClassCastException bei 123!</span>
+}
+</code></pre>
+<p>Fehler wie der Versuch, eine Zahl als <code>String</code> zu behandeln, zeigen sich erst <strong>zur Laufzeit</strong> – und das oft an ganz anderer Stelle im Programm.</p>
+<p><strong>Mit Generics:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+namen.add(<span class="hljs-string">&quot;Anna&quot;</span>);
+<span class="hljs-comment">// namen.add(123); // Compilerfehler: Typsicherheit!</span>
+
+<span class="hljs-keyword">for</span> (String name : namen) {
+    System.out.println(name.toUpperCase());
+}
+</code></pre>
+<p>Hier erkennt der <strong>Compiler</strong> sofort, wenn du einen falschen Typ hinzufügst. Typsicherheit ist gewährleistet.</p>
+<hr>
+<h2 id="3-vergleich-generics-vs-raw-types">3. Vergleich: Generics vs. „raw types“</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Raw Types</strong></th>
+<th><strong>Generics</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Deklaration</strong></td>
+<td><code>List liste = new ArrayList();</code></td>
+<td><code>List&lt;String&gt; liste = new ArrayList&lt;&gt;();</code></td>
+</tr>
+<tr>
+<td><strong>Typprüfung</strong></td>
+<td>Nur auf <code>Object</code>-Basis</td>
+<td>Auf konkreten Typ</td>
+</tr>
+<tr>
+<td><strong>Casts nötig?</strong></td>
+<td>Ja – beim Zugriff</td>
+<td>Nein</td>
+</tr>
+<tr>
+<td><strong>Fehlerart</strong></td>
+<td>Laufzeitfehler</td>
+<td>Compilerfehler</td>
+</tr>
+<tr>
+<td><strong>Lesbarkeit</strong></td>
+<td>Schlechter, unklarer Typ</td>
+<td>Klarer, besser lesbar</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Code-Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Raw type</span>
+<span class="hljs-type">List</span> <span class="hljs-variable">daten</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>();
+daten.add(<span class="hljs-string">&quot;Wert&quot;</span>);
+daten.add(<span class="hljs-number">42</span>);
+<span class="hljs-type">String</span> <span class="hljs-variable">s</span> <span class="hljs-operator">=</span> (String) daten.get(<span class="hljs-number">1</span>); <span class="hljs-comment">// Laufzeitfehler</span>
+
+<span class="hljs-comment">// Mit Generics</span>
+List&lt;String&gt; daten2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+daten2.add(<span class="hljs-string">&quot;Wert&quot;</span>);
+<span class="hljs-comment">// daten2.add(42); // Compilerfehler: Nur Strings erlaubt!</span>
+</code></pre>
+<hr>
+<h2 id="4-kompilierzeit-prüfung-statt-laufzeit-fehler">4. Kompilierzeit-Prüfung statt Laufzeit-Fehler</h2>
+<p><strong>Generics</strong> ermöglichen, dass viele Fehler <strong>früh</strong> erkannt werden, nämlich beim Kompilieren – bevor das Programm überhaupt startet.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;Integer&gt; zahlen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+zahlen.add(<span class="hljs-number">1</span>);
+zahlen.add(<span class="hljs-number">2</span>);
+<span class="hljs-comment">// zahlen.add(&quot;drei&quot;); // Compilerfehler</span>
+
+<span class="hljs-keyword">for</span> (Integer zahl : zahlen) {
+    System.out.println(zahl * <span class="hljs-number">2</span>);
+}
+</code></pre>
+<ul>
+<li>Ohne Generics: <code>&quot;drei&quot;</code> hätte eingefügt werden können – und hätte erst beim Zugriff einen Fehler verursacht.</li>
+<li>Mit Generics: Der Fehler wird <strong>sofort</strong> angezeigt, und das Programm startet gar nicht erst mit dem Fehler.</li>
+</ul>
+<h3 id="vorteile-der-kompilierzeit-prüfung">Vorteile der Kompilierzeit-Prüfung:</h3>
+<ul>
+<li><strong>Früher Fehler erkennen</strong>: Keine Überraschungen im laufenden Programm.</li>
+<li><strong>Bessere Wartbarkeit</strong>: Andere Entwickler sehen sofort, welche Typen zulässig sind.</li>
+<li><strong>Keine unnötigen Casts</strong>: Weniger Schreibarbeit und weniger Fehlerquellen.</li>
+</ul>
+<hr>
+<h2 id="5-übungen-zum-selbststudium">5. Übungen zum Selbststudium</h2>
+<ol>
+<li>Schreibe eine Liste ohne Generics, füge verschiedene Typen ein, und versuche beim Zugriff einen Cast – was passiert?</li>
+<li>Schreibe denselben Code mit Generics – welche Fehler treten auf, und wann?</li>
+<li>Überlege: Wo in deinem bisherigen Java-Code haben Generics dich schon einmal vor Fehlern bewahrt?</li>
+</ol>
+<hr>
+<h2 id="6-merksätze">6. Merksätze</h2>
+<ul>
+<li><strong>Typsicherheit</strong> verhindert viele typische Programmierfehler schon beim Kompilieren.</li>
+<li><strong>Generics</strong> sind ein Werkzeug, das Typsicherheit für Collections und andere Klassen bereitstellt.</li>
+<li><strong>Generics = Kompilierzeit-Prüfung statt Laufzeit-Überraschung.</strong></li>
+<li>Benutze keine „raw types“ mehr – sie sind unsicher und veraltet!</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Thread-Sicherheit und sichere Datenstrukturen in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-thread-sicherheit-und-sichere-datenstrukturen-in-java">Handout: Thread-Sicherheit und sichere Datenstrukturen in Java</h1>
+<hr>
+<h2 id="51-was-ist-thread-sicherheit">5.1 Was ist Thread-Sicherheit?</h2>
+<p><strong>Definition:</strong>
+Ein Codeabschnitt, eine Methode oder eine Datenstruktur ist <strong>thread-sicher</strong>, wenn sie auch bei Zugriffen durch mehrere Threads gleichzeitig stets konsistente, korrekte Ergebnisse liefert und keine Race Conditions auftreten.</p>
+<p><strong>Wichtig:</strong></p>
+<ul>
+<li>Thread-Sicherheit bezieht sich darauf, dass keine Daten verloren gehen, keine inkonsistenten Zustände entstehen und keine unvorhersehbaren Ausnahmen auftreten, selbst wenn viele Threads auf dieselbe Ressource zugreifen.</li>
+</ul>
+<p><strong>Merkmale thread-sicheren Codes:</strong></p>
+<ul>
+<li>Schutz vor Race Conditions (durch Synchronisation, Locks oder atomare Operationen)</li>
+<li>Korrekte Sichtbarkeit von Änderungen zwischen Threads (Visibility)</li>
+<li>Keine unvorhergesehenen Ausnahmen aufgrund konkurrierenden Zugriffs</li>
+</ul>
+<hr>
+<h2 id="52-nicht-thread-sichere-vs-thread-sichere-implementierungen">5.2 Nicht-thread-sichere vs. thread-sichere Implementierungen</h2>
+<h3 id="nicht-thread-sichere-datenstrukturen"><strong>Nicht-thread-sichere Datenstrukturen</strong></h3>
+<ul>
+<li><strong><code>ArrayList</code></strong>, <strong><code>HashMap</code></strong>, <strong><code>LinkedList</code></strong>, usw.</li>
+<li>Diese Klassen sind NICHT für gleichzeitigen Zugriff durch mehrere Threads gedacht.</li>
+</ul>
+<p><strong>Beispielproblem:</strong></p>
+<pre><code class="language-java">List&lt;Integer&gt; list = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+<span class="hljs-comment">// Zwei Threads fügen gleichzeitig Elemente hinzu → Inkonsistenzen!</span>
+</code></pre>
+<ul>
+<li>Mögliche Folgen: Datenverluste, <code>ConcurrentModificationException</code>, beschädigte interne Zustände.</li>
+</ul>
+<h3 id="thread-sichere-datenstrukturen"><strong>Thread-sichere Datenstrukturen</strong></h3>
+<ul>
+<li>
+<p><strong>Historisch:</strong></p>
+<ul>
+<li><code>Vector</code> und <code>Hashtable</code> – synchronisierte Methoden, aber langsam, heute meist nicht mehr empfohlen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Moderne Varianten:</strong></p>
+<ul>
+<li><code>CopyOnWriteArrayList</code>, <code>ConcurrentHashMap</code>, <code>ConcurrentLinkedQueue</code>, etc. aus dem Paket <code>java.util.concurrent</code>.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;Integer&gt; safeList = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CopyOnWriteArrayList</span>&lt;&gt;();
+Map&lt;String, String&gt; safeMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConcurrentHashMap</span>&lt;&gt;();
+</code></pre>
+<ul>
+<li>Diese Klassen sind für gleichzeitigen Zugriff optimiert.</li>
+</ul>
+<hr>
+<h2 id="53-verwendung-von-synchronisierten-collections">5.3 Verwendung von synchronisierten Collections</h2>
+<h3 id="a-synchronisierte-wrapper"><strong>a) Synchronisierte Wrapper</strong></h3>
+<ul>
+<li>Man kann eine nicht-thread-sichere Collection mit einem synchronisierten Wrapper versehen:</li>
+</ul>
+<pre><code class="language-java">List&lt;Integer&gt; syncList = Collections.synchronizedList(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;());
+Map&lt;String, String&gt; syncMap = Collections.synchronizedMap(<span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;());
+</code></pre>
+<ul>
+<li>Jeder Zugriff auf die Collection wird dann durch einen gemeinsamen Lock (Monitor) geschützt.</li>
+</ul>
+<p><strong>ACHTUNG:</strong></p>
+<ul>
+<li>Iteratoren auf synchronisierten Collections sind <strong>nicht</strong> automatisch thread-sicher! Beim Iterieren muss man selbst synchronisieren:</li>
+</ul>
+<pre><code class="language-java"><span class="hljs-keyword">synchronized</span>(syncList) {
+    <span class="hljs-keyword">for</span> (Integer i : syncList) {
+        <span class="hljs-comment">// ...</span>
+    }
+}
+</code></pre>
+<h3 id="b-moderne-spezialisierte-datenstrukturen"><strong>b) Moderne, spezialisierte Datenstrukturen</strong></h3>
+<ul>
+<li><strong><code>ConcurrentHashMap</code></strong> – Für hohe Performance bei vielen Lese-/Schreibzugriffen von mehreren Threads.</li>
+<li><strong><code>CopyOnWriteArrayList</code></strong> – Für Listen mit vielen Lesezugriffen und seltenen Änderungen.</li>
+<li><strong><code>BlockingQueue</code></strong> – Für Producer/Consumer-Patterns.</li>
+</ul>
+<p><strong>Vorteil:</strong></p>
+<ul>
+<li>Keine manuelle Synchronisation nötig, viele interne Optimierungen.</li>
+</ul>
+<hr>
+<h2 id="54-immutable-objects-als-strategie-für-nebenläufigkeit">5.4 Immutable Objects als Strategie für Nebenläufigkeit</h2>
+<p><strong>Was sind Immutable Objects?</strong></p>
+<ul>
+<li>Objekte, deren Zustand nach der Erstellung nicht mehr geändert werden kann (z.B. <code>String</code>, eigene Klassen mit final-Feldern und ohne Setter).</li>
+<li>Alle Felder sind <code>final</code> und werden nur im Konstruktor gesetzt.</li>
+</ul>
+<p><strong>Vorteil für Thread-Sicherheit:</strong></p>
+<ul>
+<li>Immutable Objects können gefahrlos von beliebig vielen Threads gleichzeitig gelesen und verwendet werden – keine Synchronisation nötig!</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Point</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> x, y;
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Point</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y)</span> {
+        <span class="hljs-built_in">this</span>.x = x; <span class="hljs-built_in">this</span>.y = y;
+    }
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getX</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> x; }
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getY</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> y; }
+}
+</code></pre>
+<ul>
+<li>Auch Sammlungen können (z.B. mit <code>List.of(...)</code> ab Java 9) als immutable erstellt werden.</li>
+</ul>
+<hr>
+<h2 id="55-praktische-beispiele-für-thread-sicheren-code">5.5 Praktische Beispiele für Thread-sicheren Code</h2>
+<h3 id="a-verwendung-synchronisierter-collections"><strong>a) Verwendung synchronisierter Collections</strong></h3>
+<pre><code class="language-java">List&lt;String&gt; list = Collections.synchronizedList(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;());
+list.add(<span class="hljs-string">&quot;A&quot;</span>);
+list.add(<span class="hljs-string">&quot;B&quot;</span>);
+<span class="hljs-comment">// In mehreren Threads: kein Datenverlust, kein Absturz</span>
+</code></pre>
+<h3 id="b-verwendung-von-concurrenthashmap"><strong>b) Verwendung von <code>ConcurrentHashMap</code></strong></h3>
+<pre><code class="language-java">Map&lt;String, Integer&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConcurrentHashMap</span>&lt;&gt;();
+map.put(<span class="hljs-string">&quot;Apfel&quot;</span>, <span class="hljs-number">3</span>);
+map.put(<span class="hljs-string">&quot;Birne&quot;</span>, <span class="hljs-number">5</span>);
+<span class="hljs-comment">// Viele Threads können gleichzeitig lesen und schreiben</span>
+</code></pre>
+<h3 id="c-immutable-object"><strong>c) Immutable Object</strong></h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Configuration</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String server;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> port;
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Configuration</span><span class="hljs-params">(String server, <span class="hljs-type">int</span> port)</span> {
+        <span class="hljs-built_in">this</span>.server = server; <span class="hljs-built_in">this</span>.port = port;
+    }
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getServer</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> server; }
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getPort</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> port; }
+}
+</code></pre>
+<h3 id="d-copyonwritearraylist-für-häufiges-lesen"><strong>d) CopyOnWriteArrayList für häufiges Lesen</strong></h3>
+<pre><code class="language-java">List&lt;String&gt; userList = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CopyOnWriteArrayList</span>&lt;&gt;();
+<span class="hljs-comment">// Optimal, wenn viele Threads lesen und nur selten geschrieben wird</span>
+</code></pre>
+<h3 id="e-mit-synchronisation"><strong>e) Mit Synchronisation</strong></h3>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">SafeCounter</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> { count++; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getCount</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> count; }
+}
+</code></pre>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Was ist der Unterschied zwischen <code>ArrayList</code> und <code>CopyOnWriteArrayList</code>?</li>
+<li>Warum sind immutable Objekte für Multithreading besonders geeignet?</li>
+<li>Wann solltest du eine <code>ConcurrentHashMap</code> statt einer synchronisierten <code>HashMap</code> verwenden?</li>
+<li>Welche Probleme kann es geben, wenn du Iteratoren auf synchronisierten Collections verwendest?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Thread-Sicherheit ist die Basis für stabile und korrekte Multithread-Programme in Java.</li>
+<li>Nutze moderne, thread-sichere Datenstrukturen wie <code>ConcurrentHashMap</code> und <code>CopyOnWriteArrayList</code> wann immer möglich.</li>
+<li>Immutable Objects eliminieren viele Nebenläufigkeitsprobleme auf elegante Weise.</li>
+<li>Vermeide manuelle Synchronisation, wenn es spezialisierte Datenstrukturen gibt – sie sind meist schneller und weniger fehleranfällig.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

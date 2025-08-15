@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Verwendung von Generics in eigenen Klassen und Interfaces</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-verwendung-von-generics-in-eigenen-klassen-und-interfaces">Handout: Verwendung von Generics in eigenen Klassen und Interfaces</h1>
+<hr>
+<h2 id="1-generische-klassen">1. Generische Klassen</h2>
+<h3 id="a-was-ist-eine-generische-klasse">a) Was ist eine generische Klasse?</h3>
+<p>Eine generische Klasse ist eine Klasse, bei der <strong>ein oder mehrere Typen erst bei der Verwendung festgelegt werden</strong>. Statt einen festen Typ zu verwenden, setzt man an den Stellen, an denen sonst der Typ stehen würde, einen <strong>Typ-Parameter</strong> (meist einen Großbuchstaben wie <code>T</code>).</p>
+<hr>
+<h3 id="b-syntax">b) Syntax:</h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span>&lt;T&gt; {
+    <span class="hljs-keyword">private</span> T content;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setContent</span><span class="hljs-params">(T content)</span> {
+        <span class="hljs-built_in">this</span>.content = content;
+    }
+
+    <span class="hljs-keyword">public</span> T <span class="hljs-title function_">getContent</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> content;
+    }
+}
+</code></pre>
+<ul>
+<li><code>T</code> ist ein <strong>Typ-Parameter</strong> (stellvertretend für einen konkreten Datentyp).</li>
+<li>Beim Erstellen des Objekts wird <code>T</code> festgelegt (z. B. <code>String</code>, <code>Integer</code>, eine eigene Klasse …).</li>
+</ul>
+<hr>
+<h3 id="c-beispiel-eine-generische-box-für-verschiedene-datentypen">c) Beispiel: Eine generische Box für verschiedene Datentypen</h3>
+<pre><code class="language-java">Box&lt;String&gt; stringBox = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;();
+stringBox.setContent(<span class="hljs-string">&quot;Hallo Java&quot;</span>);
+<span class="hljs-type">String</span> <span class="hljs-variable">wert</span> <span class="hljs-operator">=</span> stringBox.getContent(); <span class="hljs-comment">// Kein Cast nötig</span>
+
+Box&lt;Integer&gt; intBox = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;();
+intBox.setContent(<span class="hljs-number">42</span>);
+<span class="hljs-type">Integer</span> <span class="hljs-variable">zahl</span> <span class="hljs-operator">=</span> intBox.getContent(); <span class="hljs-comment">// Kein Cast nötig</span>
+</code></pre>
+<ul>
+<li>
+<p>Die Klasse <code>Box&lt;T&gt;</code> kann jetzt für jeden beliebigen Typ verwendet werden.</p>
+</li>
+<li>
+<p>Es können keine „falschen“ Typen hineingelegt werden:</p>
+<pre><code class="language-java">Box&lt;String&gt; nameBox = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;();
+nameBox.setContent(<span class="hljs-string">&quot;Anna&quot;</span>);
+<span class="hljs-comment">// nameBox.setContent(123); // Compilerfehler!</span>
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="2-generische-interfaces">2. Generische Interfaces</h2>
+<h3 id="a-was-ist-ein-generisches-interface">a) Was ist ein generisches Interface?</h3>
+<p>Ein generisches Interface ist ein Interface, das Typ-Parameter verwendet – ähnlich wie bei generischen Klassen. So können Implementierungen für verschiedene Typen geschaffen werden.</p>
+<hr>
+<h3 id="b-beispiel-das-interface-comparablet">b) Beispiel: Das Interface <code>Comparable&lt;T&gt;</code></h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">Comparable</span>&lt;T&gt; {
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">compareTo</span><span class="hljs-params">(T o)</span>;
+}
+</code></pre>
+<ul>
+<li>Das Interface <code>Comparable&lt;T&gt;</code> ist in der Java-Standardbibliothek weit verbreitet.</li>
+<li>Klassen, die <code>Comparable&lt;T&gt;</code> implementieren, müssen die Methode <code>compareTo(T o)</code> für den jeweiligen Typ implementieren.</li>
+</ul>
+<h4 id="beispiel-eigene-klasse-die-comparable-verwendet">Beispiel: Eigene Klasse, die Comparable verwendet</h4>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Student</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Comparable</span>&lt;Student&gt; {
+    <span class="hljs-keyword">private</span> String name;
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> punkte;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Student</span><span class="hljs-params">(String name, <span class="hljs-type">int</span> punkte)</span> {
+        <span class="hljs-built_in">this</span>.name = name;
+        <span class="hljs-built_in">this</span>.punkte = punkte;
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">compareTo</span><span class="hljs-params">(Student other)</span> {
+        <span class="hljs-keyword">return</span> Integer.compare(<span class="hljs-built_in">this</span>.punkte, other.punkte);
+    }
+}
+</code></pre>
+<ul>
+<li>So kann eine Liste von <code>Student</code>-Objekten problemlos sortiert werden.</li>
+</ul>
+<hr>
+<h2 id="3-instanziierung-generischer-klassen">3. Instanziierung generischer Klassen</h2>
+<h3 id="a-wie-erzeugt-man-eine-instanz-einer-generischen-klasse">a) Wie „erzeugt“ man eine Instanz einer generischen Klasse?</h3>
+<p>Beim Erzeugen des Objekts gibst du in spitzen Klammern <code>&lt;...&gt;</code> den konkreten Typ an, für den der Typ-Parameter stehen soll.</p>
+<pre><code class="language-java">Box&lt;String&gt; meineBox = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;();
+meineBox.setContent(<span class="hljs-string">&quot;Java rocks!&quot;</span>);
+
+Box&lt;Double&gt; preisBox = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;();
+preisBox.setContent(<span class="hljs-number">9.99</span>);
+</code></pre>
+<ul>
+<li>
+<p>Ab Java 7 kann beim Erzeugen rechts die Typ-Angabe durch <code>&lt;&gt;</code> abgekürzt werden:</p>
+<pre><code class="language-java">Box&lt;String&gt; box = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;(); <span class="hljs-comment">// &quot;Diamond Operator&quot;</span>
+</code></pre>
+</li>
+</ul>
+<h3 id="b-wichtige-hinweise">b) Wichtige Hinweise</h3>
+<ul>
+<li>Die Typ-Angabe in <code>&lt;...&gt;</code> ist <strong>keine</strong> echte Variable, sondern existiert nur zur Compile-Zeit.</li>
+<li>Der Typ-Parameter kann alles sein: primitive Datentypen müssen aber als Wrapper (<code>Integer</code>, <code>Double</code> usw.) verwendet werden, nicht als <code>int</code>/<code>double</code>.</li>
+</ul>
+<h3 id="c-falsche-verwendung-wird-vom-compiler-erkannt">c) Falsche Verwendung wird vom Compiler erkannt:</h3>
+<pre><code class="language-java">Box&lt;Integer&gt; box = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;();
+<span class="hljs-comment">// box.setContent(&quot;Text&quot;); // Compilerfehler! Nur Integer erlaubt</span>
+</code></pre>
+<hr>
+<h2 id="4-aufgaben-zum-üben">4. Aufgaben zum Üben</h2>
+<ol>
+<li>
+<p><strong>Eigene generische Klasse:</strong>
+Schreibe eine Klasse <code>Pair&lt;T, U&gt;</code>, die zwei Werte von (beliebigen) Typen speichert.</p>
+</li>
+<li>
+<p><strong>Eigene generische Methode:</strong>
+Erstelle eine Methode, die aus einer <code>Box&lt;T&gt;</code> den Wert zurückgibt, egal welcher Typ.</p>
+</li>
+<li>
+<p><strong>Implementiere ein eigenes generisches Interface:</strong>
+Schreibe ein Interface <code>Saver&lt;T&gt;</code>, das eine Methode <code>void save(T value)</code> vorgibt. Implementiere eine Klasse <code>StringSaver</code>, die dieses Interface für Strings umsetzt.</p>
+</li>
+</ol>
+<hr>
+<h2 id="5-zusammenfassung">5. Zusammenfassung</h2>
+<ul>
+<li><strong>Generische Klassen</strong> und <strong>Interfaces</strong> ermöglichen dir, flexiblen und typsicheren Code zu schreiben.</li>
+<li>Du musst dich <strong>nicht mehr auf einen bestimmten Datentyp festlegen</strong>, sondern kannst denselben Code für viele verschiedene Typen wiederverwenden.</li>
+<li>Der <strong>Compiler prüft</strong>, dass du keine „falschen“ Typen verwendest.</li>
+<li>Besonders nützlich ist das in der Java-Standardbibliothek (z. B. bei Listen, Maps, Sets …).</li>
+</ul>
+<hr>
+<h2 id="6-merksätze">6. Merksätze</h2>
+<ul>
+<li><strong>T</strong> steht meist für „Type“; auch gängig: E (Element), K (Key), V (Value).</li>
+<li>Du kannst mehrere Typ-Parameter nutzen: <code>Pair&lt;T, U&gt;</code>.</li>
+<li>Generics machen deinen Code <strong>robuster</strong> und <strong>leichter lesbar</strong>.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

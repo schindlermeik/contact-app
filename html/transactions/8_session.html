@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praktische &Uuml;bungen und Beispiele</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-praktische-übungen-und-beispiele">Handout: Praktische Übungen und Beispiele</h3>
+<p>Nachdem du die Theorie zu Transaktionen kennst, ist es Zeit, sie praktisch anzuwenden. Die folgenden Übungen helfen dir, das Verhalten von Transaktionen in JPA zu verstehen und typische Anwendungsfälle zu meistern.</p>
+<h4 id="81-übung-implementiere-eine-überweisung-mit-transaktion">8.1 Übung: Implementiere eine Überweisung mit Transaktion</h4>
+<p>Das klassische Beispiel für eine Transaktion ist die Überweisung von Geld. Diese Operation besteht aus zwei Schritten, die atomar ausgeführt werden müssen: Geld abbuchen und Geld einzahlen.</p>
+<h5 id="voraussetzungen">Voraussetzungen</h5>
+<ul>
+<li>Du benötigst ein funktionierendes JPA-Setup (wie in den vorherigen Handouts beschrieben).</li>
+<li>Erstelle eine Entität <code>Konto</code>:</li>
+</ul>
+<!-- end list -->
+<pre><code class="language-java"><span class="hljs-comment">// src/main/java/com/example/model/Konto.java</span>
+<span class="hljs-keyword">import</span> javax.persistence.*;
+
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Konto</span> {
+
+    <span class="hljs-meta">@Id</span>
+    <span class="hljs-meta">@GeneratedValue(strategy = GenerationType.IDENTITY)</span>
+    <span class="hljs-keyword">private</span> Long id;
+
+    <span class="hljs-keyword">private</span> String inhaber;
+    <span class="hljs-keyword">private</span> <span class="hljs-type">double</span> guthaben;
+
+    <span class="hljs-comment">// Standard-Konstruktor</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Konto</span><span class="hljs-params">()</span> {}
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Konto</span><span class="hljs-params">(String inhaber, <span class="hljs-type">double</span> guthaben)</span> {
+        <span class="hljs-built_in">this</span>.inhaber = inhaber;
+        <span class="hljs-built_in">this</span>.guthaben = guthaben;
+    }
+
+    <span class="hljs-comment">// Getters and Setters ...</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-type">double</span> <span class="hljs-title function_">getGuthaben</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> guthaben; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setGuthaben</span><span class="hljs-params">(<span class="hljs-type">double</span> guthaben)</span> { <span class="hljs-built_in">this</span>.guthaben = guthaben; }
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<h5 id="implementierung">Implementierung</h5>
+<p>Erstelle eine Methode <code>ueberweisen()</code>, die eine Überweisung durchführt. Die gesamte Logik muss in einer einzigen Transaktion gekapselt sein.</p>
+<pre><code class="language-java"><span class="hljs-comment">// In deiner Hauptklasse oder einem Service-Objekt</span>
+<span class="hljs-keyword">import</span> javax.persistence.*;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KontoService</span> {
+
+    <span class="hljs-keyword">private</span> EntityManager em;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">KontoService</span><span class="hljs-params">(EntityManager em)</span> {
+        <span class="hljs-built_in">this</span>.em = em;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">ueberweisen</span><span class="hljs-params">(Long vonKontoId, Long zuKontoId, <span class="hljs-type">double</span> betrag)</span> {
+        <span class="hljs-type">EntityTransaction</span> <span class="hljs-variable">transaction</span> <span class="hljs-operator">=</span> em.getTransaction();
+        transaction.begin();
+
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-comment">// 1. Konten aus der Datenbank laden</span>
+            <span class="hljs-type">Konto</span> <span class="hljs-variable">vonKonto</span> <span class="hljs-operator">=</span> em.find(Konto.class, vonKontoId);
+            <span class="hljs-type">Konto</span> <span class="hljs-variable">zuKonto</span> <span class="hljs-operator">=</span> em.find(Konto.class, zuKontoId);
+
+            <span class="hljs-comment">// 2. Prüfen, ob die Konten existieren und genug Guthaben vorhanden ist</span>
+            <span class="hljs-keyword">if</span> (vonKonto == <span class="hljs-literal">null</span> || zuKonto == <span class="hljs-literal">null</span>) {
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Ein Konto existiert nicht.&quot;</span>);
+            }
+            <span class="hljs-keyword">if</span> (vonKonto.getGuthaben() &lt; betrag) {
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<span class="hljs-string">&quot;Nicht genug Guthaben für die Überweisung.&quot;</span>);
+            }
+
+            <span class="hljs-comment">// 3. Geld abbuchen und einzahlen</span>
+            vonKonto.setGuthaben(vonKonto.getGuthaben() - betrag);
+            zuKonto.setGuthaben(zuKonto.getGuthaben() + betrag);
+
+            <span class="hljs-comment">// 4. Änderungen in der Datenbank speichern (commit)</span>
+            transaction.commit();
+            System.out.println(<span class="hljs-string">&quot;Überweisung erfolgreich abgeschlossen.&quot;</span>);
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            <span class="hljs-comment">// 5. Bei einem Fehler: Transaktion zurückrollen</span>
+            <span class="hljs-keyword">if</span> (transaction.isActive()) {
+                transaction.rollback();
+                System.err.println(<span class="hljs-string">&quot;Überweisung fehlgeschlagen. Rollback durchgeführt.&quot;</span>);
+            }
+            <span class="hljs-keyword">throw</span> e; <span class="hljs-comment">// Exception weiterwerfen</span>
+        }
+    }
+}
+</code></pre>
+<p><strong>Aufgabe:</strong> Schreibe nun die <code>main</code>-Methode, die zwei Konten erstellt, Guthaben einzahlt und die <code>ueberweisen()</code>-Methode aufruft. Überprüfe die Guthaben vor und nach der Überweisung.</p>
+<hr>
+<h4 id="82-übung-rollback-bei-fehlern">8.2 Übung: Rollback bei Fehlern</h4>
+<p>In dieser Übung simulierst du einen Fehler, um zu sehen, wie die <code>rollback</code>-Funktionalität sicherstellt, dass deine Daten konsistent bleiben.</p>
+<h5 id="implementierung-1">Implementierung</h5>
+<p>Passe die Methode <code>ueberweisen()</code> aus Übung 8.1 so an, dass sie absichtlich fehlschlägt.</p>
+<pre><code class="language-java"><span class="hljs-comment">// In deiner Hauptklasse oder einem Service-Objekt</span>
+<span class="hljs-comment">// ... wie zuvor bis zum try-Block</span>
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-type">Konto</span> <span class="hljs-variable">vonKonto</span> <span class="hljs-operator">=</span> em.find(Konto.class, vonKontoId);
+    <span class="hljs-type">Konto</span> <span class="hljs-variable">zuKonto</span> <span class="hljs-operator">=</span> em.find(Konto.class, zuKontoId);
+
+    <span class="hljs-keyword">if</span> (vonKonto == <span class="hljs-literal">null</span> || zuKonto == <span class="hljs-literal">null</span>) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Ein Konto existiert nicht.&quot;</span>);
+    }
+    
+    <span class="hljs-comment">// Simuliere einen Fehler, z.B. zu wenig Guthaben</span>
+    <span class="hljs-type">double</span> <span class="hljs-variable">betrag</span> <span class="hljs-operator">=</span> <span class="hljs-number">200.0</span>;
+    <span class="hljs-keyword">if</span> (vonKonto.getGuthaben() &lt; betrag) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<span class="hljs-string">&quot;Nicht genug Guthaben für die Überweisung.&quot;</span>);
+    }
+
+    <span class="hljs-comment">// Wenn der Fehler hier passiert, werden die folgenden Zeilen nicht ausgeführt</span>
+    vonKonto.setGuthaben(vonKonto.getGuthaben() - betrag);
+    zuKonto.setGuthaben(zuKonto.getGuthaben() + betrag);
+
+    <span class="hljs-comment">// Hier passiert die Ausnahme, z.B. eine unerwartete Exception</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-literal">true</span>) { <span class="hljs-comment">// Absichtlich einen Fehler simulieren</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(<span class="hljs-string">&quot;Ein unerwarteter Fehler ist aufgetreten.&quot;</span>);
+    }
+
+    transaction.commit();
+} <span class="hljs-keyword">catch</span> (Exception e) {
+    <span class="hljs-keyword">if</span> (transaction.isActive()) {
+        transaction.rollback();
+    }
+    System.err.println(<span class="hljs-string">&quot;Fehler: &quot;</span> + e.getMessage());
+}
+</code></pre>
+<p><strong>Aufgabe:</strong></p>
+<ol>
+<li>Führe die angepasste Methode aus.</li>
+<li>Beobachte in der Konsolenausgabe, wie <code>rollback</code> aufgerufen wird.</li>
+<li>Prüfe die Datenbank: Wurde das Guthaben von <code>vonKonto</code> abgezogen? Du solltest feststellen, dass der Zustand der Datenbank unverändert bleibt, da die gesamte Operation rückgängig gemacht wurde.</li>
+<li>Entferne die <code>if (true) { ... }</code>-Zeile und führe den Code erneut aus, um zu überprüfen, dass die Überweisung jetzt korrekt durchgeführt wird.</li>
+</ol>
+<hr>
+<h4 id="83-übung-simuliere-verschiedene-isolationsebenen">8.3 Übung: Simuliere verschiedene Isolationsebenen</h4>
+<p>Die <strong>Isolationsstufe</strong> einer Transaktion bestimmt, wie stark die Transaktionen von den Aktionen anderer gleichzeitiger Transaktionen abgeschirmt sind. In dieser Übung siehst du, welche Auswirkungen das hat.</p>
+<h5 id="hintergrund">Hintergrund</h5>
+<p>Datenbanken haben verschiedene Isolationsstufen:</p>
+<ul>
+<li><code>READ_UNCOMMITTED</code> (niedrigste): Eine Transaktion kann Änderungen sehen, die von anderen Transaktionen gemacht, aber noch nicht committed wurden (&quot;Dirty Reads&quot;).</li>
+<li><code>READ_COMMITTED</code> (Standard): Eine Transaktion sieht nur committede Änderungen.</li>
+<li><code>REPEATABLE_READ</code>: Eine Transaktion sieht immer dieselben Daten in einem <code>SELECT</code>, selbst wenn eine andere Transaktion in der Zwischenzeit Daten committed hat.</li>
+<li><code>SERIALIZABLE</code> (höchste): Transaktionen werden vollständig isoliert ausgeführt, als ob sie nacheinander stattfänden.</li>
+</ul>
+<h5 id="implementierung-2">Implementierung</h5>
+<p>Du kannst die Isolationsstufe in JPA über die <code>persistence.xml</code> konfigurieren oder direkt über die Transaktionseinstellungen. Wir verwenden letzteres, da es direkter ist.</p>
+<p><strong>Aufgabe:</strong></p>
+<ol>
+<li>Schreibe eine Methode, die zwei Threads erstellt, die gleichzeitig auf denselben Datensatz zugreifen.</li>
+<li>Der <strong>Thread 1</strong> soll eine Transaktion starten, einen <code>Konto</code>-Datensatz auslesen, 10 Sekunden warten und dann ein Update durchführen und committen.</li>
+<li>Der <strong>Thread 2</strong> soll in der Zwischenzeit eine zweite Transaktion starten, denselben <code>Konto</code>-Datensatz auslesen, versuchen, ihn zu ändern und committen.</li>
+<li><strong>Experimentiere mit den Isolationsstufen</strong>:
+<ul>
+<li><strong>Simuliere <code>READ_COMMITTED</code></strong>: Wenn Thread 2 den Datensatz vor dem Commit von Thread 1 ausliest, sollte er den alten Wert sehen. Erst nach dem Commit von Thread 1 sollte das Update von Thread 2 möglich sein.</li>
+<li><strong>Simuliere <code>REPEATABLE_READ</code></strong>: In dieser Isolationsstufe sollte Thread 2 immer den ursprünglichen Wert sehen, den es zu Beginn der Transaktion gesehen hat, auch wenn Thread 1 bereits committed hat.</li>
+<li><strong>Hinweis:</strong> In der Praxis werden die meisten Datenbanken <code>READ_COMMITTED</code> oder <code>REPEATABLE_READ</code> als Standard verwenden. Um das Verhalten zu simulieren, musst du möglicherweise in deinem Code explizite Sperren verwenden.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Tipp:</strong> Um die Isolationsstufen explizit zu setzen, kannst du die Methode <code>setTransactionIsolation()</code> des JDBC-Connections-Objekts verwenden, das du von deinem <code>EntityManager</code> erhalten kannst. Das ist jedoch ein fortgeschrittenes Thema und für diese Übung reicht es aus, das Standardverhalten deiner Datenbank zu beobachten.</p>
+
+            
+            
+        </body>
+        </html>

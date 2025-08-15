@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundprinzipien modularer Softwareentwicklung</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundprinzipien-modularer-softwareentwicklung">Handout: Grundprinzipien modularer Softwareentwicklung</h1>
+<hr>
+<h2 id="21-kapselung-und-abstraktion">2.1 Kapselung und Abstraktion</h2>
+<h3 id="kapselung-encapsulation"><strong>Kapselung (Encapsulation)</strong></h3>
+<ul>
+<li><strong>Definition:</strong> Das Verbergen von inneren Details eines Moduls (Daten, Implementierung) und das Bereitstellen einer klaren, wohldefinierten Schnittstelle (API).</li>
+<li><strong>Ziel:</strong> Außenstehende („Nutzer“ des Moduls) sehen und verwenden nur die öffentliche Schnittstelle, nicht aber die internen Details.</li>
+<li><strong>Vorteil:</strong> Änderungen an der Implementierung sind möglich, ohne andere Module zu beeinflussen.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Eine Klasse bietet Methoden zum Zugriff auf Daten, aber die eigentlichen Felder sind <code>private</code>.
+Im Modulsystem (z. B. JPMS) können ganze Pakete/Typen versteckt werden.</p>
+<h3 id="abstraktion"><strong>Abstraktion</strong></h3>
+<ul>
+<li><strong>Definition:</strong> Das Reduzieren von Komplexität, indem nur die relevanten Aspekte eines Moduls sichtbar gemacht werden.</li>
+<li><strong>Ziel:</strong> Nutzer eines Moduls müssen nur wissen, <strong>was</strong> es tut, nicht <strong>wie</strong>.</li>
+<li><strong>Vorteil:</strong> Erhöhte Verständlichkeit, geringere Fehleranfälligkeit.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Ein Datenbankmodul stellt eine API wie <code>save()</code> und <code>findById()</code> bereit – der Nutzer muss nichts über SQL, Verbindungen oder Transaktionen wissen.</p>
+<hr>
+<h2 id="22-lose-kopplung-und-starke-kohäsion">2.2 Lose Kopplung und starke Kohäsion</h2>
+<h3 id="lose-kopplung-loose-coupling"><strong>Lose Kopplung (Loose Coupling)</strong></h3>
+<ul>
+<li><strong>Definition:</strong> Module sind möglichst unabhängig voneinander, sie kennen und verwenden nur die Schnittstellen, nicht die konkreten Implementierungen anderer Module.</li>
+<li><strong>Ziel:</strong> Änderungen oder Austausch eines Moduls haben minimale Auswirkungen auf andere Module.</li>
+<li><strong>Vorteil:</strong> Flexibilität, bessere Testbarkeit, einfachere Wartung.</li>
+</ul>
+<p><strong>Typische Techniken:</strong></p>
+<ul>
+<li>Verwendung von Interfaces oder Abstraktionen</li>
+<li>Dependency Injection</li>
+<li>Ereignisse/Messaging</li>
+</ul>
+<h3 id="starke-kohäsion-high-cohesion"><strong>Starke Kohäsion (High Cohesion)</strong></h3>
+<ul>
+<li><strong>Definition:</strong> Alle Bestandteile eines Moduls verfolgen ein gemeinsames, klares Ziel – sie gehören funktional zusammen.</li>
+<li><strong>Ziel:</strong> Ein Modul sollte <strong>eine</strong> klar abgegrenzte Verantwortung haben.</li>
+<li><strong>Vorteil:</strong> Verständlicher, besser wartbar, einfacher wiederverwendbar.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Ein Modul für „Benutzerverwaltung“ enthält nur alles Notwendige dafür – nicht für Produkte, Zahlungen etc.</p>
+<hr>
+<h2 id="23-schnittstellen-apis-als-verträge-zwischen-modulen">2.3 Schnittstellen (APIs) als Verträge zwischen Modulen</h2>
+<ul>
+<li>
+<p><strong>Definition:</strong> Eine Schnittstelle (API) ist ein Vertrag, der festlegt, <strong>wie</strong> andere Module mit diesem Modul interagieren dürfen.</p>
+</li>
+<li>
+<p><strong>Bedeutung:</strong></p>
+<ul>
+<li>APIs definieren, welche Funktionen/Möglichkeiten öffentlich sind.</li>
+<li>Sie „schützen“ die interne Struktur und erlauben gezielte Erweiterungen.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Best Practices:</strong></p>
+<ul>
+<li>APIs so gestalten, dass sie stabil und verständlich sind.</li>
+<li>Möglichst wenig nach außen „leaken“ – was nicht gebraucht wird, bleibt intern.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+In Java: Öffentliche Methoden, Service-Interfaces, <code>module-info.java</code> (JPMS: exports/imports).</p>
+<hr>
+<h2 id="24-separation-of-concerns-trennung-von-verantwortlichkeiten">2.4 Separation of Concerns (Trennung von Verantwortlichkeiten)</h2>
+<ul>
+<li><strong>Definition:</strong> Jede Softwarekomponente (Modul, Klasse, Methode) sollte <strong>nur eine</strong> klar definierte Aufgabe (Verantwortung) haben.</li>
+<li><strong>Vorteil:</strong> Weniger Abhängigkeiten, einfacheres Testen, bessere Wartung.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+In einer Webanwendung:</p>
+<ul>
+<li>Ein Modul für Authentifizierung</li>
+<li>Ein Modul für Datenzugriff</li>
+<li>Ein Modul für Präsentation</li>
+</ul>
+<p>Wenn diese Verantwortlichkeiten vermischt werden, wird das System schnell unübersichtlich und schwer wartbar.</p>
+<hr>
+<h2 id="25-modulgrenzen-und-verantwortung-richtig-ziehen">2.5 Modulgrenzen und Verantwortung richtig ziehen</h2>
+<ul>
+<li>
+<p><strong>Herausforderung:</strong> Zu große Module werden unübersichtlich („Gott-Modul“), zu kleine führen zu unnötiger Komplexität.</p>
+</li>
+<li>
+<p><strong>Faustregeln:</strong></p>
+<ul>
+<li>Ein Modul, eine Aufgabe/Verantwortung (Single Responsibility Principle).</li>
+<li>Module so schneiden, dass sie unabhängig und wiederverwendbar sind.</li>
+<li>Schnittstellen als „Verträge“ klar und stabil halten.</li>
+</ul>
+</li>
+<li>
+<p><strong>Praktische Überlegung:</strong>
+Überlege, wie die Domäne (Fachlichkeit) aufgeteilt ist und ziehe Module entlang natürlicher Grenzen (z. B. „Benutzer“, „Bestellung“, „Bezahlung“).</p>
+</li>
+</ul>
+<p><strong>Hilfreiche Fragen:</strong></p>
+<ul>
+<li>Kann ich ein Modul einfach austauschen, ohne den Rest anzupassen?</li>
+<li>Sind die Verantwortlichkeiten klar voneinander getrennt?</li>
+<li>Welche Daten/Funktionen sollten wirklich nach außen sichtbar sein?</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Wie hilft Kapselung dabei, Änderungen an Modulen risikoärmer zu machen?</li>
+<li>Warum ist starke Kohäsion und lose Kopplung so wichtig für große Projekte?</li>
+<li>Was sollte eine gute Schnittstelle leisten – und was nicht?</li>
+<li>Wie findest du die „richtigen“ Modulgrenzen in einem Projekt?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li><strong>Kapselung und Abstraktion</strong> schützen und vereinfachen die Nutzung von Modulen.</li>
+<li><strong>Lose Kopplung</strong> und <strong>starke Kohäsion</strong> machen Software flexibel, verständlich und wartbar.</li>
+<li><strong>Schnittstellen</strong> sind Verträge – je klarer und stabiler, desto besser.</li>
+<li><strong>Separation of Concerns</strong> verhindert Vermischung von Verantwortlichkeiten und sorgt für Klarheit.</li>
+<li>Die <strong>richtige Modulaufteilung</strong> ist entscheidend – sie sollte sich an natürlichen Aufgaben und Domänengrenzen orientieren.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

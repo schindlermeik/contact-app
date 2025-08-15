@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in Modularit&auml;t</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-modularität">Handout: Einführung in Modularität</h1>
+<hr>
+<h2 id="11-was-bedeutet-modularität-begriff-motivation-ziele">1.1 Was bedeutet Modularität? Begriff, Motivation, Ziele</h2>
+<h3 id="begriffsklärung"><strong>Begriffsklärung</strong></h3>
+<ul>
+<li><strong>Modularität</strong> bedeutet, ein System in klar abgegrenzte, unabhängige Einheiten (<strong>Module</strong>) zu zerlegen.</li>
+<li>Ein <strong>Modul</strong> ist ein abgeschlossener, eigenständig entwickel- und testbarer Teil eines Softwaresystems, der eine klar definierte Aufgabe erfüllt.</li>
+<li>Module haben wohl definierte Schnittstellen (APIs) und verbergen ihre interne Implementierung („Information Hiding“).</li>
+</ul>
+<h3 id="motivation"><strong>Motivation</strong></h3>
+<ul>
+<li>Komplexe Softwareprojekte wachsen oft schnell und werden schwer zu warten und zu verstehen.</li>
+<li>Durch Modularisierung lassen sich Komplexität beherrschen, Verantwortlichkeiten klar zuordnen und Wiederverwendung fördern.</li>
+<li>Ziel: Die „Teile“ des Systems sind unabhängig weiterentwickelbar und können flexibel kombiniert werden.</li>
+</ul>
+<h3 id="ziele-der-modularität"><strong>Ziele der Modularität</strong></h3>
+<ul>
+<li><strong>Reduzierung von Komplexität:</strong> Große Anwendungen werden in kleine, verständliche Einheiten zerlegt.</li>
+<li><strong>Wiederverwendbarkeit:</strong> Module können in verschiedenen Projekten wiederverwendet werden.</li>
+<li><strong>Wartbarkeit:</strong> Änderungen in einem Modul wirken sich nicht direkt auf andere Module aus.</li>
+<li><strong>Austauschbarkeit:</strong> Module können ersetzt oder aktualisiert werden, ohne das Gesamtsystem zu beeinträchtigen.</li>
+<li><strong>Testbarkeit:</strong> Einzelne Module lassen sich separat testen (Unit-Tests, Integrationstests).</li>
+<li><strong>Verständlichkeit:</strong> Klare Modulstruktur macht das System für neue Teammitglieder leichter erfassbar.</li>
+<li><strong>Teamarbeit:</strong> Teams können unabhängig und parallel an verschiedenen Modulen arbeiten.</li>
+</ul>
+<hr>
+<h2 id="12-vorteile-modularer-software">1.2 Vorteile modularer Software</h2>
+<h3 id="1-wartbarkeit"><strong>1. Wartbarkeit</strong></h3>
+<ul>
+<li>Änderungen betreffen meist nur das jeweilige Modul.</li>
+<li>Weniger Fehler beim Anpassen, geringeres Risiko für unerwartete Nebenwirkungen.</li>
+<li>Fehler lassen sich leichter lokalisieren und beheben.</li>
+</ul>
+<h3 id="2-wiederverwendbarkeit"><strong>2. Wiederverwendbarkeit</strong></h3>
+<ul>
+<li>Module mit klaren Schnittstellen können in mehreren Anwendungen verwendet werden.</li>
+<li>Beispiel: Ein Authentifizierungsmodul für verschiedene Apps.</li>
+</ul>
+<h3 id="3-testbarkeit"><strong>3. Testbarkeit</strong></h3>
+<ul>
+<li>Module lassen sich isoliert testen, was zu zuverlässigerem Code führt.</li>
+<li>Automatisierte Tests können gezielt für einzelne Module geschrieben werden.</li>
+</ul>
+<h3 id="4-teamarbeit"><strong>4. Teamarbeit</strong></h3>
+<ul>
+<li>Entwicklungsteams können an unterschiedlichen Modulen arbeiten, ohne sich gegenseitig zu blockieren.</li>
+<li>Schnittstellen definieren die „Verträge“ zwischen Modulen und Teams.</li>
+</ul>
+<h3 id="weitere-vorteile"><strong>Weitere Vorteile</strong></h3>
+<ul>
+<li><strong>Flexibilität:</strong> Einzelne Module lassen sich unabhängig weiterentwickeln und austauschen.</li>
+<li><strong>Skalierbarkeit:</strong> Große Systeme können einfacher wachsen, indem neue Module hinzugefügt werden.</li>
+<li><strong>Bessere Lesbarkeit:</strong> Der Code ist übersichtlicher, weil die Verantwortlichkeiten klar getrennt sind.</li>
+</ul>
+<hr>
+<h2 id="13-beispiele-modularer-architekturen">1.3 Beispiele modularer Architekturen</h2>
+<h3 id="unix-philosophie"><strong>Unix-Philosophie</strong></h3>
+<ul>
+<li>Ein Programm = eine Aufgabe = ein Modul</li>
+<li>Programme sind kleine, eigenständige Werkzeuge, die über Schnittstellen (z. B. Pipes) zusammenarbeiten.</li>
+</ul>
+<h3 id="microservices"><strong>Microservices</strong></h3>
+<ul>
+<li>Anwendung als Sammlung von unabhängigen, lose gekoppelten Diensten (Services), die jeweils ein Modul darstellen.</li>
+<li>Jeder Service ist eigenständig lauffähig und hat eigene Verantwortlichkeiten.</li>
+</ul>
+<h3 id="plugins"><strong>Plugins</strong></h3>
+<ul>
+<li>Erweiterungssysteme für Software (z. B. IDEs wie Eclipse, VS Code, Browser).</li>
+<li>Plugins sind Module, die bei Bedarf geladen und entladen werden können.</li>
+</ul>
+<h3 id="osgi"><strong>OSGi</strong></h3>
+<ul>
+<li>Dynamisches Modulsystem für Java.</li>
+<li>Ermöglicht das Laden, Entladen und Aktualisieren von Modulen (Bundles) zur Laufzeit.</li>
+</ul>
+<h3 id="java-platform-module-system-jpms-ab-java-9"><strong>Java Platform Module System (JPMS, ab Java 9)</strong></h3>
+<ul>
+<li>Modulsystem auf Sprachebene: Ermöglicht die explizite Definition von Modulen über <code>module-info.java</code>.</li>
+<li>Kapselt Pakete und kontrolliert, was exportiert und importiert wird.</li>
+<li>Erleichtert große, wartbare Java-Projekte.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Warum ist Modularität für große Softwareprojekte besonders wichtig?</li>
+<li>Wie können durch Modularisierung Wartung und Weiterentwicklung verbessert werden?</li>
+<li>Nenne ein Beispiel für ein modulares Softwaresystem, das du kennst (außerhalb von Java).</li>
+<li>Was unterscheidet ein Modul von einer einfachen Klasse oder einem Package?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li><strong>Modularität</strong> hilft, große Softwareprojekte in überschaubare, unabhängige Einheiten zu unterteilen.</li>
+<li>Sie fördert Wartbarkeit, Wiederverwendbarkeit, Testbarkeit und effektive Teamarbeit.</li>
+<li>Beispiele wie Unix-Programme, Microservices, Plugins, OSGi und das Java-Modulsystem zeigen die praktische Umsetzung von Modularität.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

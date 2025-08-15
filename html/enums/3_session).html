@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Erweiterte M&ouml;glichkeiten mit Enums in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-erweiterte-möglichkeiten-mit-enums-in-java">Handout: Erweiterte Möglichkeiten mit Enums in Java</h1>
+<hr>
+<h2 id="1-methoden-in-enums">1. Methoden in Enums</h2>
+<p>Enums können – wie Klassen – <strong>eigene Methoden</strong> und sogar <strong>Überschreibungen von Standardmethoden</strong> enthalten. Das macht sie sehr mächtig und vielseitig.</p>
+<hr>
+<h3 id="a-eigene-methoden-im-enum">a) Eigene Methoden im Enum</h3>
+<p>Du kannst in einem Enum beliebige Methoden definieren, um das Verhalten der einzelnen Enum-Werte zu beschreiben.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Richtung</span> {
+    NORD, SUED, OST, WEST;
+
+    <span class="hljs-comment">// Eigene Methode</span>
+    <span class="hljs-keyword">public</span> Richtung <span class="hljs-title function_">gegenrichtung</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">switch</span>(<span class="hljs-built_in">this</span>) {
+            <span class="hljs-keyword">case</span> NORD: <span class="hljs-keyword">return</span> SUED;
+            <span class="hljs-keyword">case</span> SUED: <span class="hljs-keyword">return</span> NORD;
+            <span class="hljs-keyword">case</span> OST:  <span class="hljs-keyword">return</span> WEST;
+            <span class="hljs-keyword">case</span> WEST: <span class="hljs-keyword">return</span> OST;
+            <span class="hljs-keyword">default</span>:   <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+        }
+    }
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">Richtung</span> <span class="hljs-variable">r</span> <span class="hljs-operator">=</span> Richtung.OST;
+System.out.println(r.gegenrichtung()); <span class="hljs-comment">// WEST</span>
+</code></pre>
+<hr>
+<h3 id="b-überschreiben-der-tostring-methode">b) Überschreiben der <code>toString()</code>-Methode</h3>
+<p>Wie bei Klassen kann auch in Enums die Methode <code>toString()</code> überschrieben werden, um eine lesbare oder angepasste String-Repräsentation zu liefern.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Status</span> {
+    AKTIV, INAKTIV, GESPERRT;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">switch</span>(<span class="hljs-built_in">this</span>) {
+            <span class="hljs-keyword">case</span> AKTIV:    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Aktiv&quot;</span>;
+            <span class="hljs-keyword">case</span> INAKTIV:  <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Inaktiv&quot;</span>;
+            <span class="hljs-keyword">case</span> GESPERRT: <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Gesperrt&quot;</span>;
+            <span class="hljs-keyword">default</span>:       <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>.toString();
+        }
+    }
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">Status</span> <span class="hljs-variable">s</span> <span class="hljs-operator">=</span> Status.AKTIV;
+System.out.println(s); <span class="hljs-comment">// Gibt &quot;Aktiv&quot; aus</span>
+</code></pre>
+<hr>
+<h2 id="2-attribute-felder-und-konstruktoren-im-enum">2. Attribute (Felder) und Konstruktoren im Enum</h2>
+<p>Enums können <strong>Felder</strong> (Attribute) besitzen und <strong>Konstruktoren</strong> definieren, um jedem Wert zusätzliche Eigenschaften zu geben.</p>
+<hr>
+<h3 id="a-enum-mit-zusätzlichen-eigenschaften">a) Enum mit zusätzlichen Eigenschaften</h3>
+<p><strong>Beispiel:</strong> Ein Enum für Planeten mit Masse und Radius:</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Planet</span> {
+    MERKUR(<span class="hljs-number">3.30e23</span>, <span class="hljs-number">2_439_700</span>),
+    VENUS(<span class="hljs-number">4.87e24</span>, <span class="hljs-number">6_051_800</span>),
+    ERDE(<span class="hljs-number">5.97e24</span>, <span class="hljs-number">6_371_000</span>);
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">double</span> masse;  <span class="hljs-comment">// in Kilogramm</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">double</span> radius; <span class="hljs-comment">// in Metern</span>
+
+    <span class="hljs-comment">// Konstruktor</span>
+    Planet(<span class="hljs-type">double</span> masse, <span class="hljs-type">double</span> radius) {
+        <span class="hljs-built_in">this</span>.masse = masse;
+        <span class="hljs-built_in">this</span>.radius = radius;
+    }
+
+    <span class="hljs-comment">// Getter</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-type">double</span> <span class="hljs-title function_">getMasse</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> masse; }
+    <span class="hljs-keyword">public</span> <span class="hljs-type">double</span> <span class="hljs-title function_">getRadius</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> radius; }
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">Planet</span> <span class="hljs-variable">p</span> <span class="hljs-operator">=</span> Planet.ERDE;
+System.out.println(p + <span class="hljs-string">&quot;: Masse = &quot;</span> + p.getMasse() + <span class="hljs-string">&quot;, Radius = &quot;</span> + p.getRadius());
+</code></pre>
+<hr>
+<h3 id="b-konstruktoren-und-getter">b) Konstruktoren und Getter</h3>
+<ul>
+<li>Der Konstruktor im Enum ist immer <strong>privat</strong> (bzw. package-private), wird aber <strong>ohne Zugriffsmodifizierer</strong> geschrieben.</li>
+<li>Du kannst für jedes Enum-Element beim Anlegen Eigenschaften mitgeben.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">AmpelPhase</span> {
+    ROT(<span class="hljs-string">&quot;Stop&quot;</span>),
+    GELB(<span class="hljs-string">&quot;Achtung&quot;</span>),
+    GRUEN(<span class="hljs-string">&quot;Go&quot;</span>);
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String bedeutung;
+
+    AmpelPhase(String bedeutung) {
+        <span class="hljs-built_in">this</span>.bedeutung = bedeutung;
+    }
+
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getBedeutung</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> bedeutung;
+    }
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">for</span> (AmpelPhase phase : AmpelPhase.values()) {
+    System.out.println(phase + <span class="hljs-string">&quot;: &quot;</span> + phase.getBedeutung());
+}
+</code></pre>
+<p><strong>Ausgabe:</strong></p>
+<pre><code>ROT: Stop
+GELB: Achtung
+GRUEN: Go
+</code></pre>
+<hr>
+<h2 id="3-übungen-zum-selbststudium">3. Übungen zum Selbststudium</h2>
+<ol>
+<li>
+<p>Definiere ein Enum <code>Schulnote</code> mit den Werten EINS, ZWEI, DREI, VIER, FUENF, SECHS.
+Gib jeder Note die Eigenschaft „Punkte“ (z. B. EINS = 15, ZWEI = 12, …).
+Implementiere eine Methode, die für jede Note die Punkte zurückliefert.</p>
+</li>
+<li>
+<p>Schreibe ein Enum <code>Wetterlage</code> mit den Werten SONNIG, BEWÖLKT, REGNERISCH, SCHNEE.
+Überschreibe die <code>toString()</code>-Methode so, dass eine Wetterbeschreibung wie „Die Sonne scheint“ ausgegeben wird.</p>
+</li>
+<li>
+<p>Füge in ein vorhandenes Enum eine eigene Methode ein (z. B. <code>istWochenende()</code> bei <code>Wochentag</code>).</p>
+</li>
+</ol>
+<hr>
+<h2 id="4-merksätze">4. Merksätze</h2>
+<ul>
+<li><strong>Enums können Methoden, Attribute und Konstruktoren besitzen.</strong></li>
+<li><strong>Jeder Enum-Wert kann eigene Eigenschaften und individuelles Verhalten haben.</strong></li>
+<li><strong>Mit <code>toString()</code> kannst du die Textdarstellung deiner Enum-Werte anpassen.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

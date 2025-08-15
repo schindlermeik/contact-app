@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in Dependency Injection &lpar;DI&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-dependency-injection-di">Handout: Einführung in Dependency Injection (DI)</h1>
+<hr>
+<h2 id="11-was-ist-dependency-injection">1.1 Was ist Dependency Injection?</h2>
+<p><strong>Dependency Injection (DI)</strong> ist ein Entwurfsmuster aus der Softwareentwicklung, das dazu dient, die Abhängigkeiten (Dependencies) eines Objekts nicht selbst innerhalb des Objekts zu erzeugen, sondern von außen bereitzustellen (zu „injizieren“).</p>
+<p><strong>Definition:</strong>
+DI bedeutet, dass eine Komponente die Objekte, die sie benötigt, nicht selbst erstellt, sondern diese von außen – meist durch den Konstruktor, eine Methode oder ein Interface – übergeben bekommt.</p>
+<p><strong>Beispiel:</strong></p>
+<p><em>Ohne Dependency Injection:</em></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Service</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">Repository</span> <span class="hljs-variable">repository</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Repository</span>();
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p><em>Mit Dependency Injection:</em></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Service</span> {
+    <span class="hljs-keyword">private</span> Repository repository;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Service</span><span class="hljs-params">(Repository repository)</span> {
+        <span class="hljs-built_in">this</span>.repository = repository;
+    }
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<h3 id="vorteile">Vorteile:</h3>
+<ul>
+<li>Die Klasse <code>Service</code> ist nicht mehr dafür verantwortlich, wie das Repository erzeugt wird.</li>
+<li>Die Abhängigkeit (<code>Repository</code>) kann ausgetauscht, gemockt oder konfiguriert werden.</li>
+</ul>
+<hr>
+<h2 id="12-begriffserklärung-abhängigkeiten-und-ihre-rolle-in-software-projekten">1.2 Begriffserklärung: Abhängigkeiten und ihre Rolle in Software-Projekten</h2>
+<h3 id="was-sind-abhängigkeiten-dependencies">Was sind Abhängigkeiten (Dependencies)?</h3>
+<p>Eine <strong>Abhängigkeit</strong> ist jedes Objekt oder jede Komponente, auf das eine Klasse oder ein Modul angewiesen ist, um korrekt zu funktionieren.</p>
+<p><strong>Beispiel:</strong>
+Eine Klasse <code>UserController</code> benötigt ein <code>UserRepository</code>, um Benutzerdaten aus einer Datenbank zu laden.
+<code>UserRepository</code> ist in diesem Fall eine Abhängigkeit von <code>UserController</code>.</p>
+<h3 id="rolle-von-abhängigkeiten-in-projekten">Rolle von Abhängigkeiten in Projekten</h3>
+<ul>
+<li><strong>Kopplung:</strong> Viele direkte Abhängigkeiten führen zu einer engen Kopplung („Tight Coupling“).</li>
+<li><strong>Austauschbarkeit:</strong> Starke Abhängigkeiten erschweren das Ersetzen einzelner Komponenten.</li>
+<li><strong>Testbarkeit:</strong> Eng gekoppelte Komponenten sind schwerer zu testen, da echte Abhängigkeiten (z.B. Datenbank, Services) verwendet werden müssen.</li>
+</ul>
+<p><strong>Merksatz:</strong>
+Jede Komponente, die ein anderes Objekt benutzt, ist von diesem abhängig – je loser die Kopplung, desto flexibler das System.</p>
+<hr>
+<h2 id="13-motivation-warum-sollte-man-di-verwenden">1.3 Motivation: Warum sollte man DI verwenden?</h2>
+<h3 id="die-wichtigsten-gründe-für-dependency-injection">Die wichtigsten Gründe für Dependency Injection:</h3>
+<ol>
+<li>
+<p><strong>Reduzierung der Kopplung:</strong></p>
+<ul>
+<li>Komponenten wissen nicht, wie ihre Abhängigkeiten erzeugt werden, sondern bekommen sie bereitgestellt.</li>
+<li>Das macht das System flexibler und weniger anfällig für Änderungen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Verbesserte Testbarkeit:</strong></p>
+<ul>
+<li>Durch DI kann man leicht sogenannte Mocks oder Stubs einsetzen, um z.B. eine Datenbank zu simulieren.</li>
+<li>Tests können isoliert geschrieben werden (Unit-Tests).</li>
+</ul>
+</li>
+<li>
+<p><strong>Förderung von Wiederverwendbarkeit:</strong></p>
+<ul>
+<li>Komponenten, die ihre Abhängigkeiten von außen bekommen, sind einfacher in anderen Kontexten wiederverwendbar.</li>
+</ul>
+</li>
+<li>
+<p><strong>Einfacherer Austausch von Implementierungen:</strong></p>
+<ul>
+<li>Man kann verschiedene Implementierungen (z.B. für <code>Repository</code>) verwenden, ohne die abhängige Klasse zu ändern.</li>
+</ul>
+</li>
+<li>
+<p><strong>Bessere Wartbarkeit:</strong></p>
+<ul>
+<li>Änderungen an Abhängigkeiten betreffen nur die Stelle, an der sie eingebunden werden, nicht aber jede Komponente einzeln.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Praxisbeispiel:</strong></p>
+<ul>
+<li>Wenn ein <code>PaymentService</code> plötzlich mit PayPal statt mit Kreditkarte arbeiten soll, genügt es, eine neue Implementierung zu „injizieren“.</li>
+</ul>
+<hr>
+<h2 id="14-vergleich-traditionelle-abhängigkeitsverwaltung-vs-dependency-injection">1.4 Vergleich: Traditionelle Abhängigkeitsverwaltung vs. Dependency Injection</h2>
+<h3 id="traditionelle-abhängigkeitsverwaltung"><strong>Traditionelle Abhängigkeitsverwaltung</strong></h3>
+<ul>
+<li>Komponenten erzeugen oder „wissen“ selbst, wie ihre Abhängigkeiten erzeugt werden.</li>
+<li>Änderungen an Abhängigkeiten führen oft zu Änderungen an vielen Stellen im Code.</li>
+<li>Schwer zu testen (da z.B. konkrete Datenbankverbindungen genutzt werden).</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">OrderRepository</span> <span class="hljs-variable">repository</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OrderRepository</span>();
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<ul>
+<li>Hier ist die Implementierung des Repositories fest verdrahtet.</li>
+</ul>
+<hr>
+<h3 id="dependency-injection"><strong>Dependency Injection</strong></h3>
+<ul>
+<li>Abhängigkeiten werden von außen gesetzt (Konstruktor, Setter, Interface).</li>
+<li>Komponenten benötigen nur das Wissen über das „Was“, nicht über das „Wie“ einer Abhängigkeit.</li>
+<li>Erleichtert das Austauschen von Abhängigkeiten, z.B. im Test.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+    <span class="hljs-keyword">private</span> OrderRepository repository;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">OrderService</span><span class="hljs-params">(OrderRepository repository)</span> {
+        <span class="hljs-built_in">this</span>.repository = repository;
+    }
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<ul>
+<li>Hier kann <code>OrderRepository</code> im Test z.B. durch ein <code>MockOrderRepository</code> ersetzt werden.</li>
+</ul>
+<hr>
+<h3 id="vergleich-in-stichpunkten"><strong>Vergleich in Stichpunkten</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Kriterium</th>
+<th>Traditionell</th>
+<th>Dependency Injection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kopplung</td>
+<td>Hoch</td>
+<td>Gering</td>
+</tr>
+<tr>
+<td>Testbarkeit</td>
+<td>Gering</td>
+<td>Hoch</td>
+</tr>
+<tr>
+<td>Austauschbarkeit</td>
+<td>Schwierig</td>
+<td>Einfach</td>
+</tr>
+<tr>
+<td>Wartbarkeit</td>
+<td>Schlechter</td>
+<td>Besser</td>
+</tr>
+<tr>
+<td>Wiederverwendbarkeit</td>
+<td>Eingeschränkt</td>
+<td>Hoch</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="reflexionsfragen-zur-selbstüberprüfung">Reflexionsfragen zur Selbstüberprüfung</h3>
+<ol>
+<li>Was versteht man unter einer „Abhängigkeit“ im Softwaredesign?</li>
+<li>Was ist der Hauptvorteil von Dependency Injection gegenüber traditioneller Abhängigkeitsverwaltung?</li>
+<li>Wie verbessert Dependency Injection die Testbarkeit von Code?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li><strong>Dependency Injection</strong> trennt die Erstellung und Nutzung von Abhängigkeiten.</li>
+<li>Dadurch werden Kopplung, Wartbarkeit und Testbarkeit deutlich verbessert.</li>
+<li>DI kann auch ohne Framework einfach im Code umgesetzt werden.</li>
+</ul>
+<hr>
+<p><strong>Tipp:</strong>
+Probiere aus, eine eigene kleine Klasse zu schreiben, die eine Abhängigkeit von außen über den Konstruktor erhält – z.B. ein <code>PrinterService</code>, der ein <code>OutputDevice</code> injected bekommt.</p>
+<hr>
+<p><strong>Fragen?</strong>
+Notiere dir offene Fragen oder Beispiele, die dir bei der Lektüre einfallen, um sie in der nächsten Übung oder im Gespräch zu klären!</p>
+<hr>
+<p><strong>Weitere Ressourcen:</strong></p>
+<ul>
+<li><a href="https://martinfowler.com/articles/injection.html">Martin Fowler – Inversion of Control Containers and the Dependency Injection pattern</a></li>
+<li><a href="https://www.baeldung.com/inversion-control-and-dependency-injection-in-spring">Baeldung: Dependency Injection Explained</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

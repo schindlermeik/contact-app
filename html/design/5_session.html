@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Build&comma; Deployment und Versionierung modularer Anwendungen</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-build-deployment-und-versionierung-modularer-anwendungen">Handout: Build, Deployment und Versionierung modularer Anwendungen</h1>
+<hr>
+<h2 id="51-modulares-bauen-mit-maven">5.1 Modulares Bauen mit Maven</h2>
+<h3 id="was-ist-maven"><strong>Was ist Maven?</strong></h3>
+<ul>
+<li>Ein weit verbreitetes Build-Management- und Projektverwaltungstool für Java.</li>
+<li>Unterstützt die Strukturierung in Module (Subprojekte) und verwaltet Abhängigkeiten, Builds und Tests.</li>
+</ul>
+<h3 id="modulares-bauen-mit-maven"><strong>Modulares Bauen mit Maven</strong></h3>
+<ul>
+<li>In Maven können Module als eigenständige Projekte verwaltet werden, die jeweils ihre eigene <code>pom.xml</code> besitzen.</li>
+<li>Die Abhängigkeiten (Dependencies) zwischen Modulen werden explizit in der <code>pom.xml</code> definiert.</li>
+<li>Maven erkennt und baut die Module in der richtigen Reihenfolge.</li>
+</ul>
+<p><strong>Beispiel-Struktur:</strong></p>
+<pre><code>my-app/
+├── pom.xml            # Parent-POM
+├── user-module/
+│   └── pom.xml
+├── order-module/
+│   └── pom.xml
+└── common-module/
+    └── pom.xml
+</code></pre>
+<p><strong>Parent-POM (<code>my-app/pom.xml</code>):</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">modules</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">module</span>&gt;</span>user-module<span class="hljs-tag">&lt;/<span class="hljs-name">module</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">module</span>&gt;</span>order-module<span class="hljs-tag">&lt;/<span class="hljs-name">module</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">module</span>&gt;</span>common-module<span class="hljs-tag">&lt;/<span class="hljs-name">module</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">modules</span>&gt;</span>
+</code></pre>
+<ul>
+<li>Die Module referenzieren sich gegenseitig über <code>&lt;dependency&gt;</code>-Blöcke in ihren jeweiligen <code>pom.xml</code>.</li>
+</ul>
+<hr>
+<h2 id="52-mehrmodulprojekte-multi-module-builds">5.2 Mehrmodulprojekte (Multi-Module Builds)</h2>
+<h3 id="was-ist-ein-multi-module-build"><strong>Was ist ein Multi-Module Build?</strong></h3>
+<ul>
+<li>Ein Maven-Projekt, das aus mehreren Modulen (Subprojekten) besteht.</li>
+<li>Der Parent-Build orchestriert den Bau aller Module.</li>
+<li>Ideal für große Anwendungen, bei denen Funktionalität sauber getrennt werden soll.</li>
+</ul>
+<h3 id="vorteile"><strong>Vorteile:</strong></h3>
+<ul>
+<li>Klare Trennung und Kapselung von Funktionalität.</li>
+<li>Getrennte Abhängigkeiten, Versionen und Releases für jedes Modul.</li>
+<li>Einfache Wiederverwendung von Modulen in anderen Projekten.</li>
+</ul>
+<p><strong>Build-Befehl:</strong>
+Im Wurzelverzeichnis ausführen:</p>
+<pre><code class="language-shell">mvn clean install
+</code></pre>
+<ul>
+<li>Maven baut alle Module automatisch in der richtigen Reihenfolge.</li>
+</ul>
+<hr>
+<h2 id="53-versionierung-von-modulen-api-kompatibilität-und-semantic-versioning">5.3 Versionierung von Modulen, API-Kompatibilität und Semantic Versioning</h2>
+<h3 id="warum-versionierung"><strong>Warum Versionierung?</strong></h3>
+<ul>
+<li>Module entwickeln sich unabhängig weiter – saubere Versionierung sichert Rückwärtskompatibilität und planbare Updates.</li>
+</ul>
+<h3 id="semantic-versioning-semver"><strong>Semantic Versioning (SemVer)</strong></h3>
+<ul>
+<li>
+<p>Versionsnummern nach dem Schema: <strong>MAJOR.MINOR.PATCH</strong> (z. B. 2.1.3)</p>
+<ul>
+<li><strong>MAJOR</strong>: Inkompatible API-Änderungen</li>
+<li><strong>MINOR</strong>: Abwärtskompatible Funktions-Erweiterungen</li>
+<li><strong>PATCH</strong>: Fehlerbehebungen, keine API-Änderung</li>
+</ul>
+</li>
+</ul>
+<p><strong>Best Practice:</strong></p>
+<ul>
+<li>API-Änderungen nur mit neuer Hauptversion (MAJOR) veröffentlichen.</li>
+<li>Jedes Modul hat eigene Versionsnummer in der <code>pom.xml</code>.</li>
+</ul>
+<h3 id="api-kompatibilität-prüfen"><strong>API-Kompatibilität prüfen</strong></h3>
+<ul>
+<li>Tools wie <a href="https://siom79.github.io/japicmp/">japicmp</a> oder <a href="https://revapi.org/">revapi</a> prüfen Änderungen zwischen Modulen/Versionen.</li>
+<li>Gute Dokumentation der Schnittstellen und Veränderungen ist Pflicht!</li>
+</ul>
+<hr>
+<h2 id="54-dynamisches-laden-und-entladen-von-modulen-zb-osgi-java-module-layer">5.4 Dynamisches Laden und Entladen von Modulen (z. B. OSGi, Java Module Layer)</h2>
+<h3 id="warum-dynamisches-laden"><strong>Warum dynamisches Laden?</strong></h3>
+<ul>
+<li>In großen, modularen Systemen möchte man Module im laufenden Betrieb hinzufügen, aktualisieren oder entfernen – ohne Systemneustart.</li>
+</ul>
+<h3 id="osgi-open-services-gateway-initiative"><strong>OSGi (Open Services Gateway Initiative)</strong></h3>
+<ul>
+<li>Industriestandard für dynamische Java-Modulsysteme.</li>
+<li>Module („Bundles“) können zur Laufzeit geladen, entladen und aktualisiert werden.</li>
+<li>Klare Trennung von API und Implementierung, Service Registry für lose Kopplung.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Ein neues Plugin (als OSGi-Bundle) kann ins System geladen werden und stellt zusätzliche Services bereit.</p>
+<h3 id="java-module-layer-ab-java-9"><strong>Java Module Layer (ab Java 9)</strong></h3>
+<ul>
+<li>Das Java Platform Module System erlaubt über <code>ModuleLayer</code> die <strong>dynamische Erstellung</strong> von Modulen im laufenden Programm.</li>
+<li>Möglich, z. B. für Plug-in-Architekturen oder für Systemsicherheit (Module mit verschiedenen Rechten laden).</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Welche Vorteile bietet ein Multi-Module-Build mit Maven für die Wartung und Weiterentwicklung großer Projekte?</li>
+<li>Wie sorgt Semantic Versioning für sichere, planbare Updates?</li>
+<li>Was unterscheidet statisches von dynamischem Laden von Modulen – und wann lohnt sich welches?</li>
+<li>Wie kann man API-Kompatibilität bei Modul-Updates verlässlich prüfen?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li><strong>Maven</strong> erleichtert das modulare Bauen, Testen und Deployen großer Java-Anwendungen.</li>
+<li>Multi-Module-Builds ermöglichen klare Architektur, bessere Wartbarkeit und Wiederverwendung.</li>
+<li><strong>Semantic Versioning</strong> ist essenziell für planbare Updates und Kompatibilität.</li>
+<li>Dynamisches Laden und Entladen (z. B. mit OSGi oder Java Module Layer) steigert die Flexibilität und Erweiterbarkeit von Softwaresystemen.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

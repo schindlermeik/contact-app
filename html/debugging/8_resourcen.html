@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Weiterf&uuml;hrende Ressourcen f&uuml;r Debugging in IntelliJ</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-weiterführende-ressourcen-für-debugging-in-intellij">Handout: Weiterführende Ressourcen für Debugging in IntelliJ</h1>
+<hr>
+<h2 id="1-offizielle-intellij-doku-debugging">1. Offizielle IntelliJ Doku: Debugging</h2>
+<ul>
+<li>
+<p><strong>IntelliJ IDEA – Debugging Your First Java Application</strong>
+<a href="https://www.jetbrains.com/help/idea/debugging-your-first-java-application.html">https://www.jetbrains.com/help/idea/debugging-your-first-java-application.html</a>
+→ Schritt-für-Schritt-Anleitung für Einsteiger (deutsch/englisch verfügbar), behandelt alle Grundfunktionen und erste Tipps für fortgeschrittenes Debugging.</p>
+</li>
+<li>
+<p><strong>Allgemeiner Debugging-Überblick (offizielle Hilfe):</strong>
+<a href="https://www.jetbrains.com/help/idea/debugging-code.html">https://www.jetbrains.com/help/idea/debugging-code.html</a>
+→ Detaillierte Beschreibungen aller Debugger-Features, inkl. fortgeschrittener Techniken.</p>
+</li>
+</ul>
+<hr>
+<h2 id="2-keyboard-shortcuts-für-schnelleres-arbeiten-im-debugger">2. Keyboard-Shortcuts für schnelleres Arbeiten im Debugger</h2>
+<p><strong>Wichtige Shortcuts (Windows/Linux):</strong></p>
+<ul>
+<li><strong>Step Over:</strong> <code>F8</code></li>
+<li><strong>Step Into:</strong> <code>F7</code></li>
+<li><strong>Step Out:</strong> <code>Shift + F8</code></li>
+<li><strong>Run to Cursor:</strong> <code>Alt + F9</code></li>
+<li><strong>Resume Program:</strong> <code>F9</code></li>
+<li><strong>Toggle Breakpoint:</strong> <code>Ctrl + F8</code></li>
+<li><strong>View Breakpoints:</strong> <code>Ctrl + Shift + F8</code></li>
+<li><strong>Evaluate Expression:</strong> <code>Alt + F8</code></li>
+<li><strong>Stop Debugging:</strong> <code>Ctrl + F2</code></li>
+<li><strong>Switch Threads/Frames:</strong> Im Debug-Fenster per Maus oder Pfeiltasten</li>
+</ul>
+<p><strong>Wichtige Shortcuts (Mac):</strong></p>
+<ul>
+<li><strong>Step Over:</strong> <code>F8</code></li>
+<li><strong>Step Into:</strong> <code>F7</code></li>
+<li><strong>Step Out:</strong> <code>Shift + F8</code></li>
+<li><strong>Run to Cursor:</strong> <code>Alt + F9</code></li>
+<li><strong>Resume Program:</strong> <code>Command + Option + R</code></li>
+<li><strong>Toggle Breakpoint:</strong> <code>Command + F8</code></li>
+<li><strong>View Breakpoints:</strong> <code>Command + Shift + F8</code></li>
+<li><strong>Evaluate Expression:</strong> <code>Option + F8</code></li>
+<li><strong>Stop Debugging:</strong> <code>Command + F2</code></li>
+</ul>
+<p><strong>Komplette Übersicht als PDF:</strong></p>
+<ul>
+<li><a href="https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf">IntelliJ IDEA Reference Card (Windows/Linux/Mac)</a></li>
+</ul>
+<hr>
+<h2 id="3-video-tutorials-und-cheat-sheets">3. Video-Tutorials und Cheat-Sheets</h2>
+<h3 id="a-video-tutorials">a) <strong>Video-Tutorials</strong></h3>
+<ul>
+<li>
+<p><strong>IntelliJ Debugging Basics (YouTube, englisch, JetBrains):</strong>
+<a href="https://www.youtube.com/watch?v=KIK5S_6kUA8">Debugging in IntelliJ IDEA</a>
+(Perfekt für Anfänger und zum Auffrischen der wichtigsten Features)</p>
+</li>
+<li>
+<p><strong>Multi-threaded Debugging in IntelliJ (YouTube, englisch):</strong>
+<a href="https://www.youtube.com/watch?v=IsAJIT8a6rs">Debugging Multi-threaded Applications</a></p>
+</li>
+<li>
+<p><strong>Deutsches Tutorial:</strong>
+<a href="https://www.youtube.com/watch?v=6e5VjOdphjY">Java Debugging in IntelliJ IDEA – Deutsch (YouTube)</a></p>
+</li>
+</ul>
+<h3 id="b-cheat-sheets">b) <strong>Cheat-Sheets</strong></h3>
+<ul>
+<li><strong>IntelliJ IDEA Debugger Cheat Sheet (offiziell):</strong>
+<a href="https://resources.jetbrains.com/storage/products/intellij-idea/docs/IntelliJIDEA_ReferenceCard.pdf">Keymap PDF mit Debugging-Shortcuts</a></li>
+<li><strong>Kompakte Übersicht als Blogartikel:</strong>
+<a href="https://blog.jetbrains.com/idea/2021/11/top-debugger-features-in-intellij-idea/">Top Debugging Features in IntelliJ IDEA (Blog, englisch)</a></li>
+</ul>
+<hr>
+<h2 id="4-weitere-nützliche-links-und-quellen">4. Weitere nützliche Links und Quellen</h2>
+<ul>
+<li>
+<p><strong>Stack Overflow:</strong>
+Viele typische Debugging-Fragen (mit Beispielcodes und Problemlösungen)</p>
+</li>
+<li>
+<p><strong>Baeldung Java Debugging Guide:</strong>
+<a href="https://www.baeldung.com/java-debugging">https://www.baeldung.com/java-debugging</a>
+(Umfassende Einführung und viele Praxistipps zu Java-Debugging allgemein)</p>
+</li>
+<li>
+<p><strong>IntelliJ IDEA Blog (Debugging-Tipps):</strong>
+<a href="https://blog.jetbrains.com/idea/tag/debugger/">https://blog.jetbrains.com/idea/tag/debugger/</a></p>
+</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

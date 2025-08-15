@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praxis &ndash; Hands-On und &Uuml;bungen zu Dependency Injection &lpar;DI&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praxis--hands-on-und-übungen-zu-dependency-injection-di">Handout: Praxis – Hands-On und Übungen zu Dependency Injection (DI)</h1>
+<hr>
+<h2 id="61-refactoring-einer-hard-coded-implementierung-zu-di">6.1 Refactoring einer „hard-coded“ Implementierung zu DI</h2>
+<h3 id="ziel">Ziel:</h3>
+<p>Lerne, bestehende festverdrahtete („hard-coded“) Abhängigkeitsbeziehungen in deinem Code auf Dependency Injection umzustellen.</p>
+<hr>
+<p><strong>Ausgangssituation (ohne DI):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">OrderRepository</span> <span class="hljs-variable">repository</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OrderRepository</span>();
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">createOrder</span><span class="hljs-params">(Order order)</span> {
+        repository.save(order);
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Problem:</strong> <code>OrderService</code> hängt fest von einer konkreten <code>OrderRepository</code>-Implementierung ab.</li>
+<li><strong>Konsequenz:</strong> Schwer testbar, schlecht erweiterbar (z. B. für Mocking oder alternative Repositories).</li>
+</ul>
+<hr>
+<p><strong>Refactoring mit DI (Konstruktor-Injektion):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> OrderRepository repository;
+
+    <span class="hljs-comment">// Abhängigkeit wird injiziert!</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">OrderService</span><span class="hljs-params">(OrderRepository repository)</span> {
+        <span class="hljs-built_in">this</span>.repository = repository;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">createOrder</span><span class="hljs-params">(Order order)</span> {
+        repository.save(order);
+    }
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">OrderRepository</span> <span class="hljs-variable">repo</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseOrderRepository</span>();
+<span class="hljs-type">OrderService</span> <span class="hljs-variable">service</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OrderService</span>(repo);
+</code></pre>
+<p><strong>Teste selbst:</strong></p>
+<ul>
+<li>Führe ein Refactoring in deinem eigenen Code durch:
+Suche eine Klasse mit fest eingebauter Abhängigkeit und stelle auf Konstruktor-Injektion um.</li>
+</ul>
+<hr>
+<h2 id="62-testen-von-komponenten-mit-dependency-injection">6.2 Testen von Komponenten mit Dependency Injection</h2>
+<h3 id="ziel-1">Ziel:</h3>
+<p>Verstehe, wie DI das Testen durch das Einsetzen von Mock-Objekten ermöglicht.</p>
+<hr>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">PaymentGateway</span> {
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">pay</span><span class="hljs-params">(<span class="hljs-type">double</span> amount)</span>;
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> PaymentGateway paymentGateway;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">OrderService</span><span class="hljs-params">(PaymentGateway paymentGateway)</span> {
+        <span class="hljs-built_in">this</span>.paymentGateway = paymentGateway;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">processPayment</span><span class="hljs-params">(<span class="hljs-type">double</span> amount)</span> {
+        paymentGateway.pay(amount);
+    }
+}
+</code></pre>
+<p><strong>Mock-Implementierung für den Test:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MockPaymentGateway</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">PaymentGateway</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">called</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-type">double</span> <span class="hljs-variable">lastAmount</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">pay</span><span class="hljs-params">(<span class="hljs-type">double</span> amount)</span> {
+        called = <span class="hljs-literal">true</span>;
+        lastAmount = amount;
+    }
+}
+</code></pre>
+<p><strong>Unit Test (z. B. mit JUnit):</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">testProcessPayment</span><span class="hljs-params">()</span> {
+    <span class="hljs-type">MockPaymentGateway</span> <span class="hljs-variable">mockGateway</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MockPaymentGateway</span>();
+    <span class="hljs-type">OrderService</span> <span class="hljs-variable">service</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OrderService</span>(mockGateway);
+
+    service.processPayment(<span class="hljs-number">42.0</span>);
+
+    assertTrue(mockGateway.called);
+    assertEquals(<span class="hljs-number">42.0</span>, mockGateway.lastAmount, <span class="hljs-number">0.01</span>);
+}
+</code></pre>
+<h3 id="übung">Übung:</h3>
+<ul>
+<li>Schreibe selbst eine Komponente, injiziere ein Mock-Objekt, und teste, ob eine Methode korrekt aufgerufen wurde.</li>
+</ul>
+<hr>
+<h2 id="63-diskussion-typische-stolperfallen-und-lösungen">6.3 Diskussion: Typische Stolperfallen und Lösungen</h2>
+<table>
+<thead>
+<tr>
+<th><strong>Problem/Stolperfalle</strong></th>
+<th><strong>Lösung/Empfehlung</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Zu viele Abhängigkeiten in einer Klasse</strong></td>
+<td>SRP beachten, Klasse aufteilen, Verantwortung prüfen</td>
+</tr>
+<tr>
+<td><strong>Mischung von hard-coded und DI-Abhängigkeiten</strong></td>
+<td>Immer einheitlich vorgehen, keine „versteckten“ new-Aufrufe</td>
+</tr>
+<tr>
+<td><strong>Vergessene/fehlende Injektion</strong></td>
+<td>Unit Tests schreiben, Code Reviews, Konstruktor-Pflichtfelder</td>
+</tr>
+<tr>
+<td><strong>Zirkuläre Abhängigkeiten (A→B, B→A)</strong></td>
+<td>Redesign, Einführung von Schnittstellen oder Factories</td>
+</tr>
+<tr>
+<td><strong>Unübersichtlicher „Zusammensteck-Code“</strong></td>
+<td>„Composition Root“ zentral halten, ggf. Factory nutzen</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reflexionsfragen:</strong></p>
+<ul>
+<li>Wo finden sich in deinem Code solche Stolperfallen?</li>
+<li>Wie kannst du durch DI und Refactoring die Architektur verbessern?</li>
+</ul>
+<hr>
+<h2 id="64-kurzer-ausblick-auf-dependency-injection-frameworks-spring-guice-quarkus">6.4 Kurzer Ausblick auf Dependency Injection Frameworks (Spring, Guice, Quarkus)</h2>
+<h3 id="warum-und-wann-frameworks-sinnvoll-werden">Warum und wann Frameworks sinnvoll werden</h3>
+<p><strong>Manuelle DI ist ausreichend…</strong></p>
+<ul>
+<li>…bei kleinen bis mittleren Projekten.</li>
+<li>…wenn die Anzahl der Komponenten überschaubar ist.</li>
+</ul>
+<p><strong>Aber:</strong></p>
+<ul>
+<li>Mit wachsendem Projekt werden das Management und die Konfiguration von Abhängigkeiten schnell unübersichtlich.</li>
+<li>Lebenszyklus, Konfiguration (z. B. für verschiedene Umgebungen), automatische Erzeugung, Ressourcenverwaltung etc. sind aufwendig.</li>
+</ul>
+<hr>
+<h3 id="vorteile-von-di-frameworks">Vorteile von DI-Frameworks</h3>
+<ul>
+<li><strong>Automatische Verdrahtung:</strong> Framework übernimmt die Erzeugung und das Verbinden der Komponenten.</li>
+<li><strong>Lebenszyklus-Verwaltung:</strong> Singleton, Prototype, etc.</li>
+<li><strong>Konfigurierbarkeit:</strong> Unterschiedliche Implementierungen für verschiedene Umgebungen (z. B. Test, Produktion).</li>
+<li><strong>Weitere Features:</strong> Scopes, Events, Aspektorientierung, etc.</li>
+</ul>
+<hr>
+<h3 id="kurzüberblick-bekannter-frameworks">Kurzüberblick bekannter Frameworks</h3>
+<ul>
+<li>
+<p><strong>Spring (Java):</strong></p>
+<ul>
+<li>Marktführer, sehr umfangreich, viele Zusatzfeatures (Web, Data, Security, …)</li>
+<li>@Component, @Autowired, XML- und Java-Konfiguration möglich.</li>
+</ul>
+</li>
+<li>
+<p><strong>Guice (Google, Java):</strong></p>
+<ul>
+<li>Leichtgewichtiger, nur Java-Konfiguration, Annotation-basiert.</li>
+</ul>
+</li>
+<li>
+<p><strong>Quarkus (Java, für Cloud/Container):</strong></p>
+<ul>
+<li>Moderne, schnelle Microservices-Entwicklung, setzt auf CDI (Contexts and Dependency Injection, JSR 330).</li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel (Spring Boot):</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Service</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> OrderRepository repository;
+
+    <span class="hljs-meta">@Autowired</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">OrderService</span><span class="hljs-params">(OrderRepository repository)</span> {
+        <span class="hljs-built_in">this</span>.repository = repository;
+    }
+}
+</code></pre>
+<ul>
+<li>Spring „verdrahtet“ automatisch das passende Repository-Bean.</li>
+</ul>
+<hr>
+<h2 id="praxis-aufgaben-für-das-selbststudium">Praxis-Aufgaben für das Selbststudium</h2>
+<ol>
+<li>
+<p><strong>Refactore eine Klasse:</strong>
+Wähle eine fest verdrahtete Klasse und stelle sie auf Dependency Injection um.
+Erzeuge die Objekte im Main-Programm und injiziere sie.</p>
+</li>
+<li>
+<p><strong>Schreibe einen Test mit Mock:</strong>
+Erstelle eine Mock-Implementierung eines Interfaces und teste, ob die zu testende Methode korrekt darauf zugreift.</p>
+</li>
+<li>
+<p><strong>Reflektiere Stolperfallen:</strong>
+Analysiere deinen Code auf die oben genannten Stolperfallen. Wie könntest du sie beheben?</p>
+</li>
+<li>
+<p><strong>Recherchiere Frameworks:</strong>
+Informiere dich über mindestens eines der genannten Frameworks und notiere Vor- und Nachteile für deine Projekte.</p>
+</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Refactoring auf DI und der Einsatz von Mocks verbessern Flexibilität, Testbarkeit und Wartbarkeit.</li>
+<li>Typische Probleme können durch klare Prinzipien und Clean Code gelöst werden.</li>
+<li>Frameworks werden bei wachsender Projektgröße unverzichtbar und bieten viele Zusatzfunktionen.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

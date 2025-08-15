@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Transaktionen im Microservices-Kontext</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-transaktionen-im-microservices-kontext">Handout: Transaktionen im Microservices-Kontext</h3>
+<p>In der Welt der monolithischen Anwendungen ist das Transaktionsmanagement relativ einfach: Eine einzelne, lokale Transaktion garantiert die Datenkonsistenz über alle Operationen hinweg. In einer <strong>Microservice-Architektur</strong> ist das jedoch anders. Hier sind Daten über mehrere, voneinander unabhängige Datenbanken verteilt, und eine einzige Transaktion, die alle Services umfasst, ist nicht möglich. Das führt zu neuen Herausforderungen.</p>
+<h4 id="61-herausforderungen-verteilter-transaktionen-xa-2pc-saga">6.1 Herausforderungen verteilter Transaktionen (XA, 2PC, SAGA)</h4>
+<p>Eine verteilte Transaktion ist eine Transaktion, die sich über mehrere voneinander unabhängige Ressourcen (in unserem Fall Datenbanken, die zu verschiedenen Microservices gehören) erstreckt.</p>
+<ul>
+<li>
+<p><strong>XA-Transaktionen und 2-Phasen-Commit (2PC)</strong>:</p>
+<ul>
+<li><strong>Was es ist:</strong> Der &quot;2-Phasen-Commit&quot; (Two-Phase Commit, 2PC) ist ein klassisches Protokoll, um verteilte Transaktionen zu koordinieren. Es basiert auf einem zentralen Koordinator, der die beteiligten Ressourcen verwaltet.</li>
+<li><strong>Die zwei Phasen:</strong>
+<ol>
+<li><strong>Vorbereitungsphase (Prepare Phase):</strong> Der Koordinator fragt alle beteiligten Ressourcen, ob sie bereit sind, die Transaktion zu committen. Jede Ressource führt ihre Operation aus und sperrt die betroffenen Daten. Sie antwortet dem Koordinator mit &quot;Ja, ich bin bereit&quot; oder &quot;Nein, ich kann nicht&quot;.</li>
+<li><strong>Commit-Phase (Commit Phase):</strong> Wenn alle Ressourcen mit &quot;Ja&quot; geantwortet haben, sendet der Koordinator das Commit-Signal an alle. Jede Ressource speichert die Änderungen. Wenn auch nur eine Ressource mit &quot;Nein&quot; geantwortet hat, sendet der Koordinator ein Rollback-Signal, und alle Ressourcen machen ihre Änderungen rückgängig.</li>
+</ol>
+</li>
+<li><strong>Warum es in Microservices nicht ideal ist:</strong>
+<ul>
+<li><strong>Synchron:</strong> Das gesamte Protokoll ist blockierend. Während die Ressourcen auf die Antwort des Koordinators warten, sind die Daten gesperrt. Das führt zu Latenzen und skaliert schlecht.</li>
+<li><strong>Verfügbarkeit:</strong> Wenn der Koordinator ausfällt, bevor er das Commit-Signal senden kann, bleiben die Ressourcen in einem unsicheren &quot;Bereit&quot;-Zustand. Dieses Problem wird als &quot;Single Point of Failure&quot; bezeichnet. Aus diesen Gründen ist 2PC in modernen, hochverfügbaren Microservice-Architekturen selten die erste Wahl.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>SAGA-Pattern</strong>:</p>
+<ul>
+<li><strong>Was es ist:</strong> Das SAGA-Pattern ist eine Alternative zu 2PC. Es löst verteilte Transaktionen auf, indem es sie in eine Kette von lokalen Transaktionen umwandelt. Jede lokale Transaktion in einem Service führt ihre Aufgabe aus und veröffentlicht ein Ereignis, das die nächste lokale Transaktion in einem anderen Service auslöst.</li>
+<li><strong>Kompensierende Transaktionen:</strong> Der entscheidende Teil des SAGA-Patterns sind die &quot;kompensierenden Transaktionen&quot;. Wenn eine der lokalen Transaktionen in der Kette fehlschlägt, werden kompensierende Transaktionen ausgelöst, um die Änderungen der vorherigen, bereits erfolgreichen Transaktionen rückgängig zu machen.</li>
+<li><strong>Beispiel:</strong> Eine Online-Bestellung.
+<ol>
+<li><strong>Bestellservice:</strong> Lokale Transaktion: &quot;Bestellung erstellt&quot;. Veröffentlicht das Ereignis: <code>OrderCreated</code>.</li>
+<li><strong>Zahlungsservice:</strong> Hört auf <code>OrderCreated</code>. Lokale Transaktion: &quot;Zahlung verarbeitet&quot;. Veröffentlicht das Ereignis: <code>PaymentProcessed</code>.</li>
+<li><strong>Lagerservice:</strong> Hört auf <code>PaymentProcessed</code>. Lokale Transaktion: &quot;Lagerbestand aktualisiert&quot;. Veröffentlicht das Ereignis: <code>InventoryUpdated</code>.</li>
+<li><strong>Fehlerfall:</strong> Wenn der Lagerservice fehlschlägt, würde der Zahlungsservice eine &quot;Zahlungs-Rückgängig-Transaktion&quot; ausführen und der Bestellservice eine &quot;Bestellung-Storno-Transaktion&quot;.</li>
+</ol>
+</li>
+<li><strong>Vorteil:</strong> Das SAGA-Pattern ist nicht-blockierend, hochverfügbar und skaliert gut. Es ist der am häufigsten verwendete Ansatz für verteilte Transaktionen in modernen Microservice-Architekturen.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="62-kompensierende-transaktionen-und-eventual-consistency">6.2 Kompensierende Transaktionen und Eventual Consistency</h4>
+<p>Da das SAGA-Pattern eine atomare Transaktion (alles oder nichts) nicht garantieren kann, musst du dich mit den Konzepten der <strong>kompensierenden Transaktionen</strong> und der <strong>Eventual Consistency</strong> auseinandersetzen.</p>
+<ul>
+<li>
+<p><strong>Kompensierende Transaktionen:</strong> Wie oben beschrieben, sind dies Aktionen, die eine bereits abgeschlossene lokale Transaktion rückgängig machen. Wichtig: Eine kompensierende Transaktion macht die Änderung nicht ungeschehen (das ist bei verteilten Systemen oft unmöglich), sondern sie führt eine entgegengesetzte Operation aus, um den Zustand wiederherzustellen.</p>
+</li>
+<li>
+<p><strong>Eventual Consistency (Eventuelle Konsistenz):</strong></p>
+<ul>
+<li>In einer SAGA-basierten Architektur sind die Daten zu einem bestimmten Zeitpunkt nicht sofort über alle Services hinweg konsistent. Es braucht einige Zeit, bis alle lokalen Transaktionen abgeschlossen sind und sich der endgültige Zustand eingestellt hat.</li>
+<li>Das bedeutet, dass ein Benutzer, der direkt nach dem Auslösen einer SAGA-Transaktion einen anderen Service abfragt, möglicherweise veraltete Daten sieht. Nach kurzer Zeit werden die Daten jedoch konsistent.</li>
+<li>Das erfordert ein Umdenken in der Anwendungslogik. Du musst deine Benutzeroberfläche so gestalten, dass sie mit potenziell inkonsistenten Daten umgehen kann (z. B. durch Anzeigen eines &quot;Zahlung ausstehend&quot;-Status, anstatt sofort zu bestätigen).</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="63-transaktionen-in-rest-apis-und-microservice-architekturen">6.3 Transaktionen in REST-APIs und Microservice-Architekturen</h4>
+<p>REST-APIs sind von Natur aus zustandslos und unterstützen keine verteilten Transaktionen wie 2PC. Jede API-Anfrage ist eine eigenständige Operation. Das Transaktionsmanagement muss daher auf einer höheren Ebene implementiert werden, um die Konsistenz zu gewährleisten.</p>
+<ul>
+<li>
+<p><strong>SAGA-Orchestrierung:</strong></p>
+<ul>
+<li><strong>Choreografie:</strong> Die Services kommunizieren direkt miteinander, indem sie Ereignisse veröffentlichen und darauf hören. Das ist ideal für einfache Workflows. Es kann aber schnell unübersichtlich werden, wenn die Logik komplexer wird.</li>
+<li><strong>Orchestrierung:</strong> Ein zentraler Service (der &quot;Orchestrator&quot;) ist für die gesamte Transaktionslogik verantwortlich. Er sendet Befehle an die Services, wartet auf deren Antworten und entscheidet, was als Nächstes zu tun ist. Das ist übersichtlicher und leichter zu debuggen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Transaktionale Mails/Nachrichten:</strong></p>
+<ul>
+<li>Wenn ein Service eine Änderung in seiner Datenbank vornimmt, sollte er das Ereignis nicht einfach nur senden. Er sollte es in derselben lokalen Transaktion in einer &quot;Outbox-Tabelle&quot; speichern. Ein separater Prozess liest diese Tabelle und sendet die Nachrichten asynchron.</li>
+<li>Das garantiert, dass die Nachricht nur gesendet wird, wenn die Datenbanktransaktion erfolgreich war, und umgekehrt.</li>
+</ul>
+</li>
+</ul>
+<p>Zusammenfassend lässt sich sagen, dass der Umstieg auf eine Microservice-Architektur auch einen Paradigmenwechsel im Umgang mit Transaktionen bedeutet. Weg von atomaren, blockierenden Transaktionen und hin zu asynchronen, event-basierten SAGA-Workflows, die die Eventual Consistency der Daten akzeptieren und verwalten.</p>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Modul-Design und Strukturierung in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-modul-design-und-strukturierung-in-java">Handout: Modul-Design und Strukturierung in Java</h1>
+<hr>
+<h2 id="31-modul-begriff-im-kontext-von-java-packages-jars-module-seit-java-9">3.1 Modul-Begriff im Kontext von Java (Packages, JARs, Module seit Java 9)</h2>
+<h3 id="packages"><strong>Packages</strong></h3>
+<ul>
+<li>Seit Java 1.0: Logische Gruppierung verwandter Klassen, Interfaces und Sub-Packages.</li>
+<li>Kapselung auf Klassenebene mit <code>public</code>, <code>protected</code>, package-private, <code>private</code>.</li>
+<li>Keine echte „physische“ Abgrenzung oder Abhängigkeitskontrolle auf Paketebene.</li>
+</ul>
+<h3 id="jars-java-archives"><strong>JARs (Java Archives)</strong></h3>
+<ul>
+<li>Seit Java 1.1: Bündelung (Archivierung) von Klassen und Ressourcen zu wiederverwendbaren Komponenten.</li>
+<li>Häufig als „Bibliotheks-Modul“ eingesetzt, aber technisch nur ein Container.</li>
+<li>Abhängigkeiten werden nicht explizit beschrieben – alles ist von allem zugreifbar, wenn im Classpath.</li>
+</ul>
+<h3 id="module-ab-java-9--jpms"><strong>Module (ab Java 9 – JPMS)</strong></h3>
+<ul>
+<li>Neue Spracheinheit: „Modul“ kapselt Packages und legt explizit fest, was nach außen sichtbar ist.</li>
+<li>Module werden durch <code>module-info.java</code> beschrieben.</li>
+<li>Ermöglicht echte Kapselung und gezielte Abhängigkeitskontrolle auf Modul-Ebene.</li>
+</ul>
+<p><strong>Beispiel-Entwicklung:</strong></p>
+<ul>
+<li>Früher: Anwendung → mehrere JARs → viele Packages, aber keine klare Abgrenzung oder Kontrolle</li>
+<li>Heute: Anwendung → mehrere Module (je Modul: mehrere Packages, ein JAR, explizite Schnittstellen und Abhängigkeiten)</li>
+</ul>
+<hr>
+<h2 id="32-das-java-platform-module-system-jpms">3.2 Das Java Platform Module System (JPMS)</h2>
+<h3 id="321-module-infojava-und-sichtbarkeit-von-paketen"><strong>3.2.1 <code>module-info.java</code> und Sichtbarkeit von Paketen</strong></h3>
+<ul>
+<li>
+<p>Jedes Modul besitzt (im Wurzelverzeichnis) eine <code>module-info.java</code>-Datei.</p>
+</li>
+<li>
+<p>Beispiel:</p>
+<pre><code class="language-java"><span class="hljs-keyword">module</span> shop.core {
+    <span class="hljs-keyword">exports</span> com.myshop.products;
+    <span class="hljs-keyword">exports</span> com.myshop.orders;
+    <span class="hljs-keyword">requires</span> shop.utils;
+}
+</code></pre>
+</li>
+<li>
+<p>Mit <code>exports</code> werden Packages <strong>explizit</strong> nach außen sichtbar gemacht – der Rest ist gekapselt!</p>
+</li>
+<li>
+<p>Ohne <code>exports</code> ist ein Package <strong>nur</strong> innerhalb des eigenen Moduls sichtbar.</p>
+</li>
+</ul>
+<hr>
+<h3 id="322-export-und-import-von-paketen"><strong>3.2.2 Export und Import von Paketen</strong></h3>
+<ul>
+<li>
+<p><strong>Export (exports):</strong>
+Steuert, welche Packages für andere Module sichtbar sind.</p>
+<pre><code class="language-java"><span class="hljs-keyword">exports</span> com.myshop.products;
+</code></pre>
+</li>
+<li>
+<p><strong>Import (requires):</strong>
+Steuert, welche anderen Module benötigt werden.</p>
+<pre><code class="language-java"><span class="hljs-keyword">requires</span> shop.utils;
+</code></pre>
+</li>
+<li>
+<p><strong>Sichtbarkeit auf Klassenebene:</strong>
+Nur Klassen aus exportierten Packages sind für andere Module sichtbar. Interne Packages bleiben privat.</p>
+</li>
+<li>
+<p><strong>Restriktiver Export:</strong>
+Seit Java 9 kann gezielt für einzelne Module exportiert werden:</p>
+<pre><code class="language-java"><span class="hljs-keyword">exports</span> com.myshop.internal to shop.admin; <span class="hljs-comment">// Nur für bestimmtes Modul sichtbar</span>
+</code></pre>
+</li>
+</ul>
+<hr>
+<h3 id="323-starke-kapselung-vs-klassische-packages"><strong>3.2.3 Starke Kapselung vs. klassische Packages</strong></h3>
+<ul>
+<li>
+<p><strong>Klassische Packages:</strong></p>
+<ul>
+<li>Jedes <code>public</code>-Element ist für jedes andere Package in jedem JAR im Classpath sichtbar.</li>
+<li>Keine explizite Kontrolle über die Nutzung – „public“ heißt wirklich öffentlich.</li>
+</ul>
+</li>
+<li>
+<p><strong>Starke Kapselung im Modul-System:</strong></p>
+<ul>
+<li>„public“ ist nur innerhalb des eigenen Moduls und exportierter Packages wirklich öffentlich.</li>
+<li>Klassen aus nicht-exportierten Packages sind für andere Module nicht zugreifbar – auch wenn sie „public“ sind.</li>
+<li><strong>Vorteil:</strong> Weniger unbeabsichtigte Abhängigkeiten, bessere Wartbarkeit, mehr Kontrolle.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="33-best-practices-beim-zuschnitt-von-modulen">3.3 Best Practices beim Zuschnitt von Modulen</h2>
+<h3 id="domain-driven-design-ddd"><strong>Domain Driven Design (DDD)</strong></h3>
+<ul>
+<li>Module an der Fachlichkeit ausrichten: z. B. „benutzer“, „bestellung“, „produkt“.</li>
+<li>Jedes Modul kapselt ein konsistentes Stück Geschäftslogik.</li>
+</ul>
+<h3 id="feature-slices"><strong>Feature Slices</strong></h3>
+<ul>
+<li>Module entlang von Features schneiden (z. B. „warenkorb“, „bezahlung“), nicht nur entlang technischer Layer.</li>
+<li>Vorteil: Alles, was zu einem Feature gehört, liegt beisammen.</li>
+</ul>
+<h3 id="layered-architecture"><strong>Layered Architecture</strong></h3>
+<ul>
+<li>Klassische Schichtenarchitektur: Module für „core“, „api“, „web“, „service“, „persistence“ etc.</li>
+<li>Trennung nach Verantwortlichkeiten, oft hilfreich für größere Teams.</li>
+</ul>
+<h3 id="weitere-best-practices"><strong>Weitere Best Practices</strong></h3>
+<ul>
+<li>Module nicht zu groß („Gott-Modul“), nicht zu klein („Nano-Modul“).</li>
+<li>Klare Schnittstellen definieren, so wenig wie möglich exportieren.</li>
+<li>Zyklische Abhängigkeiten vermeiden!</li>
+<li>Namensgebung: Klar, eindeutig, am besten sprechend für die Domäne.</li>
+</ul>
+<hr>
+<h2 id="34-typische-fehler-und-stolperfallen-bei-der-modulbildung">3.4 Typische Fehler und Stolperfallen bei der Modulbildung</h2>
+<h3 id="1-zu-große-oder-zu-kleine-module"><strong>1. Zu große oder zu kleine Module</strong></h3>
+<ul>
+<li>„Gott-Modul“: Alles in einem Modul → keine Vorteile der Modularität.</li>
+<li>„Nano-Modul“: Jedes Feature/Klasse ein eigenes Modul → Overhead, schwer verständlich.</li>
+</ul>
+<h3 id="2-zyklische-abhängigkeiten"><strong>2. Zyklische Abhängigkeiten</strong></h3>
+<ul>
+<li>Module A benötigt B und B benötigt A → schlecht wartbar, erschwert Testen und Deployment.</li>
+<li><strong>Vermeidung:</strong> Architekturreview, API-Design, technische Checks (Maven Enforcer, JDeps).</li>
+</ul>
+<h3 id="3-falsche-oder-zu-großzügige-exporte"><strong>3. Falsche oder zu großzügige Exporte</strong></h3>
+<ul>
+<li>Zu viele Packages exportiert → Kapselung verloren, API wird schwer änderbar.</li>
+<li><strong>Empfehlung:</strong> Nur das Nötigste exportieren.</li>
+</ul>
+<h3 id="4-unklare-schnittstellen"><strong>4. Unklare Schnittstellen</strong></h3>
+<ul>
+<li>Unpräzise oder „unsaubere“ APIs führen zu Missverständnissen und Kopplung.</li>
+<li><strong>Tipp:</strong> Schnittstellen als Verträge behandeln; sauber dokumentieren.</li>
+</ul>
+<h3 id="5-unbedachte-abhängigkeiten-von-externen-bibliotheken"><strong>5. Unbedachte Abhängigkeiten von externen Bibliotheken</strong></h3>
+<ul>
+<li>Fremdbibliotheken direkt ins eigene API „leaken“ lassen – erschwert Wartung/Migration.</li>
+<li><strong>Empfehlung:</strong> Externe Abhängigkeiten möglichst intern halten oder explizit im API-Design kennzeichnen.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Was unterscheidet ein Modul von einem Package oder JAR?</li>
+<li>Wie schützt das Modul-System vor ungewollten Abhängigkeiten und Zugriffsproblemen?</li>
+<li>Welche Strategie für die Modulaufteilung passt am besten zu deinem Projekt – und warum?</li>
+<li>Welche Probleme entstehen bei zyklischen Abhängigkeiten zwischen Modulen?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li><strong>Modul-Design in Java</strong> beginnt bei der klaren Trennung von Packages, JARs und echten Modulen (ab Java 9).</li>
+<li>Mit <strong>JPMS</strong> (Java Platform Module System) lassen sich Abhängigkeiten und Sichtbarkeit exakt steuern – Kapselung und Kontrolle werden gestärkt.</li>
+<li>Gute Module orientieren sich an Domäne, Features oder Schichten – nie am Zufall!</li>
+<li>Typische Fehler sind zu große/zu kleine Module, zyklische Abhängigkeiten und unsaubere Schnittstellen.</li>
+<li>Eine kluge Modulaufteilung legt die Grundlage für wartbare, skalierbare und testbare Softwaresysteme.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

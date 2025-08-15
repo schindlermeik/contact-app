@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Testen von Panache-Entit&auml;ten und -Repos</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-testen-von-panache-entitäten-und--repos">Handout: Testen von Panache-Entitäten und -Repos</h1>
+<hr>
+<h2 id="61-unit--und-integrationstests-für-panache-modelle">6.1 Unit- und Integrationstests für Panache-Modelle</h2>
+<h3 id="a-grundprinzipien"><strong>A) Grundprinzipien</strong></h3>
+<p>Beim Testen von Panache-Entities und -Repositories unterscheidet man:</p>
+<ul>
+<li><strong>Unit-Tests:</strong> Testen einzelne Methoden ohne echte Datenbankanbindung (oft mit Mocks/Stubs).</li>
+<li><strong>Integrationstests:</strong> Testen das Zusammenspiel von Quarkus, Panache und der Datenbank (idealerweise in einer echten DB-Umgebung, z. B. mit Docker).</li>
+</ul>
+<h3 id="b-unit-tests-für-panache"><strong>B) Unit-Tests für Panache</strong></h3>
+<p><strong>Ziel:</strong>
+Geschäftslogik oder Methoden testen, die keine echte Datenbank benötigen.</p>
+<p><strong>Beispiel:</strong>
+Angenommen, du hast ein Panache-Entity mit einer einfachen Methode:</p>
+<pre><code class="language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">PanacheEntity</span> {
+    <span class="hljs-keyword">public</span> String name;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">hasLongName</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> name != <span class="hljs-literal">null</span> &amp;&amp; name.length() &gt; <span class="hljs-number">10</span>;
+    }
+}
+</code></pre>
+<p><strong>JUnit 5 Test:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.junit.jupiter.api.Assertions.*;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">UserTest</span> {
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testHasLongName</span><span class="hljs-params">()</span> {
+        <span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+        user.name = <span class="hljs-string">&quot;KurzerName&quot;</span>;
+        assertFalse(user.hasLongName());
+
+        user.name = <span class="hljs-string">&quot;SehrLangerBenutzername&quot;</span>;
+        assertTrue(user.hasLongName());
+    }
+}
+</code></pre>
+<blockquote>
+<p><strong>Tipp:</strong>
+Für reine Entity-Methoden brauchst du keine Panache- oder Datenbank-Umgebung.</p>
+</blockquote>
+<hr>
+<h3 id="c-integrationstests-für-panache"><strong>C) Integrationstests für Panache</strong></h3>
+<p>Integrationstests prüfen das Zusammenspiel zwischen deiner Anwendung, Panache und einer echten (oder simulierten) Datenbank.</p>
+<h4 id="typische-anforderungen"><strong>Typische Anforderungen:</strong></h4>
+<ul>
+<li>Quarkus-Context mit allen Extensions starten.</li>
+<li>Testdatenbank für jeden Test ggf. neu aufsetzen.</li>
+<li>Persistenz von Entities, Queries und Transaktionen prüfen.</li>
+</ul>
+<h4 id="beispiel-junit-5-mit-quarkustest"><strong>Beispiel (JUnit 5 mit QuarkusTest):</strong></h4>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> io.quarkus.test.junit.QuarkusTest;
+<span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+
+<span class="hljs-keyword">import</span> javax.inject.Inject;
+<span class="hljs-keyword">import</span> javax.transaction.Transactional;
+<span class="hljs-keyword">import</span> java.util.List;
+
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.junit.jupiter.api.Assertions.*;
+
+<span class="hljs-meta">@QuarkusTest</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserRepositoryTest</span> {
+
+    <span class="hljs-meta">@Inject</span>
+    UserRepository userRepository;
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testPersistAndFind</span><span class="hljs-params">()</span> {
+        <span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+        user.name = <span class="hljs-string">&quot;Max&quot;</span>;
+        userRepository.persist(user);
+
+        <span class="hljs-type">User</span> <span class="hljs-variable">loaded</span> <span class="hljs-operator">=</span> userRepository.find(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Max&quot;</span>).firstResult();
+        assertNotNull(loaded);
+        assertEquals(<span class="hljs-string">&quot;Max&quot;</span>, loaded.name);
+
+        List&lt;User&gt; allUsers = userRepository.listAll();
+        assertFalse(allUsers.isEmpty());
+    }
+}
+</code></pre>
+<p><strong>Was passiert hier?</strong></p>
+<ul>
+<li>Der Test läuft mit dem echten Quarkus-Testkontext.</li>
+<li>Die Datenbank (oft H2 in-memory oder Testcontainer) wird genutzt.</li>
+<li>Transaktionen sorgen für isolierte Testdaten.</li>
+</ul>
+<hr>
+<h3 id="d-tipps-für-integrationstests"><strong>D) Tipps für Integrationstests</strong></h3>
+<ul>
+<li>Nutze Annotationen wie <code>@QuarkusTest</code> (statt reinem JUnit).</li>
+<li>Bereinige Testdaten ggf. vor/nach jedem Test (z. B. mit <code>@BeforeEach</code> / <code>@AfterEach</code>).</li>
+<li>Für In-Memory-Tests kann eine H2-DB per Konfiguration genutzt werden – für realistische Tests empfiehlt sich aber Testcontainers (siehe unten).</li>
+</ul>
+<hr>
+<h2 id="62-testcontainers-für-datenbank-tests-zb-mit-postgresql">6.2 Testcontainers für Datenbank-Tests (z. B. mit PostgreSQL)</h2>
+<h3 id="a-was-ist-testcontainers"><strong>A) Was ist Testcontainers?</strong></h3>
+<p><a href="https://www.testcontainers.org/">Testcontainers</a> ist ein Java-Framework, mit dem du (z. B. für Integrationstests) echte Datenbank-Container (z. B. PostgreSQL, MySQL, MongoDB) automatisiert starten und wieder herunterfahren kannst.
+Das erhöht die Realitätsnähe deiner Tests, da du exakt die Datenbank testest, die später in Produktion verwendet wird.</p>
+<hr>
+<h3 id="b-einbindung-von-testcontainers-in-ein-maven-projekt"><strong>B) Einbindung von Testcontainers in ein Maven-Projekt</strong></h3>
+<p><strong>Beispiel-Dependencies für <code>pom.xml</code>:</strong></p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.quarkus<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>quarkus-test-h2<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.testcontainers<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.19.7<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.quarkus<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>quarkus-test-common<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+<blockquote>
+<p><strong>Tipp:</strong>
+Nutze immer aktuelle Versionen aus dem <a href="https://search.maven.org/search?q=g:org.testcontainers">Testcontainers Maven Repository</a>.</p>
+</blockquote>
+<hr>
+<h3 id="c-beispiel-integrationstest-mit-testcontainers-postgresql"><strong>C) Beispiel: Integrationstest mit Testcontainers (PostgreSQL)</strong></h3>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> io.quarkus.test.junit.QuarkusTest;
+<span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+<span class="hljs-keyword">import</span> org.junit.jupiter.api.extension.ExtendWith;
+<span class="hljs-keyword">import</span> org.testcontainers.containers.PostgreSQLContainer;
+<span class="hljs-keyword">import</span> org.testcontainers.junit.jupiter.Container;
+<span class="hljs-keyword">import</span> org.testcontainers.junit.jupiter.Testcontainers;
+
+<span class="hljs-keyword">import</span> javax.inject.Inject;
+
+<span class="hljs-meta">@QuarkusTest</span>
+<span class="hljs-meta">@Testcontainers</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserRepositoryIT</span> {
+
+    <span class="hljs-comment">// Startet einen PostgreSQL-Container für die Tests</span>
+    <span class="hljs-meta">@Container</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> PostgreSQLContainer&lt;?&gt; postgres = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PostgreSQLContainer</span>&lt;&gt;(<span class="hljs-string">&quot;postgres:16&quot;</span>)
+            .withDatabaseName(<span class="hljs-string">&quot;testdb&quot;</span>)
+            .withUsername(<span class="hljs-string">&quot;testuser&quot;</span>)
+            .withPassword(<span class="hljs-string">&quot;testpw&quot;</span>);
+
+    <span class="hljs-meta">@Inject</span>
+    UserRepository userRepository;
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">testPersistAndLoadUser</span><span class="hljs-params">()</span> {
+        <span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+        user.name = <span class="hljs-string">&quot;Lotte&quot;</span>;
+        userRepository.persist(user);
+
+        <span class="hljs-type">User</span> <span class="hljs-variable">loaded</span> <span class="hljs-operator">=</span> userRepository.find(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Lotte&quot;</span>).firstResult();
+        assertNotNull(loaded);
+        assertEquals(<span class="hljs-string">&quot;Lotte&quot;</span>, loaded.name);
+    }
+}
+</code></pre>
+<hr>
+<h3 id="d-anwendung-mit-quarkus-konfiguration"><strong>D) Anwendung mit Quarkus-Konfiguration</strong></h3>
+<p>Du kannst Quarkus per Umgebungsvariablen oder Test-Property-Dateien (<code>src/test/resources/application.properties</code>) so konfigurieren, dass es zur Testlaufzeit den Testcontainer benutzt:</p>
+<pre><code class="language-properties"><span class="hljs-attr">quarkus.datasource.db-kind</span>=<span class="hljs-string">postgresql</span>
+<span class="hljs-attr">quarkus.datasource.jdbc.url</span>=<span class="hljs-string">${test.jdbc.url}</span>
+<span class="hljs-attr">quarkus.datasource.username</span>=<span class="hljs-string">${test.jdbc.username}</span>
+<span class="hljs-attr">quarkus.datasource.password</span>=<span class="hljs-string">${test.jdbc.password}</span>
+</code></pre>
+<p>Die Variablen kannst du im Testcontainer-Setup dynamisch setzen (siehe Testcontainers-Docs).</p>
+<hr>
+<h3 id="e-vorteile-von-testcontainers"><strong>E) Vorteile von Testcontainers</strong></h3>
+<ul>
+<li>Echte Datenbankumgebung → Ergebnisse sind realistisch</li>
+<li>Keine Abhängigkeit von lokalen oder geteilten Datenbankinstanzen</li>
+<li>Automatischer Start und Stopp → saubere Tests und weniger &quot;Testmüll&quot;</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung"><strong>Zusammenfassung</strong></h2>
+<ul>
+<li><strong>Unit-Tests</strong> eignen sich für Methodenlogik ohne DB-Zugriff.</li>
+<li><strong>Integrationstests</strong> prüfen das Zusammenspiel von Panache, Quarkus und echter Datenbank.</li>
+<li><strong>Testcontainers</strong> ermöglichen produktionsnahe Tests mit echter PostgreSQL-DB (oder anderen DBs) – sauber, portabel, wiederholbar.</li>
+</ul>
+<hr>
+<h2 id="praxis-checkliste"><strong>Praxis-Checkliste</strong></h2>
+<ol>
+<li>Schreibe kleine Unit-Tests für Methoden ohne DB-Zugriff.</li>
+<li>Nutze <code>@QuarkusTest</code> für Integrationstests mit echter Umgebung.</li>
+<li>Setze Testcontainers ein, wenn du produktionsnahe Datenbanken testen möchtest.</li>
+<li>Konfiguriere deine Tests so, dass Daten nach jedem Lauf wieder bereinigt sind.</li>
+</ol>
+<hr>
+<p><strong>Weitere Ressourcen:</strong></p>
+<ul>
+<li><a href="https://quarkus.io/guides/getting-started-testing">Quarkus Testing Guide</a></li>
+<li><a href="https://www.testcontainers.org/">Testcontainers Java – Dokumentation</a></li>
+<li><a href="https://quarkus.io/guides/hibernate-orm-panache#testing">Testen von Panache im Quarkus Cookbook</a></li>
+</ul>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>

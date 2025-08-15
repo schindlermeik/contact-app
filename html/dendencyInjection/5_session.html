@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Vorteile von Dependency Injection &lpar;DI&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-vorteile-von-dependency-injection-di">Handout: Vorteile von Dependency Injection (DI)</h1>
+<hr>
+<h2 id="51-reduzierung-von-kopplung-coupling">5.1 Reduzierung von Kopplung (Coupling)</h2>
+<h3 id="was-bedeutet-kopplung">Was bedeutet Kopplung?</h3>
+<ul>
+<li><strong>Kopplung</strong> beschreibt den Grad der Abhängigkeit zwischen zwei Klassen oder Modulen.</li>
+<li><strong>Starke Kopplung</strong>: Komponenten sind fest miteinander verbunden – Änderungen an einer Klasse erfordern oft Änderungen an der anderen.</li>
+<li><strong>Lose Kopplung</strong>: Komponenten sind nur über Schnittstellen oder Abstraktionen verbunden – sie können unabhängig voneinander verändert werden.</li>
+</ul>
+<h3 id="wie-hilft-di-dabei">Wie hilft DI dabei?</h3>
+<ul>
+<li>Mit DI erhalten Komponenten ihre Abhängigkeiten von außen, anstatt sie selbst zu erzeugen.</li>
+<li>Das Wissen über die konkrete Implementierung einer Abhängigkeit wird entfernt – die Klasse nutzt nur das, was sie braucht (das Interface).</li>
+<li>Dies senkt die Kopplung zwischen Klassen erheblich.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Lose Kopplung durch DI und Interface</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">MessageSender</span> {
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">send</span><span class="hljs-params">(String message)</span>;
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">NotificationService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> MessageSender sender;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">NotificationService</span><span class="hljs-params">(MessageSender sender)</span> {
+        <span class="hljs-built_in">this</span>.sender = sender;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">notify</span><span class="hljs-params">(String message)</span> {
+        sender.send(message);
+    }
+}
+</code></pre>
+<ul>
+<li><code>NotificationService</code> hängt nicht mehr von einer konkreten Implementierung ab – es könnte <code>EmailSender</code>, <code>SmsSender</code> etc. sein.</li>
+</ul>
+<hr>
+<h2 id="52-erhöhte-flexibilität-und-austauschbarkeit-von-komponenten">5.2 Erhöhte Flexibilität und Austauschbarkeit von Komponenten</h2>
+<h3 id="flexibilität-durch-di">Flexibilität durch DI</h3>
+<ul>
+<li>Neue oder alternative Implementierungen können einfach eingebracht werden, ohne die abhängige Klasse zu ändern.</li>
+<li>Verschiedene Komponenten (z.B. für Produktion und Test) können leicht ausgetauscht werden.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Produktion</span>
+<span class="hljs-type">MessageSender</span> <span class="hljs-variable">sender</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">EmailSender</span>();
+<span class="hljs-type">NotificationService</span> <span class="hljs-variable">service</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NotificationService</span>(sender);
+
+<span class="hljs-comment">// Test</span>
+<span class="hljs-type">MessageSender</span> <span class="hljs-variable">mockSender</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MockSender</span>();
+<span class="hljs-type">NotificationService</span> <span class="hljs-variable">testService</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NotificationService</span>(mockSender);
+</code></pre>
+<ul>
+<li>Im Test wird ein Mock verwendet, in der Produktion ein echter Sender. Die Service-Klasse bleibt unverändert.</li>
+</ul>
+<h3 id="austauschbarkeit">Austauschbarkeit</h3>
+<ul>
+<li>Anforderungen ändern sich? Du kannst die Abhängigkeit austauschen, ohne den Code der „verbrauchenden“ Klasse anpassen zu müssen.</li>
+<li>Beispiel: Ein neuer Versandkanal (z.B. WhatsApp) wird eingeführt – einfach neue Implementierung schreiben und injizieren.</li>
+</ul>
+<hr>
+<h2 id="53-verbesserte-testbarkeit-zb-mocking-unit-testing">5.3 Verbesserte Testbarkeit (z.B. Mocking, Unit Testing)</h2>
+<h3 id="warum-ist-testbarkeit-wichtig">Warum ist Testbarkeit wichtig?</h3>
+<ul>
+<li>Gute Tests garantieren Zuverlässigkeit, helfen Fehler zu finden und erleichtern Refactoring.</li>
+<li>Starke Kopplung erschwert isolierte Tests, da reale Abhängigkeiten mitgetestet werden (z.B. Datenbankzugriffe).</li>
+</ul>
+<h3 id="wie-verbessert-di-die-testbarkeit">Wie verbessert DI die Testbarkeit?</h3>
+<ul>
+<li>Mit DI können in Tests „Mocks“, „Stubs“ oder „Fakes“ als Abhängigkeit übergeben werden.</li>
+<li>Dadurch kann gezielt das Verhalten der abhängigen Komponente gesteuert oder überprüft werden.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Testklasse mit Mock</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">MockSender</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">MessageSender</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">called</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">send</span><span class="hljs-params">(String message)</span> {
+        called = <span class="hljs-literal">true</span>;
+    }
+    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">wasCalled</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> called; }
+}
+
+<span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">testNotificationService</span><span class="hljs-params">()</span> {
+    <span class="hljs-type">MockSender</span> <span class="hljs-variable">mock</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MockSender</span>();
+    <span class="hljs-type">NotificationService</span> <span class="hljs-variable">service</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NotificationService</span>(mock);
+
+    service.notify(<span class="hljs-string">&quot;Test&quot;</span>);
+
+    assertTrue(mock.wasCalled());
+}
+</code></pre>
+<ul>
+<li>Hier kann gezielt geprüft werden, ob die Methode korrekt aufgerufen wurde, ohne einen echten E-Mail- oder SMS-Versand zu benötigen.</li>
+</ul>
+<hr>
+<h2 id="54-förderung-von-clean-code-und-solid-prinzipien">5.4 Förderung von Clean Code und SOLID-Prinzipien</h2>
+<h3 id="clean-code-durch-di">Clean Code durch DI</h3>
+<ul>
+<li><strong>Clean Code</strong>: Klar, verständlich, leicht wartbar und testbar.</li>
+<li>DI zwingt dazu, Abhängigkeiten explizit zu machen – kein „versteckter“ Code, der irgendwo Objekte anlegt.</li>
+</ul>
+<h3 id="bezug-zu-solid-prinzipien">Bezug zu SOLID-Prinzipien</h3>
+<ul>
+<li><strong>S</strong>ingle Responsibility Principle:
+Klassen haben eine klar umrissene Aufgabe; die Verantwortung für Abhängigkeitsverwaltung liegt nicht mehr bei der Fachlogik.</li>
+<li><strong>O</strong>pen/Closed Principle:
+Komponenten sind offen für Erweiterungen (neue Implementierungen), aber geschlossen für Änderungen.</li>
+<li><strong>L</strong>iskov Substitution Principle:
+Durch DI und Interfaces können verschiedene Implementierungen problemlos ausgetauscht werden.</li>
+<li><strong>I</strong>nterface Segregation Principle:
+Abhängigkeiten werden oft über schmale, spezialisierte Interfaces injiziert.</li>
+<li><strong>D</strong>ependency Inversion Principle:
+Hochrangige Module (z.B. Services) hängen von Abstraktionen ab, nicht von konkreten Implementierungen – das ist das Herz von DI!</li>
+</ul>
+<h3 id="praktischer-nutzen">Praktischer Nutzen</h3>
+<ul>
+<li>Code wird besser lesbar, da alle Abhängigkeiten offen sichtbar sind (im Konstruktor, im Setter).</li>
+<li>Refactoring und Erweiterungen werden einfacher.</li>
+<li>Bessere Strukturierung und weniger „geheimnisvolle Magie“ im Code.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Wie hilft DI dabei, die Kopplung zwischen Komponenten zu reduzieren?</li>
+<li>Warum ist Austauschbarkeit ein Vorteil bei sich verändernden Anforderungen?</li>
+<li>Wie unterstützt DI das Schreiben von Unit-Tests?</li>
+<li>Nenne ein Beispiel, wie DI das Open/Closed-Prinzip oder das Dependency Inversion Principle fördert.</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>DI reduziert die Kopplung und erhöht die Flexibilität deiner Software.</li>
+<li>Komponenten sind einfacher austauschbar und testbar.</li>
+<li>DI zwingt zu klaren Schnittstellen und unterstützt die wichtigsten Clean Code- und SOLID-Prinzipien.</li>
+<li>Moderne Softwareentwicklung profitiert in fast jedem Bereich von den Vorteilen der Dependency Injection.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

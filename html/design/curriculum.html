@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Curriculum&colon; Design und Erstellung modularer Anwendungen &lpar;mit Java-Fokus&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="curriculum-design-und-erstellung-modularer-anwendungen-mit-java-fokus">Curriculum: Design und Erstellung modularer Anwendungen (mit Java-Fokus)</h1>
+<hr>
+<h3 id="1-einführung-in-modularität">1. <strong>Einführung in Modularität</strong></h3>
+<ul>
+<li>1.1 Was bedeutet Modularität? Begriff, Motivation, Ziele</li>
+<li>1.2 Vorteile modularer Software (Wartbarkeit, Wiederverwendbarkeit, Testbarkeit, Teamarbeit)</li>
+<li>1.3 Beispiele modularer Architekturen (z. B. Unix-Philosophie, Microservices, Plugins, OSGi, Java Platform Module System)</li>
+</ul>
+<hr>
+<h3 id="2-grundprinzipien-modularer-softwareentwicklung">2. <strong>Grundprinzipien modularer Softwareentwicklung</strong></h3>
+<ul>
+<li>2.1 Kapselung und Abstraktion</li>
+<li>2.2 Lose Kopplung und starke Kohäsion</li>
+<li>2.3 Schnittstellen (APIs) als Verträge zwischen Modulen</li>
+<li>2.4 Separation of Concerns (Trennung von Verantwortlichkeiten)</li>
+<li>2.5 Modulgrenzen und Verantwortung richtig ziehen</li>
+</ul>
+<hr>
+<h3 id="3-modul-design-und-strukturierung-in-java">3. <strong>Modul-Design und Strukturierung in Java</strong></h3>
+<ul>
+<li>
+<p>3.1 Modul-Begriff im Kontext von Java (Packages, JARs, Module seit Java 9)</p>
+</li>
+<li>
+<p>3.2 Das Java Platform Module System (JPMS):</p>
+<ul>
+<li>3.2.1 <code>module-info.java</code> und Sichtbarkeit von Paketen</li>
+<li>3.2.2 Export und Import von Paketen</li>
+<li>3.2.3 Starke Kapselung vs. klassische Packages</li>
+</ul>
+</li>
+<li>
+<p>3.3 Best Practices beim Zuschnitt von Modulen (Domain Driven Design, Feature Slices, Layered Architecture)</p>
+</li>
+<li>
+<p>3.4 Typische Fehler und Stolperfallen bei der Modulbildung</p>
+</li>
+</ul>
+<hr>
+<h3 id="4-abhängigkeiten-und-kommunikation-zwischen-modulen">4. <strong>Abhängigkeiten und Kommunikation zwischen Modulen</strong></h3>
+<ul>
+<li>
+<p>4.1 API-Design für Modulgrenzen (z. B. Service Interfaces)</p>
+</li>
+<li>
+<p>4.2 Dependency Inversion Principle (DIP) und Dependency Injection im Modulkontext</p>
+</li>
+<li>
+<p>4.3 Varianten der Modulintegration:</p>
+<ul>
+<li>4.3.1 Service Loader (SPI)</li>
+<li>4.3.2 Events und Messaging</li>
+<li>4.3.3 REST (bei verteilten Systemen)</li>
+</ul>
+</li>
+<li>
+<p>4.4 Zyklische Abhängigkeiten vermeiden</p>
+</li>
+</ul>
+<hr>
+<h3 id="5-build-deployment-und-versionierung-modularer-anwendungen">5. <strong>Build, Deployment und Versionierung modularer Anwendungen</strong></h3>
+<ul>
+<li>5.1 Modulares Bauen mit Maven</li>
+<li>5.2 Mehrmodulprojekte (Multi-Module Builds)</li>
+<li>5.3 Versionierung von Modulen, API-Kompatibilität und Semantic Versioning</li>
+<li>5.4 Dynamisches Laden und Entladen von Modulen (z. B. OSGi, Java Module Layer)</li>
+</ul>
+<hr>
+<h3 id="6-testen-und-weiterentwickeln-modularer-software">6. <strong>Testen und Weiterentwickeln modularer Software</strong></h3>
+<ul>
+<li>6.1 Modultests und Integrationstests</li>
+<li>6.2 Testbarkeit durch Modularisierung</li>
+<li>6.3 Refactoring modularer Systeme</li>
+<li>6.4 Wartung und Evolution: Strategien für langlebige Modularität</li>
+</ul>
+<hr>
+<h3 id="7-praxis-und-übungen">7. <strong>Praxis und Übungen</strong></h3>
+<ul>
+<li>7.1 Entwurf einer modularen Beispielanwendung (z. B. Plugin-System, Mini-Microservice)</li>
+<li>7.2 Umsetzung eines Projekts mit mehreren Modulen (inkl. JPMS)</li>
+<li>7.3 Simulieren und Auflösen zyklischer Abhängigkeiten</li>
+<li>7.4 Refactoring einer monolithischen Codebasis zu modularer Struktur</li>
+<li>7.5 Optional: Integration von externen Modulen/Libraries (Third-Party/Ökosystem)</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

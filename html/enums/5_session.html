@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices und Fallstricke bei Enums</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-und-fallstricke-bei-enums">Handout: Best Practices und Fallstricke bei Enums</h1>
+<hr>
+<h2 id="1-vergleich-von-enums--vs-equals">1. Vergleich von Enums (<code>==</code> vs. <code>equals</code>)</h2>
+<h3 id="a-der-sichere-vergleich-">a) Der sichere Vergleich: <code>==</code></h3>
+<ul>
+<li><strong>Enums sind Singletons:</strong> Für jeden Wert eines Enums existiert <strong>nur eine Instanz</strong> (pro JVM).</li>
+<li>Deshalb ist der Vergleich mit <code>==</code> <strong>immer korrekt und empfohlen</strong>.</li>
+<li><code>==</code> prüft, ob zwei Variablen genau auf dasselbe Enum-Objekt zeigen.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">Wochentag</span> <span class="hljs-variable">tag1</span> <span class="hljs-operator">=</span> Wochentag.MONTAG;
+<span class="hljs-type">Wochentag</span> <span class="hljs-variable">tag2</span> <span class="hljs-operator">=</span> Wochentag.MONTAG;
+System.out.println(tag1 == tag2);      <span class="hljs-comment">// true</span>
+System.out.println(tag1.equals(tag2)); <span class="hljs-comment">// true (funktioniert aber ist unnötig)</span>
+</code></pre>
+<h3 id="b-vergleich-mit-equals">b) Vergleich mit <code>equals()</code></h3>
+<ul>
+<li>Auch <code>equals()</code> funktioniert für Enums und liefert das gleiche Ergebnis wie <code>==</code>.</li>
+<li>In Java-Enums ist <code>equals()</code> nicht überschrieben, sondern benutzt intern ebenfalls den Identitätsvergleich.</li>
+</ul>
+<p><strong>Best Practice:</strong>
+Verwende <strong>immer <code>==</code> für Enum-Vergleiche</strong> – das ist schnell, klar und 100% sicher.</p>
+<hr>
+<h2 id="2-serialisierung-und-versionierung-von-enums">2. Serialisierung und Versionierung von Enums</h2>
+<h3 id="a-serialisierung-von-enums">a) Serialisierung von Enums</h3>
+<ul>
+<li>Enums sind automatisch <code>Serializable</code>.</li>
+<li>Bei der Serialisierung wird <strong>nur der Name</strong> des Enum-Werts gespeichert, <strong>nicht der Index oder andere Eigenschaften</strong>.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">Status</span> <span class="hljs-variable">s</span> <span class="hljs-operator">=</span> Status.AKTIV;
+<span class="hljs-comment">// Wird z. B. als &quot;AKTIV&quot; gespeichert und beim Deserialisieren wiederhergestellt</span>
+</code></pre>
+<p><strong>Achtung:</strong>
+Veränderst du die Enum-Werte (z. B. entfernst einen), können alte, gespeicherte Daten <strong>nicht mehr richtig gelesen</strong> werden.
+<strong>Tipp:</strong> Füge Enum-Werte nur hinzu, lösche sie aber möglichst nie, wenn du Serialisierung nutzt.</p>
+<hr>
+<h3 id="b-versionierung-und-änderungen-von-enums">b) Versionierung und Änderungen von Enums</h3>
+<ul>
+<li><strong>Werte ändern:</strong> Das Umbenennen oder Entfernen von Enum-Werten kann zu Problemen beim Deserialisieren führen.</li>
+<li><strong>Felder hinzufügen:</strong> Das Hinzufügen von neuen Feldern oder Methoden ist meist unproblematisch.</li>
+<li><strong>Reihenfolge ändern:</strong> Die Reihenfolge der Enum-Konstanten spielt für die Serialisierung keine Rolle, solange die Namen gleich bleiben.</li>
+</ul>
+<p><strong>Best Practice:</strong></p>
+<ul>
+<li>Benenne Enum-Werte möglichst nie um, wenn alte Daten existieren könnten.</li>
+<li>Entferne Enum-Werte nicht leichtfertig.</li>
+<li>Prüfe nach Änderungen, ob gespeicherte Daten noch geladen werden können.</li>
+</ul>
+<hr>
+<h2 id="3-grenzen-und-nachteile-von-enums">3. Grenzen und Nachteile von Enums</h2>
+<p>Enums sind extrem nützlich, aber nicht immer die beste Lösung. Hier einige wichtige Einschränkungen und Fallstricke:</p>
+<h3 id="a-feste-wertemenge">a) Feste Wertemenge</h3>
+<ul>
+<li>Enums sind <strong>statisch</strong>: Die möglichen Werte sind <strong>bei Kompilierung festgelegt</strong> und können <strong>zur Laufzeit nicht verändert</strong> werden.</li>
+<li>Für dynamische Listen (z. B. „Benutzerdefinierte Tags“) sind Enums nicht geeignet.</li>
+</ul>
+<h3 id="b-keine-vererbung">b) Keine Vererbung</h3>
+<ul>
+<li>Enums können <strong>nicht von anderen Enums oder Klassen erben</strong> und keine Hierarchie bilden.</li>
+<li>Sie können jedoch Interfaces implementieren.</li>
+</ul>
+<h3 id="c-kein-direkter-wert---enum-mapping-für-strings-oder-zahlen">c) Kein direkter Wert &lt;-&gt; Enum-Mapping für Strings oder Zahlen</h3>
+<ul>
+<li>Jeder Enum-Wert hat zwar einen Namen (<code>name()</code>) und eine Position (<code>ordinal()</code>), aber die Reihenfolge kann sich ändern, und die Namen sind fest.</li>
+<li>Verwende zur Zuordnung von Daten immer explizite Felder (siehe vorherige Handouts), nie die <code>ordinal()</code>-Position!</li>
+</ul>
+<h3 id="d-probleme-bei-falscher-verwendung">d) Probleme bei falscher Verwendung</h3>
+<ul>
+<li><strong>Zu viele Werte:</strong> Enums mit sehr vielen Werten werden unübersichtlich und schwer wartbar.</li>
+<li><strong>Missbrauch für dynamische Daten:</strong> Wenn du z. B. eine Liste von Statuswerten aus einer Datenbank verwalten musst, ist ein Enum der falsche Weg.</li>
+</ul>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li><strong>Vergleich:</strong>
+Schreibe einen Code, der zeigt, dass der Vergleich zweier Enums mit <code>==</code> immer funktioniert.</li>
+<li><strong>Serialisierung:</strong>
+Was passiert, wenn du einen Enum-Wert entfernst und versuchst, eine alte, serialisierte Datei zu laden?</li>
+<li><strong>Grenzen erkennen:</strong>
+Überlege, ob ein Enum für folgende Fälle sinnvoll ist:
+a) Wochentage
+b) User-definierte Produktkategorien
+c) Zustände einer Bestellung (z. B. OFFEN, IN_BEARBEITUNG, ERLEDIGT)</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li><strong>Enum-Vergleich immer mit <code>==</code></strong> – das ist sicherer und klarer als <code>equals()</code>.</li>
+<li><strong>Enums sind statisch und festgelegt</strong> – für dynamische Listen ungeeignet!</li>
+<li><strong>Sei vorsichtig mit Serialisierung und Versionsänderungen.</strong></li>
+<li><strong>Missbrauche Enums nicht</strong> für Daten, die sich zur Laufzeit ändern können.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

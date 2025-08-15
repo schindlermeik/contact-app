@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Synchronisation von Threads in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-synchronisation-von-threads-in-java">Handout: Synchronisation von Threads in Java</h1>
+<hr>
+<h2 id="41-notwendigkeit-der-synchronisation">4.1 Notwendigkeit der Synchronisation</h2>
+<p><strong>Warum ist Synchronisation wichtig?</strong></p>
+<ul>
+<li>Wenn mehrere Threads gleichzeitig auf gemeinsame Ressourcen (z. B. Variablen, Listen, Bankkonten) zugreifen und mindestens einer davon die Ressource verändert, kann es zu Race Conditions und inkonsistenten Zuständen kommen.</li>
+</ul>
+<p><strong>Beispiele:</strong></p>
+<h3 id="a-zähler-counter">a) Zähler (Counter)</h3>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Counter</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+        count++; <span class="hljs-comment">// Nicht thread-sicher!</span>
+    }
+}
+</code></pre>
+<ul>
+<li>Zwei Threads könnten denselben Wert lesen und überschreiben → Inkrement geht verloren.</li>
+</ul>
+<h3 id="b-banking">b) Banking</h3>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">BankAccount</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">double</span> <span class="hljs-variable">balance</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">deposit</span><span class="hljs-params">(<span class="hljs-type">double</span> amount)</span> {
+        balance += amount; <span class="hljs-comment">// Race Condition möglich!</span>
+    }
+}
+</code></pre>
+<h3 id="c-listen">c) Listen</h3>
+<ul>
+<li>Wenn mehrere Threads gleichzeitig einer nicht-synchronisierten Liste Elemente hinzufügen oder entfernen, kann die Liste „kaputt“ gehen oder es entstehen Exceptions (<code>ConcurrentModificationException</code>).</li>
+</ul>
+<p><strong>Fazit:</strong></p>
+<ul>
+<li>Synchronisation schützt den Zugriff auf kritische Abschnitte des Codes, in denen gemeinsam genutzte Ressourcen verändert werden.</li>
+</ul>
+<hr>
+<h2 id="42-synchronisierte-methoden-und-blöcke-mit-dem-schlüsselwort-synchronized">4.2 Synchronisierte Methoden und Blöcke mit dem Schlüsselwort <code>synchronized</code></h2>
+<p><strong>Synchronisierte Methoden:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+    count++;
+}
+</code></pre>
+<ul>
+<li>Der gesamte Methodenrumpf ist geschützt – es kann immer nur <strong>ein</strong> Thread gleichzeitig diese Methode für ein Objekt ausführen.</li>
+</ul>
+<p><strong>Synchronisierte Blöcke:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+    <span class="hljs-keyword">synchronized</span>(<span class="hljs-built_in">this</span>) {
+        count++;
+    }
+}
+</code></pre>
+<ul>
+<li>Nur der Block im <code>synchronized</code>-Abschnitt wird geschützt.</li>
+<li>Praktisch, wenn nur ein Teil der Methode synchronisiert werden muss oder wenn auf andere Monitore als <code>this</code> synchronisiert werden soll.</li>
+</ul>
+<p><strong>Synchronisieren auf beliebige Objekte:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Object</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>();
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">doSomething</span><span class="hljs-params">()</span> {
+    <span class="hljs-keyword">synchronized</span>(lock) {
+        <span class="hljs-comment">// kritischer Bereich</span>
+    }
+}
+</code></pre>
+<p><strong>Achtung:</strong></p>
+<ul>
+<li>Synchronisation kann zu Performanceeinbußen führen – immer nur wirklich notwendige Bereiche schützen!</li>
+<li>Bei statischen Methoden synchronisiert <code>synchronized</code> auf die <strong>Klasse</strong>, nicht auf das Objekt.</li>
+</ul>
+<hr>
+<h2 id="43-volatile-variablen-wann-und-warum-verwenden">4.3 <code>volatile</code>-Variablen: Wann und warum verwenden?</h2>
+<p><strong>Was macht <code>volatile</code>?</strong></p>
+<ul>
+<li>Das Schlüsselwort <code>volatile</code> stellt sicher, dass eine Variable immer direkt aus dem Hauptspeicher gelesen und dorthin geschrieben wird – nicht aus CPU- oder Thread-eigenen Caches.</li>
+<li>Damit sind Änderungen einer <code>volatile</code>-Variable für alle Threads sofort sichtbar.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">running</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">stop</span><span class="hljs-params">()</span> {
+    running = <span class="hljs-literal">false</span>; <span class="hljs-comment">// Änderung wird für alle Threads sichtbar</span>
+}
+</code></pre>
+<p><strong>Wann verwenden?</strong></p>
+<ul>
+<li>Bei <strong>einfachen</strong> Variablen (z.B. Flags), die von mehreren Threads gelesen und beschrieben werden, aber bei denen kein zusammengesetzter Vorgang (z.B. „lesen, rechnen, schreiben“) erforderlich ist.</li>
+<li><strong>Achtung:</strong> <code>volatile</code> reicht NICHT aus, um komplexe Operationen (wie <code>count++</code>) thread-sicher zu machen!</li>
+</ul>
+<hr>
+<h2 id="44-java-objektmonitore-wait-notify-notifyall">4.4 Java-Objektmonitore (<code>wait()</code>, <code>notify()</code>, <code>notifyAll()</code>)</h2>
+<p><strong>Was ist ein Monitor?</strong></p>
+<ul>
+<li>Jeder Java-Objekt besitzt einen sog. „Monitor“, den Threads verwenden können, um sich zu koordinieren.</li>
+</ul>
+<p><strong>Wozu dienen diese Methoden?</strong></p>
+<ul>
+<li>Ermöglichen die Kommunikation zwischen Threads („Warte, bis eine Bedingung erfüllt ist“).</li>
+</ul>
+<h3 id="beispiel-producer-consumer-problem">Beispiel: Producer-Consumer-Problem</h3>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Buffer</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> value;
+    <span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">available</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">put</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span> <span class="hljs-keyword">throws</span> InterruptedException {
+        <span class="hljs-keyword">while</span> (available) wait();
+        value = v;
+        available = <span class="hljs-literal">true</span>;
+        notifyAll();
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-type">int</span> <span class="hljs-title function_">get</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException {
+        <span class="hljs-keyword">while</span> (!available) wait();
+        available = <span class="hljs-literal">false</span>;
+        notifyAll();
+        <span class="hljs-keyword">return</span> value;
+    }
+}
+</code></pre>
+<ul>
+<li><code>wait()</code> setzt den aufrufenden Thread in den WAITING-Zustand und gibt den Monitor frei.</li>
+<li><code>notify()</code> weckt <strong>einen</strong> wartenden Thread.</li>
+<li><code>notifyAll()</code> weckt <strong>alle</strong> wartenden Threads.</li>
+</ul>
+<p><strong>Wichtig:</strong></p>
+<ul>
+<li><code>wait()</code>, <code>notify()</code>, <code>notifyAll()</code> dürfen <strong>nur innerhalb synchronisierter Kontexte</strong> aufgerufen werden (Methoden/Blöcke mit <code>synchronized</code>).</li>
+</ul>
+<hr>
+<h2 id="45-fortgeschrittene-synchronisation">4.5 Fortgeschrittene Synchronisation</h2>
+<h3 id="451-reentrantlock-und-das-javautilconcurrentlocks-paket">4.5.1 <code>ReentrantLock</code> und das <code>java.util.concurrent.locks</code>-Paket</h3>
+<ul>
+<li><strong><code>ReentrantLock</code></strong> bietet gegenüber <code>synchronized</code> mehr Kontrolle, z. B. Lock-Timeouts, Interruptibilität, Fairness.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.concurrent.locks.ReentrantLock;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">SafeCounter</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">ReentrantLock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReentrantLock</span>();
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+        lock.lock();
+        <span class="hljs-keyword">try</span> {
+            count++;
+        } <span class="hljs-keyword">finally</span> {
+            lock.unlock();
+        }
+    }
+}
+</code></pre>
+<h3 id="452-weitere-mechanismen">4.5.2 Weitere Mechanismen</h3>
+<p><strong>Semaphore:</strong></p>
+<ul>
+<li>Begrenzen den gleichzeitigen Zugriff auf eine Ressource (z. B. maximal 5 gleichzeitige Zugriffe).</li>
+</ul>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.concurrent.Semaphore;
+<span class="hljs-type">Semaphore</span> <span class="hljs-variable">sem</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Semaphore</span>(<span class="hljs-number">5</span>);
+sem.acquire(); <span class="hljs-comment">// Zugang holen</span>
+sem.release(); <span class="hljs-comment">// Zugang freigeben</span>
+</code></pre>
+<p><strong>CountDownLatch:</strong></p>
+<ul>
+<li>Synchronisiert mehrere Threads, die auf ein Ereignis warten sollen (z. B. „Starte, wenn alle bereit sind“).</li>
+</ul>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.concurrent.CountDownLatch;
+<span class="hljs-type">CountDownLatch</span> <span class="hljs-variable">latch</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CountDownLatch</span>(<span class="hljs-number">3</span>);
+latch.await(); <span class="hljs-comment">// warten, bis latch.countDown() dreimal aufgerufen wurde</span>
+latch.countDown(); <span class="hljs-comment">// von anderen Threads aufgerufen</span>
+</code></pre>
+<p><strong>CyclicBarrier:</strong></p>
+<ul>
+<li>Ähnlich wie CountDownLatch, aber mehrfach wiederverwendbar. Threads warten, bis eine bestimmte Anzahl angekommen ist.</li>
+</ul>
+<hr>
+<h2 id="46-deadlocks-in-java-erkennen-vermeiden-beheben">4.6 Deadlocks in Java: Erkennen, vermeiden, beheben</h2>
+<p><strong>Was ist ein Deadlock?</strong></p>
+<ul>
+<li>Zwei oder mehr Threads warten gegenseitig auf Ressourcen, sodass keiner mehr weiterlaufen kann.</li>
+</ul>
+<p><strong>Typisches Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Thread 1:</span>
+<span class="hljs-keyword">synchronized</span>(obj1) {
+    Thread.sleep(<span class="hljs-number">50</span>);
+    <span class="hljs-keyword">synchronized</span>(obj2) { ... }
+}
+<span class="hljs-comment">// Thread 2:</span>
+<span class="hljs-keyword">synchronized</span>(obj2) {
+    Thread.sleep(<span class="hljs-number">50</span>);
+    <span class="hljs-keyword">synchronized</span>(obj1) { ... }
+}
+</code></pre>
+<ul>
+<li>Jeder Thread hält ein Lock und wartet auf das andere → Stillstand.</li>
+</ul>
+<p><strong>Erkennen:</strong></p>
+<ul>
+<li>Programm „hängt“ fest.</li>
+<li>Mit Tools wie <code>jstack</code>, VisualVM, IDE-Thread-Dumps analysierbar.</li>
+</ul>
+<p><strong>Vermeiden:</strong></p>
+<ul>
+<li>Immer in derselben Reihenfolge auf Ressourcen locken!</li>
+<li>Möglichst wenige und kleine kritische Abschnitte verwenden.</li>
+<li>Lock-Hierarchien festlegen und dokumentieren.</li>
+<li>Hochwertige Synchronisationsklassen (Locks, Semaphoren) bevorzugen.</li>
+</ul>
+<p><strong>Beheben:</strong></p>
+<ul>
+<li>Lock-Logik überprüfen und ggf. Reihenfolge vereinheitlichen.</li>
+<li>Zeitlimits (<code>tryLock(long timeout)</code>) einsetzen.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Warum kann das Fehlen von Synchronisation zu Datenverlusten führen?</li>
+<li>Was ist der Unterschied zwischen <code>synchronized</code> und <code>ReentrantLock</code>?</li>
+<li>Wann genügt das Schlüsselwort <code>volatile</code>, wann ist Synchronisation nötig?</li>
+<li>Wie erkennt und verhindert man Deadlocks in Java?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Synchronisation ist in Java essenziell, wenn mehrere Threads auf gemeinsam genutzte Ressourcen zugreifen.</li>
+<li>Java bietet verschiedene Möglichkeiten: <code>synchronized</code>, <code>volatile</code>, Objektmonitore (<code>wait</code>, <code>notify</code>), sowie fortgeschrittene Klassen wie <code>ReentrantLock</code>, <code>Semaphore</code>, <code>CountDownLatch</code>, <code>CyclicBarrier</code>.</li>
+<li>Deadlocks sind ein zentrales Risiko bei Multithreading – sie müssen durch Design und Tools erkannt und vermieden werden.</li>
+<li>Die richtige Strategie (und möglichst wenig gemeinsam genutzte Daten!) macht Multithread-Programme robust und performant.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

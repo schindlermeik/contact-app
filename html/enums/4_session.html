@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Typische Anwendungsf&auml;lle von Enums</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-typische-anwendungsfälle-von-enums">Handout: Typische Anwendungsfälle von Enums</h1>
+<hr>
+<h2 id="1-enums-in-switch-statements">1. Enums in <code>switch</code>-Statements</h2>
+<p>Enums eignen sich hervorragend für den Einsatz in <code>switch</code>-Anweisungen, da sie eine festgelegte, überschaubare Menge an Werten haben. Das macht den Code übersichtlich und typischer als bei der Verwendung von Strings oder Zahlen.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Wochentag</span> {
+    MONTAG, DIENSTAG, MITTWOCH, DONNERSTAG, FREITAG, SAMSTAG, SONNTAG
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EnumBeispiel</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">zeigeTagesinfo</span><span class="hljs-params">(Wochentag tag)</span> {
+        <span class="hljs-keyword">switch</span> (tag) {
+            <span class="hljs-keyword">case</span> MONTAG:
+                System.out.println(<span class="hljs-string">&quot;Wochenstart!&quot;</span>);
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> FREITAG:
+                System.out.println(<span class="hljs-string">&quot;Bald Wochenende!&quot;</span>);
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> SAMSTAG:
+            <span class="hljs-keyword">case</span> SONNTAG:
+                System.out.println(<span class="hljs-string">&quot;Wochenende!&quot;</span>);
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">default</span>:
+                System.out.println(<span class="hljs-string">&quot;Ein normaler Wochentag.&quot;</span>);
+        }
+    }
+}
+</code></pre>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Tippfehler werden vom Compiler erkannt.</li>
+<li>Der Compiler warnt, wenn ein Wert nicht behandelt wird.</li>
+<li>Umstellung (z. B. Reihenfolge der Werte) ist einfach und sicher.</li>
+</ul>
+<hr>
+<h2 id="2-enums-als-sichere-alternative-zu-magischen-zahlenstrings">2. Enums als sichere Alternative zu magischen Zahlen/Strings</h2>
+<p><strong>Magische Zahlen/Strings</strong> sind nicht selbsterklärend, können zu Tippfehlern führen und machen den Code schwer wartbar.</p>
+<p><strong>Schlecht (magische Zahlen/Strings):</strong></p>
+<pre><code class="language-java"><span class="hljs-type">int</span> <span class="hljs-variable">status</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>; <span class="hljs-comment">// Was bedeutet 2?</span>
+<span class="hljs-keyword">if</span> (status == <span class="hljs-number">2</span>) { ... }
+
+<span class="hljs-type">String</span> <span class="hljs-variable">phase</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;ROOOT&quot;</span>; <span class="hljs-comment">// Tippfehler bleibt unentdeckt</span>
+<span class="hljs-keyword">if</span> (phase.equals(<span class="hljs-string">&quot;ROT&quot;</span>)) { ... }
+</code></pre>
+<p><strong>Gut (Enums):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Status</span> {
+    AKTIV, INAKTIV, GESPERRT
+}
+
+<span class="hljs-type">Status</span> <span class="hljs-variable">status</span> <span class="hljs-operator">=</span> Status.AKTIV;
+<span class="hljs-keyword">if</span> (status == Status.AKTIV) { ... }
+</code></pre>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li><strong>Typsicherheit:</strong> Es kann kein ungültiger Wert zugewiesen werden.</li>
+<li><strong>Fehlervermeidung:</strong> Tippfehler werden beim Kompilieren entdeckt.</li>
+<li><strong>Bessere Lesbarkeit:</strong> Jeder Wert ist klar und selbsterklärend.</li>
+<li><strong>Leicht erweiterbar:</strong> Neue Werte können einfach ergänzt werden.</li>
+</ul>
+<hr>
+<h2 id="3-enums-in-collections-enumset-enummap">3. Enums in Collections (<code>EnumSet</code>, <code>EnumMap</code>)</h2>
+<p>Die Java-Standardbibliothek bietet zwei spezielle Collection-Typen, die speziell für Enums optimiert sind:</p>
+<h3 id="a-enumset">a) <code>EnumSet</code></h3>
+<ul>
+<li>Sehr effiziente Set-Implementierung für Enum-Typen.</li>
+<li>Schneller als <code>HashSet</code> und mit geringerem Speicherverbrauch.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.EnumSet;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EnumSetBeispiel</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Richtung</span> { NORD, SUED, OST, WEST }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        EnumSet&lt;Richtung&gt; erlaubteRichtungen = EnumSet.of(Richtung.NORD, Richtung.OST);
+
+        <span class="hljs-keyword">for</span> (Richtung r : erlaubteRichtungen) {
+            System.out.println(r);
+        }
+    }
+}
+</code></pre>
+<ul>
+<li><code>EnumSet.allOf(Richtung.class)</code> erzeugt ein Set mit allen Enum-Werten.</li>
+<li><code>EnumSet.noneOf(Richtung.class)</code> erzeugt ein leeres EnumSet.</li>
+</ul>
+<hr>
+<h3 id="b-enummap">b) <code>EnumMap</code></h3>
+<ul>
+<li>Eine Map, deren Schlüssel vom Typ Enum sind.</li>
+<li>Sehr schnell und speichersparend, da intern ein Array verwendet wird.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.EnumMap;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EnumMapBeispiel</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">Status</span> { AKTIV, INAKTIV, GESPERRT }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        EnumMap&lt;Status, String&gt; statusTexte = <span class="hljs-keyword">new</span> <span class="hljs-title class_">EnumMap</span>&lt;&gt;(Status.class);
+
+        statusTexte.put(Status.AKTIV, <span class="hljs-string">&quot;Benutzer ist aktiv&quot;</span>);
+        statusTexte.put(Status.INAKTIV, <span class="hljs-string">&quot;Benutzer ist inaktiv&quot;</span>);
+        statusTexte.put(Status.GESPERRT, <span class="hljs-string">&quot;Benutzer ist gesperrt&quot;</span>);
+
+        <span class="hljs-keyword">for</span> (Status status : Status.values()) {
+            System.out.println(status + <span class="hljs-string">&quot;: &quot;</span> + statusTexte.get(status));
+        }
+    }
+}
+</code></pre>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>
+<p><strong>Enum &amp; switch:</strong>
+Schreibe ein Enum <code>AmpelPhase</code> mit den Werten <code>ROT</code>, <code>GELB</code>, <code>GRUEN</code>. Implementiere eine Methode, die je nach Phase eine passende Anweisung ausgibt (z. B. „Stop“, „Achtung“, „Fahren“).</p>
+</li>
+<li>
+<p><strong>Magische Strings ersetzen:</strong>
+Ersetze im folgenden Code die Farbe als String durch ein Enum und passe die Vergleiche entsprechend an:</p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">farbe</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Rot&quot;</span>;
+<span class="hljs-keyword">if</span> (farbe.equals(<span class="hljs-string">&quot;Rot&quot;</span>)) { ... }
+</code></pre>
+</li>
+<li>
+<p><strong>EnumSet/EnumMap:</strong>
+Lege ein <code>EnumSet</code> mit allen Wochenendtagen an.
+Lege eine <code>EnumMap</code> an, die für jeden Wochentag einen kurzen Info-Text speichert.</p>
+</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li>Enums sind der sichere, moderne Weg für Zustände, Optionen und Kategorien im Code.</li>
+<li>Für Mengen und Zuordnungen von Enum-Werten verwende <strong>EnumSet</strong> und <strong>EnumMap</strong>.</li>
+<li>Setze Enums gezielt ein, um Fehler durch magische Zahlen/Strings zu vermeiden und den Code klarer zu machen.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

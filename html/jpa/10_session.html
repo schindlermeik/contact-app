@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praktische &Uuml;bung&colon; Eine einfache Benutzerverwaltung mit JPA</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-praktische-übung-eine-einfache-benutzerverwaltung-mit-jpa">Handout: Praktische Übung: Eine einfache Benutzerverwaltung mit JPA</h3>
+<p>In dieser Übung bauen wir eine Konsolenanwendung, die Benutzer (User) in einer PostgreSQL-Datenbank verwaltet. Du wirst alle gelernten Konzepte anwenden: Entitäten, Konfiguration, CRUD-Operationen und Abfragen.</p>
+<hr>
+<h4 id="101-schritt-1-projekt-setup-mit-maven">10.1 Schritt 1: Projekt-Setup mit Maven</h4>
+<p>Erstelle ein neues Maven-Projekt. In deiner <strong><code>pom.xml</code></strong> fügst du die notwendigen Abhängigkeiten hinzu:</p>
+<ol>
+<li><strong>JPA-Provider (Hibernate)</strong></li>
+<li><strong>JDBC-Treiber für PostgreSQL</strong></li>
+<li><strong><code>javax.xml.bind-api</code></strong> (wird von neueren Java-Versionen benötigt)</li>
+</ol>
+<p>Deine <code>pom.xml</code> sollte so aussehen:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">project</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://maven.apache.org/POM/4.0.0&quot;</span>
+         <span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+         <span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">modelVersion</span>&gt;</span>4.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">modelVersion</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.example<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>jpa-userverwaltung<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.0-SNAPSHOT<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">properties</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">maven.compiler.source</span>&gt;</span>11<span class="hljs-tag">&lt;/<span class="hljs-name">maven.compiler.source</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">maven.compiler.target</span>&gt;</span>11<span class="hljs-tag">&lt;/<span class="hljs-name">maven.compiler.target</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">properties</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.hibernate<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>hibernate-core<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.6.15.Final<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>42.5.4<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>javax.xml.bind<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>jaxb-api<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.3.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">project</span>&gt;</span>
+</code></pre>
+<hr>
+<h4 id="102-schritt-2-entität-und-konfiguration-erstellen">10.2 Schritt 2: Entität und Konfiguration erstellen</h4>
+<h5 id="a-entitätsklasse-user">A. Entitätsklasse <code>User</code></h5>
+<p>Erstelle die Klasse <code>User</code> im Verzeichnis <strong><code>src/main/java/com/example/model/User.java</code></strong>. Diese Entität wird die Benutzerdaten speichern. Ein Benutzer hat eine ID, einen Namen und eine E-Mail-Adresse.</p>
+<pre><code class="language-java"><span class="hljs-keyword">package</span> com.example.model;
+
+<span class="hljs-keyword">import</span> javax.persistence.*;
+
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-meta">@Table(name = &quot;users&quot;)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> {
+
+    <span class="hljs-meta">@Id</span>
+    <span class="hljs-meta">@GeneratedValue(strategy = GenerationType.IDENTITY)</span>
+    <span class="hljs-keyword">private</span> Long id;
+
+    <span class="hljs-meta">@Column(name = &quot;username&quot;, nullable = false, unique = true)</span>
+    <span class="hljs-keyword">private</span> String name;
+
+    <span class="hljs-meta">@Column(nullable = false, unique = true)</span>
+    <span class="hljs-keyword">private</span> String email;
+
+    <span class="hljs-comment">// Standard-Konstruktor</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">User</span><span class="hljs-params">()</span> {
+    }
+
+    <span class="hljs-comment">// Konstruktor für die Erstellung</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">User</span><span class="hljs-params">(String name, String email)</span> {
+        <span class="hljs-built_in">this</span>.name = name;
+        <span class="hljs-built_in">this</span>.email = email;
+    }
+
+    <span class="hljs-comment">// Getters and Setters</span>
+    <span class="hljs-keyword">public</span> Long <span class="hljs-title function_">getId</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> id; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setId</span><span class="hljs-params">(Long id)</span> { <span class="hljs-built_in">this</span>.id = id; }
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getName</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> name; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setName</span><span class="hljs-params">(String name)</span> { <span class="hljs-built_in">this</span>.name = name; }
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getEmail</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> email; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setEmail</span><span class="hljs-params">(String email)</span> { <span class="hljs-built_in">this</span>.email = email; }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;User{&quot;</span> +
+               <span class="hljs-string">&quot;id=&quot;</span> + id +
+               <span class="hljs-string">&quot;, name=&#x27;&quot;</span> + name + <span class="hljs-string">&#x27;\&#x27;&#x27;</span> +
+               <span class="hljs-string">&quot;, email=&#x27;&quot;</span> + email + <span class="hljs-string">&#x27;\&#x27;&#x27;</span> +
+               <span class="hljs-string">&#x27;}&#x27;</span>;
+    }
+}
+</code></pre>
+<h5 id="b-konfiguration-in-persistencexml">B. Konfiguration in <code>persistence.xml</code></h5>
+<p>Erstelle die Konfigurationsdatei im Verzeichnis <strong><code>src/main/resources/META-INF/persistence.xml</code></strong>. Passe hier deine PostgreSQL-Zugangsdaten an.</p>
+<pre><code class="language-xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;UTF-8&quot;</span>?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">persistence</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://xmlns.jcp.org/xml/ns/persistence&quot;</span>
+             <span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+             <span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">&quot;http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd&quot;</span>
+             <span class="hljs-attr">version</span>=<span class="hljs-string">&quot;2.1&quot;</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">persistence-unit</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;userverwaltung_pu&quot;</span> <span class="hljs-attr">transaction-type</span>=<span class="hljs-string">&quot;RESOURCE_LOCAL&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">provider</span>&gt;</span>org.hibernate.jpa.HibernatePersistenceProvider<span class="hljs-tag">&lt;/<span class="hljs-name">provider</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">class</span>&gt;</span>com.example.model.User<span class="hljs-tag">&lt;/<span class="hljs-name">class</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">properties</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.url&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;jdbc:postgresql://localhost:5432/jpa_db&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.user&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;dein_benutzer&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.password&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;dein_passwort&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;javax.persistence.jdbc.driver&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;org.postgresql.Driver&quot;</span>/&gt;</span>
+
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.dialect&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;org.hibernate.dialect.PostgreSQLDialect&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.hbm2ddl.auto&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;update&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.show_sql&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">property</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;hibernate.format_sql&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">properties</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">persistence-unit</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">persistence</span>&gt;</span>
+</code></pre>
+<ul>
+<li><strong>Wichtig:</strong> Achte darauf, dass der <code>name</code> des <code>&lt;persistence-unit&gt;</code>-Tags (hier <code>userverwaltung_pu</code>) exakt dem Namen entspricht, den du später im Code verwendest.</li>
+</ul>
+<hr>
+<h4 id="103-schritt-3-crud-operationen-in-einer-hauptklasse">10.3 Schritt 3: CRUD-Operationen in einer Hauptklasse</h4>
+<p>Jetzt schreibst du eine Hauptklasse, um die JPA-Operationen auszuführen. Erstelle die Klasse <code>MainApp</code> im Verzeichnis <strong><code>src/main/java/com/example/MainApp.java</code></strong>.</p>
+<pre><code class="language-java"><span class="hljs-keyword">package</span> com.example;
+
+<span class="hljs-keyword">import</span> com.example.model.User;
+<span class="hljs-keyword">import</span> javax.persistence.EntityManager;
+<span class="hljs-keyword">import</span> javax.persistence.EntityManagerFactory;
+<span class="hljs-keyword">import</span> javax.persistence.Persistence;
+<span class="hljs-keyword">import</span> java.util.List;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MainApp</span> {
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+
+        <span class="hljs-comment">// EntityManagerFactory erstellen</span>
+        <span class="hljs-comment">// Der Name muss mit dem Namen in persistence.xml übereinstimmen</span>
+        <span class="hljs-type">EntityManagerFactory</span> <span class="hljs-variable">emf</span> <span class="hljs-operator">=</span> Persistence.createEntityManagerFactory(<span class="hljs-string">&quot;userverwaltung_pu&quot;</span>);
+        <span class="hljs-type">EntityManager</span> <span class="hljs-variable">em</span> <span class="hljs-operator">=</span> emf.createEntityManager();
+
+        <span class="hljs-comment">// 1. Benutzer erstellen und speichern (Persistieren)</span>
+        System.out.println(<span class="hljs-string">&quot;--- Benutzer erstellen ---&quot;</span>);
+        em.getTransaction().begin();
+        <span class="hljs-type">User</span> <span class="hljs-variable">user1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(<span class="hljs-string">&quot;max.mustermann&quot;</span>, <span class="hljs-string">&quot;max.mustermann@example.com&quot;</span>);
+        <span class="hljs-type">User</span> <span class="hljs-variable">user2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(<span class="hljs-string">&quot;erika.mustermann&quot;</span>, <span class="hljs-string">&quot;erika.mustermann@example.com&quot;</span>);
+        em.persist(user1);
+        em.persist(user2);
+        em.getTransaction().commit();
+
+        <span class="hljs-comment">// 2. Alle Benutzer abfragen (JPQL)</span>
+        System.out.println(<span class="hljs-string">&quot;\n--- Alle Benutzer abfragen ---&quot;</span>);
+        List&lt;User&gt; users = em.createQuery(<span class="hljs-string">&quot;SELECT u FROM User u&quot;</span>, User.class).getResultList();
+        users.forEach(System.out::println);
+
+        <span class="hljs-comment">// 3. Benutzer aktualisieren</span>
+        System.out.println(<span class="hljs-string">&quot;\n--- Benutzer aktualisieren ---&quot;</span>);
+        em.getTransaction().begin();
+        <span class="hljs-type">User</span> <span class="hljs-variable">userToUpdate</span> <span class="hljs-operator">=</span> em.find(User.class, user1.getId());
+        <span class="hljs-keyword">if</span> (userToUpdate != <span class="hljs-literal">null</span>) {
+            userToUpdate.setEmail(<span class="hljs-string">&quot;max.neue@adresse.com&quot;</span>);
+            System.out.println(<span class="hljs-string">&quot;Aktualisierter Benutzer: &quot;</span> + userToUpdate);
+        }
+        em.getTransaction().commit();
+
+        <span class="hljs-comment">// 4. Benutzer löschen</span>
+        System.out.println(<span class="hljs-string">&quot;\n--- Benutzer löschen ---&quot;</span>);
+        em.getTransaction().begin();
+        <span class="hljs-type">User</span> <span class="hljs-variable">userToDelete</span> <span class="hljs-operator">=</span> em.find(User.class, user2.getId());
+        <span class="hljs-keyword">if</span> (userToDelete != <span class="hljs-literal">null</span>) {
+            em.remove(userToDelete);
+            System.out.println(<span class="hljs-string">&quot;Benutzer gelöscht: &quot;</span> + userToDelete.getName());
+        }
+        em.getTransaction().commit();
+        
+        <span class="hljs-comment">// Letzte Abfrage, um zu überprüfen, ob der Benutzer gelöscht wurde</span>
+        System.out.println(<span class="hljs-string">&quot;\n--- Benutzer nach Löschung ---&quot;</span>);
+        List&lt;User&gt; remainingUsers = em.createQuery(<span class="hljs-string">&quot;SELECT u FROM User u&quot;</span>, User.class).getResultList();
+        remainingUsers.forEach(System.out::println);
+
+        <span class="hljs-comment">// Aufräumen: EntityManager und EntityManagerFactory schließen</span>
+        em.close();
+        emf.close();
+    }
+}
+</code></pre>
+<hr>
+<h4 id="104-schritt-4-ausführen-und-testen">10.4 Schritt 4: Ausführen und Testen</h4>
+<ol>
+<li><strong>Stelle sicher, dass deine PostgreSQL-Datenbank läuft</strong> und die Datenbank <code>jpa_db</code> (oder wie immer du sie genannt hast) existiert.</li>
+<li>Öffne dein Projekt in einer IDE (z. B. IntelliJ IDEA, Eclipse) und führe die <code>MainApp</code>-Klasse aus.</li>
+<li>Beobachte die Konsolenausgabe. Du solltest die SQL-Befehle (<code>CREATE TABLE</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) sehen, die Hibernate für dich generiert.</li>
+<li>Überprüfe mit einem Datenbank-Tool (z. B. <code>pgAdmin</code> oder der <code>psql</code>-Konsole), ob die Tabelle <code>users</code> erstellt wurde und die Daten korrekt eingefügt, aktualisiert und gelöscht wurden.</li>
+</ol>
+<p><strong>Mögliche Erweiterungen der Übung:</strong></p>
+<ul>
+<li><strong>Beziehung hinzufügen:</strong> Erstelle eine <code>UserProfile</code>-Entität und verknüpfe sie mit der <code>User</code>-Entität über eine <code>@OneToOne</code>-Beziehung.</li>
+<li><strong>Named Query implementieren:</strong> Schreibe eine <code>@NamedQuery</code> in der <code>User</code>-Klasse, um Benutzer anhand ihrer E-Mail-Adresse zu finden.</li>
+<li><strong>Transaktionen absichtlich fehlschlagen lassen:</strong> Füge eine ungültige Operation in einen Transaktionsblock ein, um zu sehen, wie <code>rollback</code> funktioniert.</li>
+</ul>
+<p>Durch das Durcharbeiten dieser praktischen Übung hast du nicht nur die Theorie verstanden, sondern auch gelernt, wie du JPA-Anwendungen von Grund auf aufbaust.</p>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices und typische Fallstricke bei asynchronem Code &lpar;CompletableFuture&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-und-typische-fallstricke-bei-asynchronem-code-completablefuture">Handout: Best Practices und typische Fallstricke bei asynchronem Code (CompletableFuture)</h1>
+<hr>
+<h2 id="61-richtige-fehlerbehandlung-und-exception-handling-bei-asynchronem-code">6.1 Richtige Fehlerbehandlung und Exception-Handling bei asynchronem Code</h2>
+<h3 id="herausforderung"><strong>Herausforderung:</strong></h3>
+<ul>
+<li>Fehler (Exceptions) passieren oft „im Hintergrund“ und können im Hauptthread leicht übersehen werden.</li>
+<li>Klassische try/catch-Blöcke funktionieren bei asynchronem Code nicht wie gewohnt.</li>
+</ul>
+<h3 id="best-practices"><strong>Best Practices:</strong></h3>
+<ul>
+<li>
+<p><strong>Sichere Fehlerbehandlung mit CompletableFuture-Methoden:</strong></p>
+<ul>
+<li>
+<p><strong><code>exceptionally()</code></strong>: Liefert einen Ersatzwert oder führt eine Aktion bei Fehlern aus.</p>
+<pre><code class="language-java">CompletableFuture.supplyAsync(() -&gt; {
+    <span class="hljs-keyword">if</span> (<span class="hljs-literal">true</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(<span class="hljs-string">&quot;Fehler!&quot;</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">10</span>;
+}).exceptionally(ex -&gt; {
+    System.out.println(<span class="hljs-string">&quot;Fehler: &quot;</span> + ex.getMessage());
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+});
+</code></pre>
+</li>
+<li>
+<p><strong><code>handle()</code></strong>: Wird bei Erfolg <strong>und</strong> Fehler aufgerufen – flexibles Fehler- und Ergebnis-Handling.</p>
+<pre><code class="language-java">.handle((result, ex) -&gt; ex != <span class="hljs-literal">null</span> ? -<span class="hljs-number">1</span> : result)
+</code></pre>
+</li>
+<li>
+<p><strong><code>whenComplete()</code></strong>: Für Logging, unabhängig vom Erfolg oder Fehler (ändert das Ergebnis nicht).</p>
+<pre><code class="language-java">.whenComplete((result, ex) -&gt; {
+    <span class="hljs-keyword">if</span> (ex != <span class="hljs-literal">null</span>) System.out.println(<span class="hljs-string">&quot;Fehler: &quot;</span> + ex.getMessage());
+});
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Fehler weitergeben statt verschlucken:</strong>
+Lasse Fehler nicht einfach „verschwinden“, sondern behandle sie sichtbar (Logging, Monitoring, Weiterreichen).</p>
+</li>
+<li>
+<p><strong>Kombinierte Fehlerbehandlung in Verkettungen:</strong>
+Auch in verketteten Chains sollte jeder Schritt Fehler korrekt weitergeben oder abfangen.</p>
+</li>
+</ul>
+<hr>
+<h2 id="62-ressourcen-management-und-umgang-mit-thread-pools">6.2 Ressourcen-Management und Umgang mit Thread Pools</h2>
+<h3 id="herausforderung-1"><strong>Herausforderung:</strong></h3>
+<ul>
+<li>Jede asynchrone Aufgabe braucht Threads. Ohne Kontrolle können zu viele Threads entstehen, die die Anwendung verlangsamen oder abstürzen lassen.</li>
+</ul>
+<h3 id="best-practices-1"><strong>Best Practices:</strong></h3>
+<ul>
+<li>
+<p><strong>Eigene, begrenzte Thread Pools verwenden:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">ExecutorService</span> <span class="hljs-variable">pool</span> <span class="hljs-operator">=</span> Executors.newFixedThreadPool(<span class="hljs-number">4</span>);
+CompletableFuture.supplyAsync(() -&gt; rechenlastig(), pool);
+</code></pre>
+</li>
+<li>
+<p><strong>Thread Pools korrekt herunterfahren:</strong>
+Vergiss niemals, nach der Verarbeitung <code>shutdown()</code> aufzurufen:</p>
+<pre><code class="language-java">pool.shutdown();
+</code></pre>
+</li>
+<li>
+<p><strong>Keine „Fire-and-Forget“-Tasks ohne Kontrolle:</strong>
+Sammle alle gestarteten Futures ein und überprüfe deren Status – so vermeidest du „Thread-Leaks“.</p>
+</li>
+<li>
+<p><strong>Pool-Größe anpassen:</strong>
+Je nach Anwendung (CPU- oder IO-lastig) die Pool-Größe sinnvoll wählen.</p>
+</li>
+</ul>
+<hr>
+<h2 id="63-vermeidung-von-callback-höllen-callback-hell-durch-methodisches-chaining">6.3 Vermeidung von Callback-Höllen (Callback Hell) durch methodisches Chaining</h2>
+<h3 id="problem"><strong>Problem:</strong></h3>
+<ul>
+<li>Verschachtelte Callbacks („Callback-Hölle“) führen zu unleserlichem, schwer wartbarem Code.</li>
+</ul>
+<p><strong>Beispiel (schlecht):</strong></p>
+<pre><code class="language-java">api1(result1 -&gt; {
+    api2(result1, result2 -&gt; {
+        api3(result2, result3 -&gt; {
+            <span class="hljs-comment">// Weiterverarbeitung...</span>
+        });
+    });
+});
+</code></pre>
+<h3 id="best-practices-2"><strong>Best Practices:</strong></h3>
+<ul>
+<li>
+<p><strong>Verkettung (Chaining) von CompletableFutures nutzen:</strong>
+Nutze Methoden wie <code>thenCompose</code>, <code>thenApply</code>, um asynchrone Abläufe linear darzustellen:</p>
+<pre><code class="language-java">CompletableFuture.supplyAsync(() -&gt; api1())
+    .thenCompose(result1 -&gt; CompletableFuture.supplyAsync(() -&gt; api2(result1)))
+    .thenCompose(result2 -&gt; CompletableFuture.supplyAsync(() -&gt; api3(result2)))
+    .thenAccept(result3 -&gt; System.out.println(<span class="hljs-string">&quot;Finales Ergebnis: &quot;</span> + result3));
+</code></pre>
+</li>
+<li>
+<p><strong>Jede Stufe hat ihren eigenen klaren Aufgabenbereich.</strong></p>
+</li>
+<li>
+<p><strong>Kombiniere parallele Aufgaben mit <code>thenCombine</code>, <code>allOf</code> usw., statt sie manuell zu synchronisieren.</strong></p>
+</li>
+</ul>
+<hr>
+<h2 id="64-debugging-und-testen-asynchroner-logik">6.4 Debugging und Testen asynchroner Logik</h2>
+<h3 id="herausforderungen"><strong>Herausforderungen:</strong></h3>
+<ul>
+<li>Fehler treten oft nicht sofort auf, sondern erst „irgendwann“ im Hintergrund.</li>
+<li>Stacktraces sind häufig schwer nachvollziehbar.</li>
+</ul>
+<h3 id="best-practices-3"><strong>Best Practices:</strong></h3>
+<ul>
+<li>
+<p><strong>Systematisches Logging:</strong>
+Logge Start, Ende und Fehler jeder asynchronen Aufgabe. Ergänze Logs mit Thread-Namen und Context-Infos.</p>
+</li>
+<li>
+<p><strong>Timeouts verwenden:</strong>
+Verhindere „hängende“ Futures durch sinnvolle Zeitbegrenzungen:</p>
+<pre><code class="language-java">future.get(<span class="hljs-number">2</span>, TimeUnit.SECONDS);
+</code></pre>
+</li>
+<li>
+<p><strong>Unit-Tests für asynchrone Logik:</strong></p>
+<ul>
+<li>Verwende Test-Utilities wie Awaitility, um auf Ergebnisse zu warten.</li>
+<li>Prüfe sowohl Erfolg als auch Fehlerfälle.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Beispiel (JUnit5):</strong></p>
+<pre><code class="language-java">CompletableFuture&lt;Integer&gt; future = CompletableFuture.supplyAsync(() -&gt; <span class="hljs-number">42</span>);
+Assertions.assertEquals(<span class="hljs-number">42</span>, future.join());
+</code></pre>
+<ul>
+<li><strong>Verwende <code>.join()</code> im Testcode:</strong>
+Im Unterschied zu <code>get()</code> wirft <code>.join()</code> eine <code>CompletionException</code> zur Laufzeit und muss nicht mit checked exceptions umgehen.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Warum reicht try/catch für Fehler in asynchronem Code nicht aus?</li>
+<li>Wie verhinderst du, dass deine Anwendung durch zu viele Threads überlastet wird?</li>
+<li>Was sind die Vorteile von methodischem Chaining gegenüber verschachtelten Callbacks?</li>
+<li>Welche Besonderheiten gelten beim Testen asynchroner Logik?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Moderne Fehlerbehandlung bei asynchronem Code nutzt <code>exceptionally</code>, <code>handle</code> und <code>whenComplete</code>.</li>
+<li>Kontrollierter Umgang mit Thread Pools ist essenziell für stabile und skalierbare Anwendungen.</li>
+<li>Methodisches Chaining macht asynchronen Code lesbar und wartbar – vermeide Verschachtelung!</li>
+<li>Teste asynchrone Logik gezielt, setze Timeouts und nutze Logging und geeignete Test-Tools.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

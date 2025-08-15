@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Implementierung von Dependency Injection &lpar;DI&rpar; ohne Framework</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-implementierung-von-dependency-injection-di-ohne-framework">Handout: Implementierung von Dependency Injection (DI) ohne Framework</h1>
+<hr>
+<h2 id="41-manuelle-dependency-injection-wie-sieht-das-praktisch-aus">4.1 Manuelle Dependency Injection: Wie sieht das praktisch aus?</h2>
+<h3 id="grundidee">Grundidee</h3>
+<ul>
+<li><strong>Manuelle DI</strong> bedeutet, dass der Entwickler die Erstellung und Zuweisung der Abhängigkeiten im Code selbst übernimmt – ohne Unterstützung durch ein spezielles Framework (wie Spring, Guice, etc.).</li>
+<li>Die Abhängigkeiten werden bei der Instanziierung explizit übergeben (Konstruktor, Setter, Interface).</li>
+</ul>
+<h3 id="beispiel-java">Beispiel (Java)</h3>
+<h4 id="ohne-di-klassisch-fest-verdrahtet">Ohne DI (klassisch, fest verdrahtet)</h4>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">UserRepository</span> <span class="hljs-variable">userRepository</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UserRepository</span>();
+}
+</code></pre>
+<h4 id="mit-manueller-di-konstruktor-injektion">Mit manueller DI (Konstruktor-Injektion)</h4>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> UserRepository userRepository;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">UserService</span><span class="hljs-params">(UserRepository userRepository)</span> {
+        <span class="hljs-built_in">this</span>.userRepository = userRepository;
+    }
+}
+</code></pre>
+<h4 id="manuelles-verdrahten-der-objekte-im-main-oder-factory">Manuelles „Verdrahten“ der Objekte (im Main oder Factory)</h4>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">UserRepository</span> <span class="hljs-variable">repo</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UserRepository</span>();
+        <span class="hljs-type">UserService</span> <span class="hljs-variable">service</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UserService</span>(repo);
+        <span class="hljs-comment">// Anwendung starten...</span>
+    }
+}
+</code></pre>
+<ul>
+<li><strong>Wichtig:</strong> Das Erstellen und „Zusammenstecken“ der Objekte geschieht hier explizit im Code.</li>
+</ul>
+<hr>
+<h2 id="42-beispiele-und-typische-fehlerquellen">4.2 Beispiele und typische Fehlerquellen</h2>
+<h3 id="beispiel-anwendung-mit-mehreren-abhängigkeiten">Beispiel: Anwendung mit mehreren Abhängigkeiten</h3>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> OrderRepository orderRepository;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> PaymentService paymentService;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">OrderService</span><span class="hljs-params">(OrderRepository orderRepository, PaymentService paymentService)</span> {
+        <span class="hljs-built_in">this</span>.orderRepository = orderRepository;
+        <span class="hljs-built_in">this</span>.paymentService = paymentService;
+    }
+}
+</code></pre>
+<p><strong>Zusammenstecken:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">OrderRepository</span> <span class="hljs-variable">orderRepo</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OrderRepository</span>();
+<span class="hljs-type">PaymentService</span> <span class="hljs-variable">payment</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PaymentService</span>();
+<span class="hljs-type">OrderService</span> <span class="hljs-variable">orderService</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OrderService</span>(orderRepo, payment);
+</code></pre>
+<hr>
+<h3 id="typische-fehlerquellen">Typische Fehlerquellen</h3>
+<ol>
+<li>
+<p><strong>Vergessen, alle Abhängigkeiten zu injizieren</strong></p>
+<ul>
+<li>Eine Abhängigkeit wird nicht gesetzt → NullPointerException zur Laufzeit.</li>
+</ul>
+</li>
+<li>
+<p><strong>Mischformen im Code</strong></p>
+<ul>
+<li>Einige Abhängigkeiten werden injiziert, andere im Konstruktor selbst erzeugt → Intransparenz und schlechtes Design.</li>
+</ul>
+</li>
+<li>
+<p><strong>Zu viele Abhängigkeiten in einer Klasse</strong></p>
+<ul>
+<li>Wenn eine Klasse z.B. 6+ Abhängigkeiten im Konstruktor hat, deutet das oft auf eine Verletzung des Single Responsibility Principle hin.</li>
+</ul>
+</li>
+<li>
+<p><strong>Zirkuläre Abhängigkeiten</strong></p>
+<ul>
+<li>Zwei oder mehr Klassen hängen gegenseitig voneinander ab (A → B, B → A), was beim „manuellen Verdrahten“ zu Problemen führen kann.</li>
+</ul>
+</li>
+<li>
+<p><strong>Unübersichtliche Objekt-Erzeugung</strong></p>
+<ul>
+<li>Das „Zusammenstecken“ aller Instanzen in einer Main-Klasse wird schnell unübersichtlich („Objekt-Baum wächst“).</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="43-prinzipien-für-saubere-di-implementierungen">4.3 Prinzipien für saubere DI-Implementierungen</h2>
+<h3 id="1-transparenz">1. <strong>Transparenz</strong></h3>
+<ul>
+<li>Alle Abhängigkeiten sind im Konstruktor (oder Setter) sichtbar.</li>
+<li>Keine versteckten new-Aufrufe innerhalb der Klassen für echte Abhängigkeiten.</li>
+</ul>
+<h3 id="2-trennung-von-objekterstellung-und-anwendungslogik">2. <strong>Trennung von Objekterstellung und Anwendungslogik</strong></h3>
+<ul>
+<li>Das eigentliche Business-Objekt kümmert sich <strong>nicht</strong> darum, wie seine Abhängigkeiten entstehen.</li>
+<li>Der „Verdrahtungscode“ (z. B. in einer Main-Klasse oder Factory) ist klar vom Rest getrennt.</li>
+</ul>
+<h3 id="3-kleine-überschaubare-klassen">3. <strong>Kleine, überschaubare Klassen</strong></h3>
+<ul>
+<li>Jede Klasse hat klar umrissene Aufgaben und wenige Abhängigkeiten (idealerweise maximal 3–4).</li>
+<li>Viele Abhängigkeiten → Prüfen, ob Aufgabenteilung/Schnittstellen nötig sind.</li>
+</ul>
+<h3 id="4-verwendung-von-schnittstellen-interfaces">4. <strong>Verwendung von Schnittstellen (Interfaces)</strong></h3>
+<ul>
+<li>Abhängigkeiten werden möglichst als Interface typisiert, nicht als konkrete Klasse → Erleichtert Testbarkeit und Austauschbarkeit.</li>
+</ul>
+<h3 id="5-keine-statischen-abhängigkeiten">5. <strong>Keine statischen Abhängigkeiten</strong></h3>
+<ul>
+<li>Statische Hilfsmethoden und globale Variablen vermeiden, da diese schwer zu testen und zu ersetzen sind.</li>
+</ul>
+<hr>
+<h2 id="44-grenzen-der-manuellen-di-skalierbarkeit-wartbarkeit-bei-großen-projekten">4.4 Grenzen der manuellen DI (Skalierbarkeit, Wartbarkeit bei großen Projekten)</h2>
+<h3 id="wachsende-komplexität"><strong>Wachsende Komplexität</strong></h3>
+<ul>
+<li>Mit zunehmender Projektgröße steigt die Anzahl der Abhängigkeiten und Objekte stark an.</li>
+<li>Das manuelle „Zusammenstecken“ wird unübersichtlich und fehleranfällig.</li>
+</ul>
+<h3 id="objektgraph-management"><strong>Objektgraph-Management</strong></h3>
+<ul>
+<li>Wer ist für die Erzeugung und Verwaltung aller Instanzen zuständig?</li>
+<li>Zirkuläre Abhängigkeiten sind schwer zu erkennen und zu lösen.</li>
+</ul>
+<h3 id="austauschbarkeit-und-konfiguration"><strong>Austauschbarkeit und Konfiguration</strong></h3>
+<ul>
+<li>Konfigurationen (z.B. verschiedene Implementierungen für Test/Produktion) müssen per Hand verwaltet werden.</li>
+<li>Kein zentrales „Konfigurationszentrum“ wie bei Frameworks.</li>
+</ul>
+<h3 id="lebenszyklus-management"><strong>Lebenszyklus-Management</strong></h3>
+<ul>
+<li>Bei Ressourcen wie Datenbankverbindungen, Sockets, etc. ist das Management (Erstellung, Schließen) komplexer.</li>
+<li>DI-Frameworks bieten oft Lebenszyklusverwaltung („Scopes“, „Singletons“), die hier fehlt.</li>
+</ul>
+<h3 id="wiederverwendbarkeit"><strong>Wiederverwendbarkeit</strong></h3>
+<ul>
+<li>Manuelle DI kann dazu führen, dass „Verdrahtungscode“ nicht gut wiederverwendbar ist.</li>
+</ul>
+<hr>
+<h2 id="45-best-practices-für-di-im-small-scale-projekt">4.5 Best Practices für DI im Small-Scale-Projekt</h2>
+<ol>
+<li>
+<p><strong>Konstruktor-Injektion als Standard</strong></p>
+<ul>
+<li>Verwende Constructor Injection für alle zwingenden Abhängigkeiten.</li>
+</ul>
+</li>
+<li>
+<p><strong>Setter-Injektion für optionale Abhängigkeiten</strong></p>
+<ul>
+<li>Nutze Setter nur dort, wo Abhängigkeiten wirklich optional oder nachträglich änderbar sein sollen.</li>
+</ul>
+</li>
+<li>
+<p><strong>„Composition Root“ definieren</strong></p>
+<ul>
+<li>Halte den Code, der alle Objekte erstellt und miteinander verbindet (meist die <code>main</code>-Methode), an einem zentralen Ort.</li>
+</ul>
+</li>
+<li>
+<p><strong>Verwendung von Interfaces</strong></p>
+<ul>
+<li>Typisiere Abhängigkeiten über Interfaces, um spätere Erweiterbarkeit und Testbarkeit zu gewährleisten.</li>
+</ul>
+</li>
+<li>
+<p><strong>Wenige, kleine, gut lesbare Klassen</strong></p>
+<ul>
+<li>Vermeide Klassen mit „zu vielen“ Abhängigkeiten; überprüfe die Verantwortung der Klasse.</li>
+</ul>
+</li>
+<li>
+<p><strong>Klare Namensgebung</strong></p>
+<ul>
+<li>Wähle sprechende Namen für Abhängigkeiten und Variablen, um die Rolle im System zu verdeutlichen.</li>
+</ul>
+</li>
+<li>
+<p><strong>Dokumentation</strong></p>
+<ul>
+<li>Dokumentiere, welche Abhängigkeiten für eine Klasse nötig sind (Javadoc, Kommentare).</li>
+</ul>
+</li>
+<li>
+<p><strong>Tests nutzen</strong></p>
+<ul>
+<li>Schreibe Unit-Tests, um die Funktionsweise von DI zu überprüfen und zu gewährleisten, dass Abhängigkeiten korrekt injiziert werden.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Wie würdest du in deinem Projekt eine Klasse mit mehreren Abhängigkeiten manuell injizieren?</li>
+<li>Welche Probleme könnten beim manuellen DI in einem sehr großen Projekt auftreten?</li>
+<li>Woran erkennst du, dass eine Klasse zu viele Abhängigkeiten hat?</li>
+<li>Welche Vorteile hat die „Composition Root“-Strategie?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li><strong>Manuelle DI</strong> ist in kleinen bis mittelgroßen Projekten gut umsetzbar, solange der Objektgraph überschaubar bleibt.</li>
+<li>Transparente Konstruktor-Injektion, zentrale „Verdrahtung“ und die Trennung von Objekterstellung und Logik sind essenziell.</li>
+<li>Ab einer gewissen Projektgröße bieten Frameworks viele Vorteile (Automatisierung, Lebenszyklus, Konfiguration).</li>
+<li>Klare Prinzipien und Best Practices sorgen dafür, dass der Code wartbar, flexibel und testbar bleibt.</li>
+</ul>
+<hr>
+<p><strong>Praxistipp:</strong>
+Reflektiere für dein aktuelles Projekt: Wie würdest du alle Services, Repositories und Controller ohne Framework miteinander verdrahten? An welcher Stelle würde es unübersichtlich?
+Teste, wie du durch einfache Interfaces und Konstruktor-Injektion die Struktur verbessern kannst!</p>
+
+            
+            
+        </body>
+        </html>

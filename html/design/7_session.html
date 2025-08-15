@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praxis und &Uuml;bungen &ndash; Modularisierung in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praxis-und-übungen--modularisierung-in-java">Handout: Praxis und Übungen – Modularisierung in Java</h1>
+<hr>
+<h2 id="71-entwurf-einer-modularen-beispielanwendung">7.1 Entwurf einer modularen Beispielanwendung</h2>
+<h3 id="aufgabenstellung"><strong>Aufgabenstellung:</strong></h3>
+<ul>
+<li>
+<p>Entwirf ein Softwaresystem, das aus mehreren klar abgegrenzten Modulen besteht, z. B.:</p>
+<ul>
+<li>Ein <strong>Plugin-System</strong> (z. B. für ein Notizbuch oder eine Mini-IDE)</li>
+<li>Ein <strong>Mini-Microservice-System</strong> (z. B. „User“- und „Order“-Service)</li>
+</ul>
+</li>
+</ul>
+<h3 id="vorgehen"><strong>Vorgehen:</strong></h3>
+<ul>
+<li>Identifiziere Kernfunktionen und trenne sie in eigenständige Module (z. B. „core“, „plugin-api“, „plugin-impl“)</li>
+<li>Definiere die Schnittstellen/Verträge (APIs) für die Kommunikation zwischen den Modulen</li>
+<li>Dokumentiere, welche Module voneinander abhängen und wie die Kommunikation abläuft (z. B. via Service-Interfaces, Events, REST)</li>
+</ul>
+<h3 id="beispiel-für-modulaufteilung-plugin-system"><strong>Beispiel für Modulaufteilung (Plugin-System):</strong></h3>
+<ul>
+<li><strong>app-core</strong> (zentrale Steuerung, Startpunkt)</li>
+<li><strong>plugin-api</strong> (Schnittstellen für Erweiterungen)</li>
+<li><strong>plugin-impl-xyz</strong> (verschiedene konkrete Plugins)</li>
+</ul>
+<hr>
+<h2 id="72-umsetzung-eines-projekts-mit-mehreren-modulen-inkl-jpms">7.2 Umsetzung eines Projekts mit mehreren Modulen (inkl. JPMS)</h2>
+<h3 id="aufgabe"><strong>Aufgabe:</strong></h3>
+<ul>
+<li>Setze ein kleines Java-Projekt mit mindestens 3 Modulen um.</li>
+<li>Verwende <strong>JPMS</strong> (ab Java 9) mit eigenen <code>module-info.java</code>-Dateien.</li>
+</ul>
+<h3 id="schritte"><strong>Schritte:</strong></h3>
+<ol>
+<li><strong>Projektstruktur anlegen:</strong>
+Erstelle ein Multi-Module-Projekt (z. B. mit Maven).</li>
+<li><strong>Module definieren:</strong>
+z. B. <code>user.core</code>, <code>user.api</code>, <code>user.impl</code></li>
+<li><strong><code>module-info.java</code> anlegen:</strong>
+Exportiere nur die benötigten Packages, importiere gezielt andere Module.</li>
+<li><strong>Abhängigkeiten setzen:</strong>
+In der <code>pom.xml</code> und in <code>module-info.java</code>.</li>
+<li><strong>Kompilieren und ausführen:</strong>
+Baue das Gesamtprojekt und teste, ob die Module korrekt miteinander arbeiten.</li>
+</ol>
+<h3 id="beispiel"><strong>Beispiel:</strong></h3>
+<pre><code class="language-java"><span class="hljs-comment">// In module user.api</span>
+<span class="hljs-keyword">module</span> user.api {
+    <span class="hljs-keyword">exports</span> com.example.user.api;
+}
+
+<span class="hljs-comment">// In module user.impl</span>
+<span class="hljs-keyword">module</span> user.impl {
+    <span class="hljs-keyword">requires</span> user.api;
+    provides com.example.user.api.UserService with com.example.user.impl.UserServiceImpl;
+}
+</code></pre>
+<hr>
+<h2 id="73-simulieren-und-auflösen-zyklischer-abhängigkeiten">7.3 Simulieren und Auflösen zyklischer Abhängigkeiten</h2>
+<h3 id="aufgabe-1"><strong>Aufgabe:</strong></h3>
+<ul>
+<li>Erzeuge bewusst eine zyklische Abhängigkeit zwischen zwei Modulen und behebe sie wieder.</li>
+</ul>
+<h3 id="vorgehen-1"><strong>Vorgehen:</strong></h3>
+<ol>
+<li>
+<p><strong>Simuliere</strong> eine zyklische Abhängigkeit, z. B.:</p>
+<ul>
+<li><code>modul-a</code> → <code>modul-b</code></li>
+<li><code>modul-b</code> → <code>modul-a</code></li>
+<li>(JPMS meldet einen Fehler!)</li>
+</ul>
+</li>
+<li>
+<p><strong>Löse die Abhängigkeit auf:</strong></p>
+<ul>
+<li>Extrahiere gemeinsame Schnittstellen in ein drittes Modul (z. B. <code>common.api</code>)</li>
+<li>Lasse beide ursprünglichen Module von diesem neuen API-Modul abhängen.</li>
+</ul>
+</li>
+</ol>
+<h3 id="lernziel"><strong>Lernziel:</strong></h3>
+<ul>
+<li>Verstehe, warum zyklische Abhängigkeiten problematisch sind, und wie sie mit sauberem API-Design aufgelöst werden können.</li>
+</ul>
+<hr>
+<h2 id="74-refactoring-einer-monolithischen-codebasis-zu-modularer-struktur">7.4 Refactoring einer monolithischen Codebasis zu modularer Struktur</h2>
+<h3 id="aufgabe-2"><strong>Aufgabe:</strong></h3>
+<ul>
+<li>Nimm eine einfache monolithische Beispielanwendung (z. B. alles in einem Package) und gliedere sie in sinnvolle Module um.</li>
+</ul>
+<h3 id="schritte-1"><strong>Schritte:</strong></h3>
+<ol>
+<li><strong>Analysiere die bestehende Codebasis:</strong>
+Welche Verantwortlichkeiten gibt es?</li>
+<li><strong>Bestimme Modulgrenzen:</strong>
+Trenne fachliche (User, Bestellung, Produkt) und technische (Persistence, Service) Aspekte.</li>
+<li><strong>Extrahiere Schnittstellen:</strong>
+Definiere, was die Module voneinander brauchen (APIs).</li>
+<li><strong>Lagere Implementierungen aus:</strong>
+Verschiebe konkrete Klassen in Implementierungs-Module.</li>
+<li><strong>Lege <code>module-info.java</code> an:</strong>
+Exportiere/importiere gezielt Packages.</li>
+<li><strong>Schreibe und führe Modultests und Integrationstests aus.</strong></li>
+</ol>
+<hr>
+<h2 id="75-optional-integration-von-externen-modulenlibraries-third-partyökosystem">7.5 Optional: Integration von externen Modulen/Libraries (Third-Party/Ökosystem)</h2>
+<h3 id="aufgabe-3"><strong>Aufgabe:</strong></h3>
+<ul>
+<li>Baue ein Modul, das eine externe Bibliothek (z. B. <code>Jackson</code> für JSON, <code>JDBC</code> für Datenbanken) verwendet.</li>
+</ul>
+<h3 id="vorgehen-2"><strong>Vorgehen:</strong></h3>
+<ol>
+<li><strong>Abhängigkeit deklarieren:</strong>
+In der <code>pom.xml</code> des entsprechenden Moduls.</li>
+<li><strong><code>module-info.java</code> anpassen:</strong>
+Füge ggf. ein <code>requires</code> für das externe Modul hinzu (Achtung: Nicht alle Drittanbieter-Libs sind JPMS-fähig!).</li>
+<li><strong>Isoliere die externe API:</strong>
+Kapsle die Benutzung in einem eigenen Adapter/Service, damit du sie später leichter ersetzen kannst.</li>
+<li><strong>Testen:</strong>
+Schreibe Tests, die sicherstellen, dass die Integration korrekt funktioniert.</li>
+</ol>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Wie würdest du ein einfaches Plugin-System in Java strukturieren?</li>
+<li>Was sind die größten Herausforderungen beim Umstieg von monolithisch zu modular?</li>
+<li>Warum sind zyklische Abhängigkeiten im Java Module System ein Problem?</li>
+<li>Welche Vorteile bietet die Integration externer Bibliotheken als separate, klar gekapselte Module?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Praxisübungen stärken das Verständnis für echte Modularisierung.</li>
+<li>Modulentwurf, JPMS-Einsatz, API-Design und das bewusste Vermeiden von Zyklik sind zentrale Fähigkeiten.</li>
+<li>Refactoring alter Codebasen und die Integration von Drittanbieter-Libraries runden das Know-how ab.</li>
+<li>Der Schritt von der Theorie zur Praxis ist entscheidend für die Entwicklung nachhaltiger, modularer Softwaresysteme.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices &amp; Fallstricke</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h3 id="handout-best-practices--fallstricke">Handout: Best Practices &amp; Fallstricke</h3>
+<p>Die ersten Schritte mit JPA sind einfach, aber um robuste und performante Anwendungen zu bauen, musst du einige Best Practices kennen und typische Fallstricke vermeiden.</p>
+<h4 id="91-umgang-mit-der-entity-lebensdauer">9.1 Umgang mit der Entity-Lebensdauer</h4>
+<p>Ein häufiger Fehler, besonders für Anfänger, ist der falsche Umgang mit dem Lebenszyklus von Entitäten (siehe Handout 2.3).</p>
+<ul>
+<li>
+<p><strong>Problem 1: <code>LazyInitializationException</code></strong></p>
+<ul>
+<li><strong>Was es ist:</strong> Diese Exception tritt auf, wenn du versuchst, auf eine faul (Lazy) geladene Beziehung zuzugreifen, nachdem die Transaktion, die die Entität geladen hat, bereits abgeschlossen und der <code>EntityManager</code> geschlossen wurde.</li>
+<li><strong>Grund:</strong> JPA kann die verknüpften Daten nicht aus der Datenbank holen, weil die Verbindung (der Persistenzkontext) nicht mehr aktiv ist.</li>
+<li><strong>Lösung:</strong>
+<ul>
+<li>Führe den Zugriff auf die faul geladenen Daten innerhalb der aktiven Transaktion durch.</li>
+<li>Oder lade die Daten explizit vor dem Ende der Transaktion (z. B. mit <code>Hibernate.initialize(entity.getCollection())</code>).</li>
+<li>Oder ändere das Fetch-Verhalten auf <code>Eager</code> (aber sei vorsichtig, siehe 9.2).</li>
+<li>Verwende JPQL-Abfragen mit <code>JOIN FETCH</code>, um die verknüpften Daten gezielt vorzuladen.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Problem 2: Falsches <code>merge()</code>-Verhalten</strong></p>
+<ul>
+<li><strong>Was es ist:</strong> Viele Entwickler versuchen, eine neue Entität mit <code>merge()</code> zu speichern, obwohl dafür <code>persist()</code> gedacht ist. <code>merge()</code> ist dafür da, eine <strong><code>detached</code></strong> Entität wieder an den Persistenzkontext anzubinden.</li>
+<li><strong>Grund:</strong> <code>merge()</code> kopiert den Zustand der übergebenen Entität auf eine neue, verwaltete Instanz und gibt diese zurück. Das ursprüngliche Objekt bleibt <code>detached</code>. Wenn du weiter mit dem ursprünglichen Objekt arbeitest, werden deine Änderungen nicht gespeichert.</li>
+<li><strong>Lösung:</strong>
+<ul>
+<li>Rufe <strong><code>persist()</code></strong> für neue Entitäten auf.</li>
+<li>Wenn du <code>merge()</code> verwendest, arbeite immer mit dem <strong>Rückgabewert</strong> von <code>merge()</code>, da nur dieser <code>managed</code> ist.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="92-performance-tipps-batching-fetch-typen">9.2 Performance-Tipps (Batching, Fetch-Typen)</h4>
+<p>JPA kann langsam sein, wenn du es nicht richtig verwendest. Hier sind ein paar Tipps, um die Performance zu optimieren.</p>
+<ul>
+<li>
+<p><strong>Batching für <code>INSERT</code> und <code>UPDATE</code></strong>:</p>
+<ul>
+<li><strong>Was es ist:</strong> Anstatt für jede <code>persist()</code>- oder <code>merge()</code>-Operation einen einzelnen SQL-Befehl auszuführen, kannst du JPA so konfigurieren, dass es mehrere Operationen sammelt und in einem einzigen Batch an die Datenbank sendet.</li>
+<li><strong>Wie es geht:</strong> Stelle die Eigenschaft <code>hibernate.jdbc.batch_size</code> in deiner <code>persistence.xml</code> auf einen Wert größer als 0 ein.</li>
+<li><strong>Vorteil:</strong> Reduziert die Netzwerk-Latenz zwischen deiner Anwendung und der Datenbank.</li>
+</ul>
+</li>
+<li>
+<p><strong>Sinnvoller Einsatz von Fetch-Typen (<code>Lazy</code> vs. <code>Eager</code>)</strong>:</p>
+<ul>
+<li><strong>Was es ist:</strong> Wie bereits in Handout 8.2 besprochen, steuert dies, wie verknüpfte Entitäten geladen werden.</li>
+<li><strong>Best Practice:</strong>
+<ul>
+<li>Verwende <strong>immer <code>FetchType.LAZY</code> als Standard</strong> für Sammlungen (<code>OneToMany</code>, <code>ManyToMany</code>). <code>Eager</code> führt oft zu Performance-Problemen, weil zu viele Daten geladen werden.</li>
+<li>Wenn du verknüpfte Daten für eine bestimmte Abfrage benötigst, lade sie gezielt mit <strong><code>JOIN FETCH</code></strong> in deiner JPQL-Abfrage vor.</li>
+<li><strong>Beispiel:</strong> <code>SELECT k FROM Kunde k JOIN FETCH k.bestellungen WHERE k.id = 1</code>. Diese Abfrage holt den Kunden und seine Bestellungen in einem einzigen optimierten Schritt.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Verwendung von JPQL und Native Queries für Massenoperationen</strong>:</p>
+<ul>
+<li>Wenn du viele Datensätze auf einmal aktualisieren oder löschen musst, verwende keine Schleife, in der du jede Entität einzeln lädst und änderst. Das wäre sehr ineffizient.</li>
+<li><strong>Lösung:</strong> Verwende stattdessen JPQL- oder Native Queries, um die Operationen direkt in der Datenbank auszuführen.</li>
+<li><strong>Beispiel (JPQL):</strong> <code>UPDATE Kunde k SET k.status = 'inactive' WHERE k.lastLogin &lt; :datum</code>.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="93-migration-von-legacy-code-zu-jpa">9.3 Migration von Legacy-Code zu JPA</h4>
+<p>Wenn du eine bestehende Anwendung von reinem JDBC oder einem alten ORM-Framework auf JPA umstellst, solltest du einige Schritte beachten.</p>
+<ul>
+<li><strong>Schritt 1: Das Datenmodell verstehen</strong>: Analysiere das bestehende Datenbankschema. Identifiziere die Primärschlüssel, Fremdschlüssel und die Beziehungen zwischen den Tabellen.</li>
+<li><strong>Schritt 2: Entitäten erstellen</strong>: Erstelle für jede relevante Tabelle eine Entitätsklasse.
+<ul>
+<li>Beginne mit den Entitäten, die keine Fremdschlüssel haben, oder mit den &quot;besitzenden&quot; Seiten der Beziehungen.</li>
+<li>Nutze die Annotationen (<code>@Entity</code>, <code>@Table</code>, <code>@Id</code>) und das Attribut-Mapping (<code>@Column</code>) wie in Handout 4 beschrieben.</li>
+</ul>
+</li>
+<li><strong>Schritt 3: Beziehungen abbilden</strong>: Verbinde die Entitäten mithilfe der Beziehungs-Annotationen (<code>@OneToMany</code>, <code>@ManyToOne</code>, etc.). Stelle sicher, dass du die besitzende und die inverse Seite korrekt definierst, um die Fremdschlüssel richtig abzubilden.</li>
+<li><strong>Schritt 4: Den Datenzugriff umschreiben</strong>: Ersetze deinen alten JDBC-Code oder deine SQL-Statements schrittweise durch JPA-Operationen (<code>entityManager.find()</code>, JPQL-Abfragen, etc.).</li>
+<li><strong>Schritt 5: Testen, testen, testen</strong>: Führe umfangreiche Tests durch, um sicherzustellen, dass die Migration keine Seiteneffekte verursacht hat und alle Abfragen korrekt funktionieren. Achte besonders auf Performance und das Laden von Beziehungen.</li>
+</ul>
+<p>Durch die Beachtung dieser Best Practices und die Vermeidung der genannten Fallstricke kannst du das volle Potenzial von JPA ausschöpfen und robuste, wartbare und performante Anwendungen entwickeln.</p>
+
+            
+            
+        </body>
+        </html>

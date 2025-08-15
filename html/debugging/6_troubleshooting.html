@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praxisf&auml;lle und Troubleshooting beim Debugging in IntelliJ</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praxisfälle-und-troubleshooting-beim-debugging-in-intellij">Handout: Praxisfälle und Troubleshooting beim Debugging in IntelliJ</h1>
+<hr>
+<h2 id="1-typische-fehlerquellen-beim-debuggen">1. Typische Fehlerquellen beim Debuggen</h2>
+<h3 id="a-fehler-beim-setzen-von-breakpoints">a) Fehler beim Setzen von Breakpoints</h3>
+<ul>
+<li>
+<p>Breakpoint an der falschen Stelle (z. B. auf einer Leerzeile oder Kommentar).</p>
+</li>
+<li>
+<p>Breakpoint im nicht erreichten Code (z. B. nie aufgerufene Methode, if-Zweig, der nie „true“ ist).</p>
+</li>
+<li>
+<p><strong>Tipp:</strong></p>
+<ul>
+<li>Achte auf die farbige Markierung im Editor (roter Punkt = aktiv).</li>
+<li>Vergewissere dich, dass der Codeweg wirklich durch die Breakpoint-Zeile führt.</li>
+</ul>
+</li>
+</ul>
+<h3 id="b-variablen-nicht-sichtbar-oder-optimized-away">b) Variablen nicht sichtbar oder „optimized away“</h3>
+<ul>
+<li>
+<p>Variablen erscheinen als „not available“, besonders bei Release-Builds mit Optimierung.</p>
+</li>
+<li>
+<p><strong>Tipp:</strong></p>
+<ul>
+<li>Für das Debuggen immer im <strong>Debug- oder Development-Modus</strong> kompilieren.</li>
+<li>Prüfe Compiler-Settings und baue ggf. neu.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-falsche-debug-konfiguration">c) Falsche Debug-Konfiguration</h3>
+<ul>
+<li>
+<p>Falscher Startpunkt (andere Methode oder Konfiguration gewählt).</p>
+</li>
+<li>
+<p>Umgebungsvariablen, Argumente oder Profile stimmen nicht.</p>
+</li>
+<li>
+<p><strong>Tipp:</strong></p>
+<ul>
+<li>Überprüfe die „Run/Debug Configurations“ in IntelliJ.</li>
+<li>Teste, ob der Code im normalen „Run“-Modus wie erwartet startet.</li>
+</ul>
+</li>
+</ul>
+<h3 id="d-nebenläufigkeit-und-zeitpunkte">d) Nebenläufigkeit und Zeitpunkte</h3>
+<ul>
+<li>
+<p>Fehler treten nur bei bestimmten Timing-Konstellationen oder mehreren Threads auf.</p>
+</li>
+<li>
+<p>Breakpoints können das Timing verändern („Heisenbug“).</p>
+</li>
+<li>
+<p><strong>Tipp:</strong></p>
+<ul>
+<li>Mit „Log Breakpoints“ und Thread-Übersicht arbeiten.</li>
+<li>Nutze zusätzliche Logs, um Timing-Probleme besser nachvollziehen zu können.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-debugging-von-unit-tests-und-integrationstests">2. Debugging von Unit-Tests und Integrationstests</h2>
+<h3 id="a-debugging-von-unit-tests">a) Debugging von Unit-Tests</h3>
+<ul>
+<li>
+<p><strong>Direkt in IntelliJ</strong>:</p>
+<ul>
+<li>Rechtsklick auf einen Test oder eine Testklasse → „Debug Test“.</li>
+<li>Setze Breakpoints wie gewohnt im Produktiv- und Testcode.</li>
+</ul>
+</li>
+<li>
+<p>Während der Test läuft, hält der Debugger an jedem Breakpoint.</p>
+</li>
+<li>
+<p>Du kannst Variablen in Test- und Produktivcode gleichzeitig untersuchen.</p>
+</li>
+</ul>
+<p><strong>Tipp:</strong>
+Setze Conditional Breakpoints, um gezielt bei bestimmten Testdaten oder Fehlerfällen zu stoppen.</p>
+<h3 id="b-debugging-von-integrationstests">b) Debugging von Integrationstests</h3>
+<ul>
+<li>
+<p>Meist komplexer, da mehrere Komponenten zusammenspielen (z. B. Datenbank, Services).</p>
+</li>
+<li>
+<p>Auch hier: „Debug Test“ verwenden und Breakpoints an passenden Schnittstellen setzen.</p>
+</li>
+<li>
+<p><strong>Achte auf parallele Ausführung:</strong>
+Viele Testframeworks führen Tests parallel aus. Prüfe, ob der richtige Test anhält!</p>
+</li>
+<li>
+<p><strong>Tipp:</strong></p>
+<ul>
+<li>Ggf. parallele Ausführung deaktivieren (Test-Framework-Settings).</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-debugging-von-remote-anwendungen-remote-debugging-konfigurieren">3. Debugging von Remote-Anwendungen (Remote Debugging konfigurieren)</h2>
+<h3 id="a-was-ist-remote-debugging">a) Was ist Remote Debugging?</h3>
+<ul>
+<li>Debugging eines Programms, das <strong>auf einem anderen Rechner</strong> oder in einer anderen Umgebung läuft (z. B. Server, Container, Cloud).</li>
+<li>Sehr hilfreich bei Fehlern, die nur „im echten Betrieb“ auftreten.</li>
+</ul>
+<h3 id="b-remote-debugging-in-javaintellij">b) Remote Debugging in Java/IntelliJ</h3>
+<p><strong>Vorgehen:</strong></p>
+<ol>
+<li>
+<p><strong>Starte das entfernte Programm mit Debug-Optionen</strong>
+(Java: <code>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</code>)</p>
+</li>
+<li>
+<p><strong>In IntelliJ:</strong></p>
+<ul>
+<li>Menü: Run → Edit Configurations… → + → „Remote JVM Debug“ auswählen</li>
+<li>Trage die Adresse und Port (z. B. localhost:5005) ein</li>
+</ul>
+</li>
+<li>
+<p><strong>Starte die Remote Debugging-Session.</strong></p>
+</li>
+<li>
+<p><strong>Setze Breakpoints wie gewohnt</strong> – der Debugger stoppt am Code der entfernten Anwendung.</p>
+</li>
+</ol>
+<p><strong>Tipp:</strong>
+Nutze Remote Debugging sparsam und nur in sicheren Netzwerken – offene Debug-Ports sind ein Sicherheitsrisiko!</p>
+<hr>
+<h2 id="4-debugging-von-webanwendungen-und-microservices">4. Debugging von Webanwendungen und Microservices</h2>
+<h3 id="a-debugging-von-webanwendungen">a) Debugging von Webanwendungen</h3>
+<ul>
+<li>Starte die Anwendung im Debug-Modus (oft im Spring Boot/Maven/Gradle-Run-Config).</li>
+<li>Setze Breakpoints im Controller, Service oder Repository.</li>
+<li>Simuliere HTTP-Requests (z. B. mit Postman oder Browser) und beobachte die Ausführung.</li>
+</ul>
+<p><strong>Beispiel:</strong>
+Breakpoint im REST-Controller → Sende eine Anfrage → Debugger hält bei jedem Request.</p>
+<h3 id="b-debugging-von-microservices">b) Debugging von Microservices</h3>
+<ul>
+<li>
+<p>Microservices laufen oft <strong>in mehreren Prozessen/Containern</strong>.</p>
+</li>
+<li>
+<p>Für Debugging:</p>
+<ul>
+<li>Einzelnen Service im Debug-Modus starten (wie Remote Debugging).</li>
+<li>Ggf. mehrere Debug-Sessions parallel in IntelliJ öffnen (für verschiedene Ports).</li>
+</ul>
+</li>
+<li>
+<p>Kommunikation und Fehler zwischen Services analysieren:</p>
+<ul>
+<li>Breakpoints an Schnittstellen</li>
+<li>Logs kombinieren</li>
+<li>Überwache Events und Messaging-Protokolle.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Tipp:</strong>
+Nutze Distributed-Tracing-Tools (z. B. Jaeger, Zipkin) für einen besseren Überblick.</p>
+<hr>
+<h2 id="5-umgang-mit-unsichtbaren-ausnahmen-zb-in-third-party-bibliotheken">5. Umgang mit „unsichtbaren“ Ausnahmen (z. B. in Third-Party-Bibliotheken)</h2>
+<ul>
+<li>„Unsichtbare“ Exceptions = Fehler, die im Code von Drittanbietern, Frameworks oder Bibliotheken entstehen und nicht direkt im eigenen Code sichtbar sind.</li>
+</ul>
+<h3 id="a-exception-breakpoints-nutzen">a) Exception Breakpoints nutzen</h3>
+<ul>
+<li>Setze Exception Breakpoints auf die gesuchte Exception-Klasse (z. B. <code>NullPointerException</code>).</li>
+<li>Das Programm hält an der <strong>ersten Auslösestelle</strong>, egal wo der Fehler auftritt.</li>
+</ul>
+<h3 id="b-call-stack-analysieren">b) Call Stack analysieren</h3>
+<ul>
+<li>
+<p>Wenn das Programm an einer Exception hält:</p>
+<ul>
+<li>Sieh dir den gesamten Call Stack an.</li>
+<li>Suche den letzten Aufruf <strong>aus deinem eigenen Code</strong> – meist liegt dort die Ursache.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-quellcode-von-bibliotheken-einbinden">c) Quellcode von Bibliotheken einbinden</h3>
+<ul>
+<li>Viele Bibliotheken bieten „Quellanhänge“ (Source Attachments).</li>
+<li>Binde sie in IntelliJ ein, um auch fremden Code im Debugger zu sehen.</li>
+<li>Über „External Libraries“ → Rechtsklick → „Download Sources“ (falls verfügbar).</li>
+</ul>
+<h3 id="d-logging-ergänzen">d) Logging ergänzen</h3>
+<ul>
+<li>Ergänze eigenes Logging, um festzustellen, welche Eingaben und Zustände zum Fehler geführt haben.</li>
+</ul>
+<hr>
+<h2 id="6-tipps--best-practices">6. Tipps &amp; Best Practices</h2>
+<ul>
+<li>Debugge mit einfachen Szenarien und steigere die Komplexität schrittweise.</li>
+<li>Kombiniere Debugger, Logging und (wenn möglich) automatisierte Tests, um Fehlerursachen effizient einzugrenzen.</li>
+<li>Bei schwer reproduzierbaren Fehlern: Nutze Conditional und Exception Breakpoints!</li>
+<li>Dokumentiere Erkenntnisse und typische Fehlerbilder für dich und das Team.</li>
+<li><strong>Nutze die IntelliJ-Hilfe!</strong> Viele Tipps sind direkt in der IDE hinterlegt (<code>Shift + Shift</code> → „Debugging“ suchen).</li>
+</ul>
+<hr>
+<h2 id="7-weiterführende-ressourcen">7. Weiterführende Ressourcen</h2>
+<ul>
+<li><a href="https://www.jetbrains.com/help/idea/debugging-code.html">IntelliJ Doku: Troubleshooting and Debugging</a></li>
+<li><a href="https://www.jetbrains.com/help/idea/remote-debugging.html">Remote Debugging in IntelliJ IDEA (Blog/YouTube)</a></li>
+<li><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.developing.web-applications">Spring Boot: Debugging Web Applications</a></li>
+<li><a href="https://www.baeldung.com/java-debugging">Baeldung: Debugging Java Applications</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Verwendung von Lambda-Ausdr&uuml;cken mit Functional Interfaces</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-verwendung-von-lambda-ausdrücken-mit-functional-interfaces">Handout: Verwendung von Lambda-Ausdrücken mit Functional Interfaces</h1>
+<hr>
+<h2 id="1-lambda-ausdrücke-als-implementierung-für-functional-interfaces">1. Lambda-Ausdrücke als Implementierung für Functional Interfaces</h2>
+<p>Ein <strong>Lambda-Ausdruck</strong> kann immer dann verwendet werden, wenn ein Functional Interface gefragt ist, also ein Interface mit <strong>genau einer abstrakten Methode</strong>.
+Der Lambda-Ausdruck „implementiert“ diese Methode und kann an jeder Stelle eingesetzt werden, an der eine Instanz dieses Interfaces erwartet wird.</p>
+<p><strong>Beispiele:</strong></p>
+<p>a) <strong>Eigenes Functional Interface</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@FunctionalInterface</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">Rechner</span> {
+    <span class="hljs-type">int</span> <span class="hljs-title function_">berechne</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span>;
+}
+
+<span class="hljs-comment">// Lambda als Implementierung:</span>
+<span class="hljs-type">Rechner</span> <span class="hljs-variable">summe</span> <span class="hljs-operator">=</span> (a, b) -&gt; a + b;
+System.out.println(summe.berechne(<span class="hljs-number">5</span>, <span class="hljs-number">3</span>)); <span class="hljs-comment">// 8</span>
+</code></pre>
+<p>b) <strong>Java-Standardinterfaces</strong></p>
+<pre><code class="language-java"><span class="hljs-type">Runnable</span> <span class="hljs-variable">r</span> <span class="hljs-operator">=</span> () -&gt; System.out.println(<span class="hljs-string">&quot;Task läuft&quot;</span>);
+r.run();
+
+Comparator&lt;String&gt; laengenVergleich = (s1, s2) -&gt; s1.length() - s2.length();
+System.out.println(laengenVergleich.compare(<span class="hljs-string">&quot;Hund&quot;</span>, <span class="hljs-string">&quot;Katze&quot;</span>)); <span class="hljs-comment">// -1</span>
+</code></pre>
+<hr>
+<h2 id="2-typinferenz-bei-lambda-ausdrücken">2. Typinferenz bei Lambda-Ausdrücken</h2>
+<p><strong>Typinferenz</strong> bedeutet, dass der Java-Compiler die Typen der Parameter in Lambda-Ausdrücken <strong>automatisch erkennt</strong>.
+Du musst sie also nicht explizit angeben, solange der Kontext klar ist.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Comparator&lt;Integer&gt; cmp1 = (a, b) -&gt; a - b;          <span class="hljs-comment">// Typen werden abgeleitet</span>
+Comparator&lt;Integer&gt; cmp2 = (Integer a, Integer b) -&gt; a - b; <span class="hljs-comment">// Typen explizit angegeben</span>
+</code></pre>
+<ul>
+<li>Beide Varianten sind möglich – die Kurzform ist aber meist übersichtlicher.</li>
+</ul>
+<p><strong>Achtung:</strong>
+Wenn der Kontext nicht eindeutig ist (z. B. bei mehreren möglichen Interfaces), muss der Typ explizit angegeben werden.</p>
+<hr>
+<h2 id="3-übergabe-von-lambda-ausdrücken-an-methoden">3. Übergabe von Lambda-Ausdrücken an Methoden</h2>
+<p>Viele Methoden der Java-API erwarten Functional Interfaces als Argumente. Dort kannst du Lambda-Ausdrücke direkt übergeben.</p>
+<h3 id="a-foreach-consumer">a) <code>forEach</code> (Consumer)</h3>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bob&quot;</span>, <span class="hljs-string">&quot;Chris&quot;</span>);
+namen.forEach(s -&gt; System.out.println(s.toUpperCase()));
+</code></pre>
+<ul>
+<li>Das Lambda (<code>s -&gt; ...</code>) ist die Implementierung des <code>Consumer&lt;String&gt;</code>-Interfaces.</li>
+</ul>
+<hr>
+<h3 id="b-sort-comparator">b) <code>sort</code> (Comparator)</h3>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+namen.sort((a, b) -&gt; b.compareTo(a)); <span class="hljs-comment">// Sortierung absteigend</span>
+System.out.println(namen);
+</code></pre>
+<ul>
+<li>Das Lambda ist ein <code>Comparator&lt;String&gt;</code>.</li>
+</ul>
+<hr>
+<h3 id="c-filter-predicate--im-stream-api-kontext">c) <code>filter</code> (Predicate) – im Stream-API-Kontext</h3>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Max&quot;</span>, <span class="hljs-string">&quot;Moni&quot;</span>, <span class="hljs-string">&quot;Chris&quot;</span>);
+List&lt;String&gt; gefiltert = namen.stream()
+    .filter(name -&gt; name.startsWith(<span class="hljs-string">&quot;M&quot;</span>))
+    .collect(Collectors.toList());
+System.out.println(gefiltert); <span class="hljs-comment">// [Max, Moni]</span>
+</code></pre>
+<ul>
+<li>Das Lambda (<code>name -&gt; ...</code>) implementiert <code>Predicate&lt;String&gt;</code>.</li>
+</ul>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>
+<p>Schreibe ein eigenes Functional Interface <code>TextTest</code>, das prüft, ob ein String ein bestimmtes Kriterium erfüllt.
+Implementiere es mit einem Lambda, das prüft, ob der Text länger als 8 Zeichen ist.</p>
+</li>
+<li>
+<p>Erstelle eine Liste von Zahlen. Nutze <code>forEach</code>, um alle Werte verdoppelt auszugeben.</p>
+</li>
+<li>
+<p>Sortiere eine Liste von Strings nach ihrer Länge mit einem Lambda-Ausdruck.</p>
+</li>
+<li>
+<p>Filtere mit Streams alle Namen, die mit einem bestimmten Buchstaben beginnen.</p>
+</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li><strong>Lambda-Ausdrücke</strong> sind immer eine Implementierung für ein Functional Interface.</li>
+<li>Der Java-Compiler erkennt die Typen der Parameter in Lambdas meist automatisch (<strong>Typinferenz</strong>).</li>
+<li>Viele Standardmethoden in Java (wie <code>forEach</code>, <code>sort</code>, <code>filter</code>) erwarten Functional Interfaces und sind für Lambdas gemacht.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

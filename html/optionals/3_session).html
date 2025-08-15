@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Optional erzeugen und verwenden</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-optional-erzeugen-und-verwenden">Handout: Optional erzeugen und verwenden</h1>
+<hr>
+<h2 id="1-optional-mit-wert-optionalof">1. Optional mit Wert: <code>Optional.of()</code></h2>
+<ul>
+<li>Erzeugt ein <strong>Optional</strong>, das garantiert einen Wert enthält.</li>
+<li>Wenn der Wert <strong>null</strong> ist, wird <strong>sofort eine NullPointerException geworfen</strong>!</li>
+<li>Verwende <code>Optional.of()</code> nur, wenn du sicher bist, dass der Wert <strong>nicht null</strong> ist.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Optional&lt;String&gt; name = Optional.of(<span class="hljs-string">&quot;Anna&quot;</span>);
+System.out.println(name.isPresent()); <span class="hljs-comment">// true</span>
+
+Optional&lt;String&gt; fehler = Optional.of(<span class="hljs-literal">null</span>); <span class="hljs-comment">// -&gt; NullPointerException!</span>
+</code></pre>
+<hr>
+<h2 id="2-optional-leer-optionalempty">2. Optional leer: <code>Optional.empty()</code></h2>
+<ul>
+<li>Erzeugt ein <strong>leeres Optional</strong>, also ein Optional ohne Wert.</li>
+<li>Praktisch, um eine &quot;Kein Wert vorhanden&quot;-Situation explizit darzustellen.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Optional&lt;String&gt; leer = Optional.empty();
+System.out.println(leer.isPresent()); <span class="hljs-comment">// false</span>
+</code></pre>
+<p>Typischer Anwendungsfall: Wenn eine Methode <em>nichts</em> finden konnte (z.B. Suche erfolglos).</p>
+<hr>
+<h2 id="3-optional-mit-evtl-nullwert-optionalofnullable">3. Optional mit evtl. Nullwert: <code>Optional.ofNullable()</code></h2>
+<ul>
+<li>Erzeugt ein Optional, das den Wert enthält, <strong>wenn er nicht null ist</strong> –
+andernfalls wird automatisch ein leeres Optional zurückgegeben.</li>
+<li>Das ist die flexibelste Methode, um mit möglichen Nullwerten umzugehen.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">wert</span> <span class="hljs-operator">=</span> findeEtwas(); <span class="hljs-comment">// könnte null sein!</span>
+Optional&lt;String&gt; eventuellWert = Optional.ofNullable(wert);
+
+<span class="hljs-keyword">if</span> (eventuellWert.isPresent()) {
+    System.out.println(eventuellWert.get());
+} <span class="hljs-keyword">else</span> {
+    System.out.println(<span class="hljs-string">&quot;Kein Wert vorhanden!&quot;</span>);
+}
+</code></pre>
+<p><strong>Vergleich:</strong></p>
+<pre><code class="language-java">Optional&lt;String&gt; name1 = Optional.of(<span class="hljs-string">&quot;Bernd&quot;</span>);        <span class="hljs-comment">// Wert garantiert</span>
+Optional&lt;String&gt; name2 = Optional.empty();            <span class="hljs-comment">// garantiert leer</span>
+Optional&lt;String&gt; name3 = Optional.ofNullable(<span class="hljs-literal">null</span>);   <span class="hljs-comment">// auch leer</span>
+Optional&lt;String&gt; name4 = Optional.ofNullable(<span class="hljs-string">&quot;Clara&quot;</span>);<span class="hljs-comment">// Wert vorhanden</span>
+</code></pre>
+<hr>
+<h2 id="4-praxis-tipps">4. Praxis-Tipps</h2>
+<ul>
+<li><strong>Nie mit <code>Optional.of(null)</code> arbeiten!</strong> Das führt sofort zu einer Exception.</li>
+<li>Für Rückgabewerte aus Methoden, die <em>etwas</em> oder <em>nichts</em> liefern können, ist <code>Optional.ofNullable()</code> die beste Wahl.</li>
+<li>Erzeuge keine Optional-Werte, wenn du stattdessen mit leeren Optional arbeiten kannst (<code>Optional.empty()</code>).</li>
+</ul>
+<hr>
+<h2 id="5-übungen-zum-selbststudium">5. Übungen zum Selbststudium</h2>
+<ol>
+<li>Erzeuge ein Optional aus einem garantiert nicht-null Wert und prüfe mit <code>.isPresent()</code>, ob ein Wert vorhanden ist.</li>
+<li>Schreibe eine Methode, die <code>null</code> zurückgeben könnte, und wandle sie so um, dass sie stattdessen ein Optional nutzt.</li>
+<li>Was passiert, wenn du <code>Optional.of(null)</code> aufrufst? Teste es und lies die Fehlermeldung.</li>
+</ol>
+<hr>
+<h2 id="6-merksätze">6. Merksätze</h2>
+<ul>
+<li><strong><code>Optional.of()</code></strong> – nur bei garantiert nicht-null Wert!</li>
+<li><strong><code>Optional.empty()</code></strong> – leeres Optional, kein Wert.</li>
+<li><strong><code>Optional.ofNullable()</code></strong> – nimmt Wert oder gibt bei null ein leeres Optional zurück.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

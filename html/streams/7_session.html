@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Best Practices und Fallstricke bei Streams in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-best-practices-und-fallstricke-bei-streams-in-java">Handout: Best Practices und Fallstricke bei Streams in Java</h1>
+<hr>
+<h2 id="1-lesbarkeit-und-nachvollziehbarkeit-von-stream-pipelines">1. Lesbarkeit und Nachvollziehbarkeit von Stream-Pipelines</h2>
+<ul>
+<li><strong>Kurze, klare Pipelines:</strong>
+Streams sind am besten lesbar, wenn die gesamte Verarbeitung <strong>in 1–3 Operationen pro Zeile</strong> ausgedrückt werden kann.</li>
+<li><strong>Sinnvolle Namensgebung:</strong>
+Zwischenergebnisse sollten als Variablen gespeichert werden, falls die Pipeline länger/komplizierter wird.</li>
+<li><strong>Kombiniere nicht zu viele Operationen:</strong>
+Lange, verschachtelte Pipelines werden schnell unübersichtlich – besser aufteilen!</li>
+</ul>
+<p><strong>Schlecht:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; ergebnis = daten.stream().filter(...).map(...).sorted(...).limit(...).collect(...);
+</code></pre>
+<p><strong>Besser:</strong></p>
+<pre><code class="language-java">Stream&lt;String&gt; gefiltert = daten.stream().filter(...);
+Stream&lt;String&gt; transformiert = gefiltert.map(...).sorted(...);
+List&lt;String&gt; ergebnis = transformiert.limit(...).collect(...);
+</code></pre>
+<p>Oder: Komplexe Teilschritte als <strong>eigene Methoden</strong> auslagern.</p>
+<hr>
+<h2 id="2-nebenläufigkeit-und-seiteneffekte-vermeiden">2. Nebenläufigkeit und Seiteneffekte vermeiden</h2>
+<ul>
+<li><strong>Streams sollten „seiteneffektarm“ bleiben:</strong>
+Lambda-Ausdrücke im Stream <strong>sollten keine äußeren Variablen verändern</strong> (z. B. nichts in Listen außerhalb des Streams hinzufügen).</li>
+<li><strong>Kein geteiltes/änderbares Objekt:</strong>
+Besonders bei parallelen Streams <strong>niemals</strong> mit <code>.forEach()</code> Elemente zu einer gemeinsamen Collection hinzufügen – das ist nicht thread-sicher.</li>
+</ul>
+<p><strong>Schlecht:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; ergebnis = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+daten.stream().forEach(s -&gt; ergebnis.add(s)); <span class="hljs-comment">// Risiko bei parallelem Stream!</span>
+</code></pre>
+<p><strong>Besser:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; ergebnis = daten.stream().collect(Collectors.toList()); <span class="hljs-comment">// thread-sicher!</span>
+</code></pre>
+<ul>
+<li><strong>Tipp:</strong> Verwende reine, zustandslose Lambda-Ausdrücke, um Fehler zu vermeiden.</li>
+</ul>
+<hr>
+<h2 id="3-ressourcenverbrauch-und-performance">3. Ressourcenverbrauch und Performance</h2>
+<ul>
+<li><strong>Stream-Pipelines sind nicht immer schneller als Schleifen:</strong>
+Für sehr kleine Datenmengen oder einfache Aufgaben sind Streams manchmal <strong>langsamer</strong>, da sie zusätzlichen Overhead mitbringen.</li>
+<li><strong>Parallele Streams bewusst einsetzen:</strong>
+Nur bei wirklich großen Datenmengen und rechenintensiven Aufgaben – sonst mehr Schaden als Nutzen!</li>
+<li><strong>Wiederverwendung vermeiden:</strong>
+Streams sind <strong>Single-Use</strong>: Nach einer Terminal-Operation sind sie „verbraucht“ – nicht noch einmal verwenden!</li>
+<li><strong>Prüfe die Speicherlast:</strong>
+Große Pipelines mit vielen Zwischenwerten können viel Speicher benötigen – besser „früh filtern“ (Filteroperationen möglichst am Anfang).</li>
+</ul>
+<hr>
+<h2 id="4-wann-streams--wann-herkömmliche-schleifen">4. Wann Streams – wann herkömmliche Schleifen?</h2>
+<p><strong>Streams verwenden, wenn:</strong></p>
+<ul>
+<li>Die Datenverarbeitung <strong>deklariert</strong> werden kann (Was soll passieren, nicht Wie?).</li>
+<li>Mehrere Operationen (Filtern, Transformieren, Gruppieren) <strong>verkettet</strong> werden.</li>
+<li>Die Verarbeitung <strong>einfach lesbar</strong> und möglichst funktional ausgedrückt werden kann.</li>
+<li>Parallelisierung sinnvoll ist und keine Seiteneffekte auftreten.</li>
+</ul>
+<p><strong>Schleifen verwenden, wenn:</strong></p>
+<ul>
+<li><strong>Seiteneffekte</strong> gewünscht oder nötig sind (z. B. Logging, komplexe Nebenwirkungen).</li>
+<li>Die Verarbeitung <strong>früh abgebrochen</strong> werden soll und keine passende Kurzschluss-Operation existiert.</li>
+<li><strong>Leistung bei sehr kleinen Datenmengen</strong> entscheidend ist.</li>
+<li><strong>Feingranulares Exception-Handling</strong> oder Zwischenschritte benötigt werden.</li>
+</ul>
+<p><strong>Beispiel – Schleife vs. Stream:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Schleife</span>
+<span class="hljs-keyword">for</span> (String s : daten) {
+    <span class="hljs-keyword">if</span> (s.length() &gt; <span class="hljs-number">5</span>) {
+        System.out.println(s.toUpperCase());
+    }
+}
+
+<span class="hljs-comment">// Stream</span>
+daten.stream()
+     .filter(s -&gt; s.length() &gt; <span class="hljs-number">5</span>)
+     .map(String::toUpperCase)
+     .forEach(System.out::println);
+</code></pre>
+<hr>
+<h2 id="5-übungen-zum-selbststudium">5. Übungen zum Selbststudium</h2>
+<ol>
+<li>Schreibe eine Stream-Pipeline, die bewusst eine äußere Variable verändert. Was passiert, wenn du auf parallele Streams umstellst?</li>
+<li>Vergleiche die Ausführungszeit einer komplexen Datenverarbeitung mit Stream und mit Schleife.</li>
+<li>Teile eine sehr lange Pipeline in Teilschritte auf und überprüfe die Lesbarkeit.</li>
+<li>Überlege für mehrere alltägliche Aufgaben, ob Stream oder Schleife passender ist.</li>
+</ol>
+<hr>
+<h2 id="6-merksätze">6. Merksätze</h2>
+<ul>
+<li><strong>Streams sind am stärksten, wenn sie kurz, deklarativ und nebenwirkungsfrei bleiben.</strong></li>
+<li><strong>Nebenläufigkeit und Seiteneffekte sind die häufigsten Fehlerquellen – immer vermeiden!</strong></li>
+<li><strong>Nicht jede Aufgabe wird mit Streams besser oder schneller – prüfe immer, was am besten zum Problem passt.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

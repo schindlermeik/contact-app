@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in Lambda-Ausdr&uuml;cke</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-lambda-ausdrücke">Handout: Einführung in Lambda-Ausdrücke</h1>
+<hr>
+<h2 id="1-syntax-und-grundstruktur-eines-lambda-ausdrucks">1. Syntax und Grundstruktur eines Lambda-Ausdrucks</h2>
+<p><strong>Lambda-Ausdrücke</strong> sind eine kompakte Möglichkeit, anonyme Funktionen (ohne Namen) zu schreiben, die ein Functional Interface implementieren.
+Sie bestehen aus:</p>
+<ul>
+<li><strong>Parameterliste</strong> (optional mit Typangabe)</li>
+<li><strong>Pfeil-Operator</strong> <code>-&gt;</code></li>
+<li><strong>Rumpf</strong> (ein Ausdruck oder ein Block mit Anweisungen)</li>
+</ul>
+<p><strong>Grundform:</strong></p>
+<pre><code class="language-java">(Parameter) -&gt; Ausdruck
+(Parameter) -&gt; { Anweisungen }
+</code></pre>
+<p><strong>Beispiele:</strong></p>
+<p>a) <strong>Ohne Typangabe (der Compiler erkennt den Typ automatisch):</strong></p>
+<pre><code class="language-java">x -&gt; x * x
+</code></pre>
+<p>b) <strong>Mit mehreren Parametern:</strong></p>
+<pre><code class="language-java">(a, b) -&gt; a + b
+</code></pre>
+<p>c) <strong>Mit expliziten Typen:</strong></p>
+<pre><code class="language-java">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b) -&gt; a * b
+</code></pre>
+<p>d) <strong>Mit Block:</strong></p>
+<pre><code class="language-java">(a, b) -&gt; {
+    <span class="hljs-type">int</span> <span class="hljs-variable">summe</span> <span class="hljs-operator">=</span> a + b;
+    <span class="hljs-keyword">return</span> summe * <span class="hljs-number">2</span>;
+}
+</code></pre>
+<p>e) <strong>Kein Parameter (z. B. für <code>Runnable</code>):</strong></p>
+<pre><code class="language-java">() -&gt; System.out.println(<span class="hljs-string">&quot;Hallo Welt!&quot;</span>)
+</code></pre>
+<hr>
+<h2 id="2-vergleich-anonyme-klasse-vs-lambda-ausdruck">2. Vergleich: Anonyme Klasse vs. Lambda-Ausdruck</h2>
+<p><strong>Vor Lambda-Ausdrücken</strong> musste man oft eine „anonyme Klasse“ schreiben, um ein Functional Interface schnell zu implementieren. Das war sehr umständlich.</p>
+<h3 id="a-anonyme-klasse">a) Anonyme Klasse:</h3>
+<pre><code class="language-java"><span class="hljs-type">Runnable</span> <span class="hljs-variable">r1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() {
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> {
+        System.out.println(<span class="hljs-string">&quot;Hallo aus der anonymen Klasse!&quot;</span>);
+    }
+};
+r1.run();
+</code></pre>
+<h3 id="b-lambda-ausdruck">b) Lambda-Ausdruck:</h3>
+<pre><code class="language-java"><span class="hljs-type">Runnable</span> <span class="hljs-variable">r2</span> <span class="hljs-operator">=</span> () -&gt; System.out.println(<span class="hljs-string">&quot;Hallo aus dem Lambda!&quot;</span>);
+r2.run();
+</code></pre>
+<p><strong>Vorteile von Lambdas:</strong></p>
+<ul>
+<li>Kürzer</li>
+<li>Klarer</li>
+<li>Lesbarer</li>
+<li>Kein Overhead von Klassendefinitionen</li>
+</ul>
+<p><strong>Vergleichstabelle:</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Anonyme Klasse</th>
+<th>Lambda-Ausdruck</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Syntax</td>
+<td>Viel Boilerplate-Code</td>
+<td>Sehr kompakt</td>
+</tr>
+<tr>
+<td>Lesbarkeit</td>
+<td>Oft verschachtelt, schwer lesbar</td>
+<td>Direkt und übersichtlich</td>
+</tr>
+<tr>
+<td>Typ-Inferenz</td>
+<td>Nein, Typ muss genannt werden</td>
+<td>Ja, meist keine Typangabe nötig</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="3-vorteile-und-grenzen-von-lambda-ausdrücken">3. Vorteile und Grenzen von Lambda-Ausdrücken</h2>
+<h3 id="vorteile">Vorteile</h3>
+<ul>
+<li><strong>Kompakter Code:</strong> Deutlich weniger Schreibaufwand.</li>
+<li><strong>Bessere Lesbarkeit:</strong> Fokus auf das Wesentliche – das Verhalten.</li>
+<li><strong>Typinferenz:</strong> Der Compiler erkennt meist die Typen automatisch.</li>
+<li><strong>Einfachere Übergabe von Verhalten:</strong> Funktionen können einfach an Methoden weitergegeben werden (z. B. für Sortierung, Filter, Mapping, Event-Handling).</li>
+</ul>
+<h3 id="grenzen">Grenzen</h3>
+<ul>
+<li><strong>Nur für Functional Interfaces:</strong> Lambdas funktionieren nur dort, wo genau ein abstrakte Methode benötigt wird.</li>
+<li><strong>Kein Zugriff auf eigene Methoden oder Felder:</strong> Im Lambda gibt es keine eigene Klasse, daher keine eigenen Member.</li>
+<li><strong>Nicht für komplexe Logik:</strong> Für sehr lange oder komplexe Methoden ist eine klassische Methode meist übersichtlicher.</li>
+<li><strong>Kein Zustand:</strong> Lambdas sind am besten für zustandslose oder kleine, zustandsarme Operationen geeignet.</li>
+<li><strong>Eingeschränkte Ausnahmebehandlung:</strong> Lambda-Ausdrücke können Ausnahmen nur behandeln, wenn das Functional Interface sie auch zulässt.</li>
+</ul>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>Schreibe einen Lambda-Ausdruck, der zwei Zahlen multipliziert und das Ergebnis zurückgibt (<code>(a, b) -&gt; a * b</code>).</li>
+<li>Erstelle eine <code>Runnable</code>-Variable mit einem Lambda, das eine Meldung ausgibt.</li>
+<li>Vergleiche eine anonyme Klasse und einen Lambda-Ausdruck, die beide ein <code>Comparator&lt;String&gt;</code> sind, und sortiere eine Liste von Strings nach Länge.</li>
+<li>Überlege, wo im eigenen Code Lambdas sinnvoll eingesetzt werden könnten – und wo lieber nicht.</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li>Lambda-Ausdrücke machen den Code <strong>kürzer, klarer und oft moderner</strong>.</li>
+<li>Sie sind ein zentrales Element funktionaler Programmierung in Java.</li>
+<li>Lambdas ersetzen anonyme Klassen, <strong>wo immer ein Functional Interface gebraucht wird</strong>.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundlagen &ndash; Panache-Entity und Panache-Repository</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundlagen--panache-entity-und-panache-repository">Handout: Grundlagen – Panache-Entity und Panache-Repository</h1>
+<hr>
+<h2 id="31-verwendung-der-panache-entity-extends-panacheentity--panacheentitybase">3.1 Verwendung der Panache-Entity (<code>extends PanacheEntity</code> / <code>PanacheEntityBase</code>)</h2>
+<h3 id="was-ist-eine-panache-entity">Was ist eine Panache-Entity?</h3>
+<p>Eine <strong>Panache-Entity</strong> ist eine Java-Klasse, die direkt als Datenbanktabelle abgebildet wird (wie bei JPA), aber zusätzlich von Panache-Klassen erbt. Dadurch bekommst du zahlreiche Methoden zum Arbeiten mit der Datenbank „geschenkt“.</p>
+<h4 id="es-gibt-zwei-möglichkeiten">Es gibt zwei Möglichkeiten:</h4>
+<ol>
+<li>
+<p><strong>Active Record Pattern:</strong>
+Vererbung von <code>io.quarkus.hibernate.orm.panache.PanacheEntity</code></p>
+<ul>
+<li>
+<p>Du schreibst:</p>
+<pre><code class="language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">PanacheEntity</span> {
+    <span class="hljs-keyword">public</span> String name;
+    <span class="hljs-keyword">public</span> String email;
+}
+</code></pre>
+</li>
+<li>
+<p>Vorteil: Das Feld <code>id</code> (Long, Primary Key) ist schon dabei!</p>
+</li>
+<li>
+<p>Du nutzt sofort Methoden wie <code>persist()</code>, <code>delete()</code>, <code>listAll()</code> direkt an der Entity.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Custom ID oder mehr Flexibilität:</strong>
+Vererbung von <code>PanacheEntityBase</code></p>
+<ul>
+<li>
+<p>Du schreibst z. B.:</p>
+<pre><code class="language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Product</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">PanacheEntityBase</span> {
+    <span class="hljs-meta">@Id</span>
+    <span class="hljs-meta">@GeneratedValue(strategy = GenerationType.IDENTITY)</span>
+    <span class="hljs-keyword">public</span> Long productId;
+    <span class="hljs-keyword">public</span> String name;
+}
+</code></pre>
+</li>
+<li>
+<p>Vorteil: Du kannst den Primärschlüssel oder Felder nach Bedarf selbst gestalten.</p>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="32-automatisierte-crud-methoden-durch-vererbung">3.2 Automatisierte CRUD-Methoden durch Vererbung</h2>
+<p>Sobald deine Entity von <strong>PanacheEntity</strong> (oder PanacheEntityBase) erbt, hast du viele Methoden für CRUD-Operationen automatisch zur Verfügung:</p>
+<h3 id="typische-methoden">Typische Methoden</h3>
+<ul>
+<li><strong>persist()</strong>
+Speichert ein neues Objekt in der Datenbank.</li>
+<li><strong>delete()</strong>
+Löscht das aktuelle Objekt aus der Datenbank.</li>
+<li><strong>listAll()</strong>
+Liefert alle Objekte der Entity als Liste.</li>
+<li><strong>find() / findById()</strong>
+Sucht nach Objekten mit bestimmten Werten.</li>
+<li><strong>count()</strong>
+Gibt die Anzahl der Einträge zurück.</li>
+</ul>
+<h4 id="beispiel">Beispiel:</h4>
+<pre><code class="language-java"><span class="hljs-comment">// Neuen Benutzer speichern:</span>
+<span class="hljs-type">User</span> <span class="hljs-variable">u</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+u.name = <span class="hljs-string">&quot;Anna&quot;</span>;
+u.email = <span class="hljs-string">&quot;anna@mail.de&quot;</span>;
+u.persist();
+
+<span class="hljs-comment">// Alle Benutzer laden:</span>
+List&lt;User&gt; users = User.listAll();
+
+<span class="hljs-comment">// Einen Benutzer mit bestimmter ID finden:</span>
+<span class="hljs-type">User</span> <span class="hljs-variable">anna</span> <span class="hljs-operator">=</span> User.findById(<span class="hljs-number">1L</span>);
+
+<span class="hljs-comment">// Benutzer nach Name suchen:</span>
+List&lt;User&gt; list = User.find(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Anna&quot;</span>).list();
+
+<span class="hljs-comment">// Einen Benutzer löschen:</span>
+u.delete();
+</code></pre>
+<p><strong>Vorteil:</strong>
+Du brauchst keinen EntityManager, keine eigenen CRUD-Methoden – alles ist schon da!</p>
+<hr>
+<h2 id="33-verwendung-von-panache-repository-pattern-panacherepositoryt">3.3 Verwendung von Panache Repository Pattern (<code>PanacheRepository&lt;T&gt;</code>)</h2>
+<p><strong>Nicht immer</strong> möchtest du das Active Record Pattern nutzen, z. B. wenn du Fachlogik trennen oder Entitäten &quot;dumm&quot; halten willst.</p>
+<p>Dafür gibt es das <strong>Repository Pattern</strong> mit Panache:</p>
+<h3 id="vorgehen">Vorgehen:</h3>
+<ol>
+<li>
+<p><strong>Entität ganz normal schreiben (wie bei klassischem JPA):</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Book</span> {
+    <span class="hljs-meta">@Id</span>
+    <span class="hljs-meta">@GeneratedValue(strategy = GenerationType.IDENTITY)</span>
+    <span class="hljs-keyword">public</span> Long id;
+    <span class="hljs-keyword">public</span> String title;
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Repository-Interface/Bean anlegen:</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@ApplicationScoped</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BookRepository</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">PanacheRepository</span>&lt;Book&gt; {
+    <span class="hljs-comment">// Optional: Eigene Methoden für spezielle Abfragen</span>
+}
+</code></pre>
+<p>Oder mit PanacheRepositoryBase (für benutzerdefinierte IDs):</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BookRepository</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">PanacheRepositoryBase</span>&lt;Book, String&gt; { ... }
+</code></pre>
+</li>
+<li>
+<p><strong>Verwendung im Code (per Dependency Injection):</strong></p>
+<pre><code class="language-java"><span class="hljs-meta">@Inject</span>
+BookRepository bookRepo;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">foo</span><span class="hljs-params">()</span> {
+    List&lt;Book&gt; all = bookRepo.listAll();
+    <span class="hljs-type">Book</span> <span class="hljs-variable">found</span> <span class="hljs-operator">=</span> bookRepo.findById(<span class="hljs-number">5L</span>);
+    bookRepo.persist(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Book</span>(<span class="hljs-string">&quot;Panache 101&quot;</span>));
+}
+</code></pre>
+</li>
+</ol>
+<p><strong>Vorteil:</strong></p>
+<ul>
+<li>Trennung zwischen Datenmodell und Datenzugriff.</li>
+<li>Bessere Testbarkeit und fachliche Kapselung.</li>
+<li>Keine statischen Methoden – Instanzbasiert.</li>
+</ul>
+<hr>
+<h2 id="34-unterschiede-und-einsatzszenarien-active-record-vs-repository-pattern">3.4 Unterschiede und Einsatzszenarien (Active Record vs. Repository Pattern)</h2>
+<h3 id="active-record-pattern-panacheentity">Active Record Pattern (PanacheEntity)</h3>
+<ul>
+<li>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Extrem kompakt, alles an einem Ort.</li>
+<li>Einfach für kleine bis mittlere Projekte oder schnelle Prototypen.</li>
+<li>Wenig Overhead, schnelle Entwicklung.</li>
+</ul>
+</li>
+<li>
+<p><strong>Nachteile:</strong></p>
+<ul>
+<li>Geschäftslogik und Persistenz sind vermischt.</li>
+<li>Für große Projekte kann die Wartbarkeit leiden.</li>
+</ul>
+</li>
+</ul>
+<h3 id="repository-pattern-panacherepository">Repository Pattern (PanacheRepository)</h3>
+<ul>
+<li>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>Saubere Trennung von Datenmodell und Datenzugriff.</li>
+<li>Gut für große und wartbare Systeme.</li>
+<li>Einfachere Unit-Tests (Mocking).</li>
+</ul>
+</li>
+<li>
+<p><strong>Nachteile:</strong></p>
+<ul>
+<li>Etwas mehr Code und Struktur notwendig.</li>
+<li>Leicht weniger „magisch“ als Active Record.</li>
+</ul>
+</li>
+</ul>
+<h4 id="wann-welches-pattern">Wann welches Pattern?</h4>
+<ul>
+<li>
+<p><strong>Active Record:</strong></p>
+<ul>
+<li>Microservices mit simpler Domäne</li>
+<li>CRUD-zentrierte Anwendungen</li>
+<li>Prototyping</li>
+</ul>
+</li>
+<li>
+<p><strong>Repository:</strong></p>
+<ul>
+<li>Komplexere Domänenmodelle</li>
+<li>Unternehmen mit klaren Architekturvorgaben</li>
+<li>Projekte mit Fokus auf Testbarkeit und Erweiterbarkeit</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="fazit">Fazit</h2>
+<ul>
+<li>Mit Panache kannst du entweder das <strong>Active Record Pattern</strong> (schnell, kompakt) oder das <strong>Repository Pattern</strong> (sauber, testbar) nutzen.</li>
+<li>Beide Varianten bieten dir viele Methoden für CRUD-Operationen „out-of-the-box“.</li>
+<li>Wähle das passende Pattern nach Projektgröße und Anforderungen!</li>
+</ul>
+<hr>
+<p><strong>Praxis-Tipp:</strong>
+Starte mit Active Record für kleine Demos und steige auf Repository um, wenn das Projekt größer wird.</p>
+<hr>
+<p><strong>Weiterführende Links:</strong></p>
+<ul>
+<li><a href="https://quarkus.io/guides/hibernate-orm-panache#active-record-vs-the-repository-pattern">Quarkus Panache Guide: Active Record vs Repository Pattern</a></li>
+<li><a href="https://quarkus.io/guides/hibernate-orm-panache#examples">Panache Beispiele im Quarkus Cookbook</a></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Einf&uuml;hrung in JDBC &lpar;Java Database Connectivity&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-einführung-in-jdbc-java-database-connectivity">Handout: Einführung in JDBC (Java Database Connectivity)</h1>
+<hr>
+<h2 id="11-was-ist-jdbc">1.1 Was ist JDBC?</h2>
+<p><strong>JDBC</strong> steht für <em>Java Database Connectivity</em> und ist eine standardisierte Programmierschnittstelle (API), die es Java-Programmen ermöglicht, auf relationale Datenbanken (z. B. PostgreSQL, MySQL, Oracle) zuzugreifen und SQL-Befehle auszuführen.</p>
+<h3 id="ziele-von-jdbc">Ziele von JDBC:</h3>
+<ul>
+<li>Kommunikation zwischen Java-Anwendung und Datenbank</li>
+<li>Ausführung von SQL-Statements (SELECT, INSERT, UPDATE, DELETE)</li>
+<li>Verwaltung von Datenbankverbindungen, Transaktionen und Ergebnismengen</li>
+</ul>
+<p><strong>Merke:</strong>
+JDBC ist ein API-Standard, keine konkrete Implementierung. Die Anbindung an die jeweilige Datenbank erfolgt über einen passenden <strong>JDBC-Treiber</strong>.</p>
+<hr>
+<h2 id="12-aufbau-und-architektur-von-jdbc">1.2 Aufbau und Architektur von JDBC</h2>
+<h3 id="komponenten-der-jdbc-architektur">Komponenten der JDBC-Architektur:</h3>
+<ul>
+<li><strong>JDBC API:</strong>
+Java-Bibliothek mit Klassen &amp; Interfaces für den Datenbankzugriff (z. B. <code>Connection</code>, <code>Statement</code>, <code>ResultSet</code>).</li>
+<li><strong>JDBC Driver Manager:</strong>
+Verbindet die Anwendung mit dem passenden JDBC-Treiber und steuert die Kommunikation.</li>
+<li><strong>JDBC-Treiber:</strong>
+Treibersoftware, die SQL-Anfragen von Java in das Datenbankprotokoll übersetzt (und umgekehrt).</li>
+<li><strong>Datenbank:</strong>
+Das eigentliche Datenbanksystem (z. B. PostgreSQL).</li>
+</ul>
+<p><strong>Vereinfachte Architektur:</strong></p>
+<pre><code>Java-Anwendung
+    |
+[JDBC API]
+    |
+[JDBC Driver Manager]
+    |
+[JDBC-Treiber] &lt;----&gt; [Datenbank (PostgreSQL)]
+</code></pre>
+<h3 id="wichtige-jdbc-klassen---interfaces">Wichtige JDBC-Klassen &amp; -Interfaces:</h3>
+<ul>
+<li><code>DriverManager</code>: Verbindet die Anwendung mit der Datenbank.</li>
+<li><code>Connection</code>: Repräsentiert die Verbindung zur Datenbank.</li>
+<li><code>Statement</code> / <code>PreparedStatement</code>: Zum Senden von SQL-Befehlen.</li>
+<li><code>ResultSet</code>: Repräsentiert das Ergebnis einer Abfrage.</li>
+</ul>
+<hr>
+<h2 id="13-jdbc-treiber-typen-und-ihre-unterschiede">1.3 JDBC-Treiber-Typen und ihre Unterschiede</h2>
+<p>JDBC-Treiber sind spezielle Programme, die als &quot;Brücke&quot; zwischen Java-Code und Datenbank dienen. Es gibt vier Typen:</p>
+<h3 id="typ-1-jdbc-odbc-bridge-driver">Typ 1: JDBC-ODBC Bridge Driver</h3>
+<ul>
+<li>Übersetzt JDBC-Calls in ODBC-Calls, die dann von einem ODBC-Treiber verarbeitet werden.</li>
+<li>Veraltet, <strong>seit Java 8 entfernt!</strong></li>
+</ul>
+<h3 id="typ-2-native-api-driver">Typ 2: Native-API Driver</h3>
+<ul>
+<li>Wandelt JDBC-Calls in native API-Aufrufe der Datenbank um.</li>
+<li>Benötigt Datenbankspezifische Bibliotheken auf dem System.</li>
+</ul>
+<h3 id="typ-3-network-protocol-driver">Typ 3: Network Protocol Driver</h3>
+<ul>
+<li>JDBC-Calls werden in einen netzwerkbasierten Protokollaufruf umgewandelt.</li>
+<li>Benötigt einen Vermittlungsserver.</li>
+</ul>
+<h3 id="typ-4-direct-to-database-pure-java-driver-am-gebräuchlichsten">Typ 4: <strong>Direct-to-Database Pure Java Driver (am gebräuchlichsten!)</strong></h3>
+<ul>
+<li>Komplett in Java geschrieben, kommuniziert direkt mit der Datenbank.</li>
+<li><strong>Beispiel:</strong> Der PostgreSQL-Treiber <code>org.postgresql.Driver</code></li>
+<li>Keine zusätzliche Software nötig, Plattform-unabhängig.</li>
+</ul>
+<p><strong>In der Praxis verwendest du fast immer einen Typ-4-Treiber.</strong></p>
+<hr>
+<h2 id="14-voraussetzungen-jdbc-api-datenbank-treiber-jars">1.4 Voraussetzungen (JDBC-API, Datenbank, Treiber-JARs)</h2>
+<p>Um mit JDBC und einer PostgreSQL-Datenbank zu arbeiten, benötigst du:</p>
+<h3 id="1-java-development-kit-jdk-11">1. Java Development Kit (JDK 11)</h3>
+<ul>
+<li>
+<p>Stelle sicher, dass Java 11 installiert ist.
+Prüfe mit:</p>
+<pre><code class="language-bash">java -version
+</code></pre>
+</li>
+</ul>
+<h3 id="2-maven-projekt-zum-verwalten-von-abhängigkeiten">2. Maven-Projekt (zum Verwalten von Abhängigkeiten)</h3>
+<ul>
+<li>Erstelle ein Maven-Projekt oder verwende ein vorhandenes.</li>
+<li>Die Abhängigkeiten werden in der <code>pom.xml</code> verwaltet.</li>
+</ul>
+<h3 id="3-postgresql-datenbank">3. PostgreSQL-Datenbank</h3>
+<ul>
+<li>
+<p>Installiere und starte eine PostgreSQL-Instanz.</p>
+</li>
+<li>
+<p>Lege eine Datenbank und ggf. einen Benutzer an.</p>
+</li>
+<li>
+<p>Beispiel (auf der Konsole):</p>
+<pre><code class="language-bash">createdb meine_datenbank
+createuser mein_benutzer --pwprompt
+</code></pre>
+</li>
+</ul>
+<h3 id="4-postgresql-jdbc-treiber-in-maven-einbinden">4. PostgreSQL JDBC-Treiber in Maven einbinden</h3>
+<ul>
+<li>
+<p>Füge den Treiber als Dependency in deiner <code>pom.xml</code> hinzu:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>42.7.3<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+<h3 id="5-datenbank-zugangsdaten-bereithalten">5. Datenbank-Zugangsdaten bereithalten</h3>
+<ul>
+<li>Host (z. B. <code>localhost</code>)</li>
+<li>Port (Standard: <code>5432</code>)</li>
+<li>Datenbankname</li>
+<li>Benutzername &amp; Passwort</li>
+</ul>
+<h3 id="6-beispiel-für-verbindungs-url-connection-string">6. Beispiel für Verbindungs-URL (Connection String)</h3>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;jdbc:postgresql://localhost:5432/meine_datenbank&quot;</span>;
+<span class="hljs-type">String</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_benutzer&quot;</span>;
+<span class="hljs-type">String</span> <span class="hljs-variable">password</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_passwort&quot;</span>;
+</code></pre>
+<hr>
+<h2 id="exkurs-erstes-kleines-verbindungsbeispiel">Exkurs: Erstes kleines Verbindungsbeispiel</h2>
+<p>So sieht ein einfacher JDBC-Verbindungsaufbau zu einer PostgreSQL-Datenbank aus:</p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.sql.Connection;
+<span class="hljs-keyword">import</span> java.sql.DriverManager;
+<span class="hljs-keyword">import</span> java.sql.SQLException;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">JdbcTest</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">String</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;jdbc:postgresql://localhost:5432/meine_datenbank&quot;</span>;
+        <span class="hljs-type">String</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_benutzer&quot;</span>;
+        <span class="hljs-type">String</span> <span class="hljs-variable">password</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;mein_passwort&quot;</span>;
+
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> DriverManager.getConnection(url, user, password)) {
+            <span class="hljs-keyword">if</span> (conn != <span class="hljs-literal">null</span>) {
+                System.out.println(<span class="hljs-string">&quot;Verbindung zur Datenbank erfolgreich!&quot;</span>);
+            } <span class="hljs-keyword">else</span> {
+                System.out.println(<span class="hljs-string">&quot;Verbindung fehlgeschlagen!&quot;</span>);
+            }
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<hr>
+<h2 id="zusammenfassung--schritte-für-den-einstieg">Zusammenfassung – <strong>Schritte für den Einstieg</strong></h2>
+<ol>
+<li>Installiere JDK 11 und richte Maven ein.</li>
+<li>Erstelle eine PostgreSQL-Datenbank und Benutzer.</li>
+<li>Lege ein Maven-Projekt mit PostgreSQL-Treiber an.</li>
+<li>Verwende die passenden Zugangsdaten und baue die Verbindung über JDBC auf.</li>
+</ol>
+<hr>
+<h3 id="nützliche-links">Nützliche Links</h3>
+<ul>
+<li><a href="https://jdbc.postgresql.org/">PostgreSQL JDBC-Treiber Download/Info (offiziell)</a></li>
+<li><a href="https://search.maven.org/artifact/org.postgresql/postgresql">Maven Central Repository (PostgreSQL Driver)</a></li>
+<li><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/package-summary.html">Offizielle Java JDBC-Dokumentation</a></li>
+</ul>
+<hr>
+<p><strong>Fragen zur Praxis:</strong></p>
+<ul>
+<li>Welche Vorteile hat Typ-4-Treiber gegenüber anderen Typen?</li>
+<li>Was muss beim Umgang mit Passwörtern und Zugangsdaten beachtet werden?</li>
+<li>Wie lässt sich die Verbindung zu einer Datenbank wieder sauber schließen?</li>
+</ul>
+<hr>
+<p><strong>Nächste Schritte:</strong>
+Im nächsten Abschnitt lernst du, wie man SQL-Befehle mit JDBC ausführt und wie man dabei mit <code>Statement</code> und <code>PreparedStatement</code> arbeitet.</p>
+<hr>
+<p><strong>Tipp:</strong>
+Wenn du dich mit Docker auskennst, kannst du deine PostgreSQL-Datenbank auch als Container betreiben. Das macht Setups für Entwicklung und Tests oft einfacher und portabler.</p>
+
+            
+            
+        </body>
+        </html>

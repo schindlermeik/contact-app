@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Grundlagen &ndash; Future und Callable in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-grundlagen--future-und-callable-in-java">Handout: Grundlagen – Future und Callable in Java</h1>
+<hr>
+<h2 id="21-das-future-interface-limitierungen-und-typische-anwendungsfälle">2.1 Das <code>Future</code>-Interface: Limitierungen und typische Anwendungsfälle</h2>
+<h3 id="was-ist-ein-future">Was ist ein <code>Future</code>?</h3>
+<ul>
+<li>Das Interface <code>Future&lt;V&gt;</code> (seit Java 5) repräsentiert das Ergebnis einer asynchronen Berechnung, die eventuell noch nicht abgeschlossen ist.</li>
+<li><code>Future</code> wird typischerweise verwendet, wenn du eine Aufgabe in einem separaten Thread ausführen willst und später das Ergebnis benötigst.</li>
+</ul>
+<h3 id="wie-verwendet-man-ein-future">Wie verwendet man ein <code>Future</code>?</h3>
+<ul>
+<li>Eine Aufgabe wird (meist über einen Executor) gestartet und liefert ein <code>Future</code>-Objekt zurück.</li>
+<li>Über Methoden wie <code>get()</code> kannst du auf das Ergebnis warten (blockierend).</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.concurrent.*;
+
+<span class="hljs-type">ExecutorService</span> <span class="hljs-variable">executor</span> <span class="hljs-operator">=</span> Executors.newSingleThreadExecutor();
+Future&lt;Integer&gt; future = executor.submit(() -&gt; {
+    Thread.sleep(<span class="hljs-number">1000</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">42</span>;
+});
+
+System.out.println(<span class="hljs-string">&quot;Berechnung läuft im Hintergrund...&quot;</span>);
+
+<span class="hljs-comment">// Hole das Ergebnis (blockiert ggf. bis das Ergebnis bereit ist)</span>
+<span class="hljs-type">Integer</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> future.get();
+System.out.println(<span class="hljs-string">&quot;Ergebnis: &quot;</span> + result);
+
+executor.shutdown();
+</code></pre>
+<h3 id="typische-anwendungsfälle-für-future">Typische Anwendungsfälle für <code>Future</code></h3>
+<ul>
+<li>Aufgaben mit langer Laufzeit (z. B. Netzwerkanfragen, rechenintensive Jobs).</li>
+<li>Aufgaben, deren Ergebnis erst später benötigt wird.</li>
+<li>Einfache Parallelisierung ohne explizite Thread-Verwaltung.</li>
+</ul>
+<h3 id="wichtige-methoden-von-future">Wichtige Methoden von <code>Future</code></h3>
+<ul>
+<li><code>get()</code>: Holt das Ergebnis, wartet ggf. blockierend.</li>
+<li><code>get(long timeout, TimeUnit unit)</code>: Holt das Ergebnis, aber nur für maximal die angegebene Zeit.</li>
+<li><code>cancel(boolean mayInterruptIfRunning)</code>: Versucht, die Aufgabe abzubrechen.</li>
+<li><code>isDone()</code>: Prüft, ob die Berechnung abgeschlossen ist.</li>
+<li><code>isCancelled()</code>: Prüft, ob die Aufgabe abgebrochen wurde.</li>
+</ul>
+<hr>
+<h2 id="22-das-callable-interface-und-unterschied-zu-runnable">2.2 Das <code>Callable</code>-Interface und Unterschied zu <code>Runnable</code></h2>
+<h3 id="das-runnable-interface">Das <code>Runnable</code>-Interface</h3>
+<ul>
+<li><code>Runnable</code> ist ein funktionales Interface mit der Methode <code>void run()</code>.</li>
+<li>Rückgabewert: keiner (void).</li>
+<li>Kann keine geprüften Ausnahmen (Checked Exceptions) werfen.</li>
+</ul>
+<h3 id="das-callable-interface">Das <code>Callable</code>-Interface</h3>
+<ul>
+<li><code>Callable&lt;V&gt;</code> ist ebenfalls ein funktionales Interface, eingeführt mit Java 5.</li>
+<li>Methode: <code>V call() throws Exception</code></li>
+<li>Rückgabewert: beliebiger Typ <code>V</code>.</li>
+<li>Kann Ausnahmen werfen.</li>
+</ul>
+<p><strong>Vergleich:</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Runnable</th>
+<th>Callable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rückgabewert</td>
+<td>nein (void)</td>
+<td>ja (beliebiger Typ V)</td>
+</tr>
+<tr>
+<td>Exceptions</td>
+<td>ungeprüft (unchecked)</td>
+<td>geprüft (checked)</td>
+</tr>
+<tr>
+<td>Verwendung</td>
+<td>Thread, Executor</td>
+<td>Executor, Future</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Callable&lt;String&gt; task = () -&gt; {
+    Thread.sleep(<span class="hljs-number">500</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Fertig!&quot;</span>;
+};
+
+<span class="hljs-type">ExecutorService</span> <span class="hljs-variable">executor</span> <span class="hljs-operator">=</span> Executors.newSingleThreadExecutor();
+Future&lt;String&gt; future = executor.submit(task);
+System.out.println(future.get()); <span class="hljs-comment">// Gibt &quot;Fertig!&quot; aus</span>
+executor.shutdown();
+</code></pre>
+<hr>
+<h2 id="23-probleme-mit-klassischen-futures-zb-blockieren-fehlendes-chaining">2.3 Probleme mit klassischen Futures (z.B. Blockieren, fehlendes Chaining)</h2>
+<h3 id="1-blockierende-get-aufrufe">1. <strong>Blockierende <code>get()</code>-Aufrufe</strong></h3>
+<ul>
+<li>Die Methode <code>get()</code> blockiert den aktuellen Thread, bis das Ergebnis vorliegt.</li>
+<li>Folge: Das Programm wartet untätig – das widerspricht oft der Idee asynchroner Programmierung!</li>
+</ul>
+<p><strong>Beispielproblem:</strong></p>
+<pre><code class="language-java">Future&lt;String&gt; f = ...;
+<span class="hljs-type">String</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> f.get(); <span class="hljs-comment">// Blockiert bis Ergebnis da ist</span>
+</code></pre>
+<ul>
+<li>Währenddessen kann der Thread nichts anderes tun.</li>
+</ul>
+<h3 id="2-kein-chainingverketten-von-aufgaben">2. <strong>Kein Chaining/Verketten von Aufgaben</strong></h3>
+<ul>
+<li>Mit dem klassischen <code>Future</code> kann man keine Verarbeitungskette („Wenn fertig, dann…“) definieren.</li>
+<li>Das macht komplexere asynchrone Abläufe (z. B. mehrere abhängige Berechnungen) sehr umständlich.</li>
+</ul>
+<p><strong>Beispielproblem:</strong></p>
+<ul>
+<li>Du kannst nicht einfach sagen: „Wenn das Ergebnis fertig ist, dann führe Methode X aus, sonst Y.“</li>
+</ul>
+<h3 id="3-keine-eingebaute-fehlerbehandlung">3. <strong>Keine eingebaute Fehlerbehandlung</strong></h3>
+<ul>
+<li>Fehler müssen separat über try/catch nach dem <code>get()</code>-Aufruf behandelt werden.</li>
+<li>Keine Möglichkeit, direkt auf Erfolg oder Fehler asynchron zu reagieren.</li>
+</ul>
+<h3 id="4-kein-zusammenschalten-mehrerer-futures">4. <strong>Kein Zusammenschalten mehrerer Futures</strong></h3>
+<ul>
+<li>Es ist nicht möglich, mehrere Futures einfach zu kombinieren (z. B. „Wenn alle Aufgaben fertig sind, dann…“).</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Wann solltest du einen klassischen <code>Future</code> verwenden – und wann reicht ein einfacher Thread?</li>
+<li>Was ist der Hauptvorteil von <code>Callable</code> gegenüber <code>Runnable</code>?</li>
+<li>Warum ist blockierendes Warten mit <code>get()</code> in vielen Anwendungsfällen problematisch?</li>
+<li>Welche Probleme können entstehen, wenn du komplexe asynchrone Workflows mit klassischen Futures umsetzen willst?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Das klassische <code>Future</code>-Interface erlaubt einfache asynchrone Berechnungen mit Ergebnis.</li>
+<li><code>Callable</code> ist flexibler als <code>Runnable</code>, da es Rückgabewerte und Ausnahmen unterstützt.</li>
+<li>Die klassische Future-API ist jedoch eingeschränkt: kein echtes Chaining, keine einfache Fehlerbehandlung, blockierende Abfragen.</li>
+<li>Für moderne, flexible asynchrone Programmierung ist <code>CompletableFuture</code> die bessere Wahl – dazu mehr im nächsten Abschnitt!</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Erweiterte Features von Panache</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-erweiterte-features-von-panache">Handout: Erweiterte Features von Panache</h1>
+<hr>
+<h2 id="51-sortierung-paging-und-filterung">5.1 Sortierung, Paging und Filterung</h2>
+<h3 id="a-sortierung"><strong>A) Sortierung</strong></h3>
+<p>Mit Panache kannst du Ergebnisse komfortabel sortieren, z. B. aufsteigend oder absteigend nach einem bestimmten Feld.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Alle User alphabetisch sortiert nach Name:</span>
+List&lt;User&gt; users = User.list(<span class="hljs-string">&quot;ORDER BY name ASC&quot;</span>);
+
+<span class="hljs-comment">// Mit dem Sort-Objekt:</span>
+List&lt;User&gt; users = User.findAll(Sort.by(<span class="hljs-string">&quot;name&quot;</span>)).list();
+
+<span class="hljs-comment">// Absteigend nach Erstellungsdatum:</span>
+List&lt;User&gt; users = User.findAll(Sort.by(<span class="hljs-string">&quot;createdAt&quot;</span>).descending()).list();
+</code></pre>
+<hr>
+<h3 id="b-paging-paginierung"><strong>B) Paging (Paginierung)</strong></h3>
+<p>Große Ergebnismengen kannst du mit Panache bequem seitenweise („paginiert“) abfragen.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Hole die erste Seite mit 10 Einträgen:</span>
+List&lt;User&gt; firstPage = User.findAll().page(Page.ofSize(<span class="hljs-number">10</span>)).list();
+
+<span class="hljs-comment">// Zu einer bestimmten Seite springen (Seitenzählung beginnt bei 0!):</span>
+List&lt;User&gt; secondPage = User.findAll().page(Page.of(<span class="hljs-number">1</span>, <span class="hljs-number">10</span>)).list();
+</code></pre>
+<p><strong>Weitere Methoden:</strong></p>
+<ul>
+<li><code>.page()</code> setzt die aktuelle Seite und Größe.</li>
+<li><code>.nextPage()</code> und <code>.previousPage()</code> blättern.</li>
+<li><code>.hasNextPage()</code>, <code>.hasPreviousPage()</code> prüfen auf Nachbarseiten.</li>
+<li><code>.pageCount()</code> liefert die Gesamtseitenzahl.</li>
+</ul>
+<hr>
+<h3 id="c-filterung"><strong>C) Filterung</strong></h3>
+<p>Du kannst Ergebnisse auch nach bestimmten Kriterien filtern:</p>
+<pre><code class="language-java"><span class="hljs-comment">// Benutzer mit bestimmtem Namen:</span>
+List&lt;User&gt; maxUsers = User.find(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Max&quot;</span>).list();
+
+<span class="hljs-comment">// Benutzer mit bestimmtem Alter und Name:</span>
+List&lt;User&gt; result = User.find(<span class="hljs-string">&quot;name = ?1 AND age &gt; ?2&quot;</span>, <span class="hljs-string">&quot;Max&quot;</span>, <span class="hljs-number">18</span>).list();
+</code></pre>
+<p>Mit <strong>Sortierung kombinieren:</strong></p>
+<pre><code class="language-java">List&lt;User&gt; result = User.find(<span class="hljs-string">&quot;age &gt; ?1&quot;</span>, Sort.by(<span class="hljs-string">&quot;name&quot;</span>).descending(), <span class="hljs-number">18</span>).list();
+</code></pre>
+<hr>
+<h2 id="52-arbeiten-mit-optionalen-rückgabewerten-zb-optionalt">5.2 Arbeiten mit optionalen Rückgabewerten (z. B. <code>Optional&lt;T&gt;</code>)</h2>
+<p>Manchmal gibt es Suchabfragen, bei denen es entweder <strong>genau ein</strong> oder <strong>kein Ergebnis</strong> gibt. Panache nutzt hierfür das <strong>Optional-Pattern</strong> aus Java 8+.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Suche nach einem Benutzer mit bestimmter E-Mail:</span>
+Optional&lt;User&gt; maybeUser = User.find(<span class="hljs-string">&quot;email&quot;</span>, <span class="hljs-string">&quot;max@example.com&quot;</span>).firstResultOptional();
+
+<span class="hljs-keyword">if</span> (maybeUser.isPresent()) {
+    <span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> maybeUser.get();
+    <span class="hljs-comment">// Weiterverarbeitung</span>
+} <span class="hljs-keyword">else</span> {
+    <span class="hljs-comment">// Kein Treffer, entsprechend reagieren</span>
+}
+</code></pre>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li>NullPointerExceptions werden vermieden.</li>
+<li>Klar definierter Umgang mit &quot;keine Treffer&quot;.</li>
+</ul>
+<hr>
+<h2 id="53-umgang-mit-beziehungen-one-to-many-many-to-one">5.3 Umgang mit Beziehungen (One-to-Many, Many-to-One)</h2>
+<p>Auch komplexere Datenmodelle mit Beziehungen lassen sich mit Panache und klassischen JPA-Annotationen abbilden.</p>
+<h3 id="a-one-to-many--many-to-one"><strong>A) One-to-Many &amp; Many-to-One</strong></h3>
+<p><strong>Beispiel:</strong>
+Ein Benutzer hat mehrere Bestellungen (User → Order).</p>
+<pre><code class="language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">PanacheEntity</span> {
+    <span class="hljs-keyword">public</span> String name;
+
+    <span class="hljs-meta">@OneToMany(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL)</span>
+    <span class="hljs-keyword">public</span> List&lt;Order&gt; orders;
+}
+
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Order</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">PanacheEntity</span> {
+    <span class="hljs-keyword">public</span> String product;
+    <span class="hljs-keyword">public</span> <span class="hljs-type">double</span> price;
+
+    <span class="hljs-meta">@ManyToOne</span>
+    <span class="hljs-meta">@JoinColumn(name = &quot;user_id&quot;)</span>
+    <span class="hljs-keyword">public</span> User user;
+}
+</code></pre>
+<p><strong>Verwendung:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+user.name = <span class="hljs-string">&quot;Anna&quot;</span>;
+
+<span class="hljs-type">Order</span> <span class="hljs-variable">order1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Order</span>();
+order1.product = <span class="hljs-string">&quot;Buch&quot;</span>;
+order1.price = <span class="hljs-number">12.99</span>;
+order1.user = user;
+
+user.orders = Arrays.asList(order1);
+
+<span class="hljs-comment">// Persistiert User und die Bestellungen dank Cascade:</span>
+user.persist();
+</code></pre>
+<hr>
+<h3 id="b-weitere-beziehungen"><strong>B) Weitere Beziehungen</strong></h3>
+<p>Auch <strong>Many-to-Many</strong> oder <strong>One-to-One</strong> lassen sich wie gewohnt mit den JPA-Annotationen realisieren.</p>
+<hr>
+<h2 id="54-nutzung-von-transaktionen-in-panache">5.4 Nutzung von Transaktionen in Panache</h2>
+<p>Datenbankänderungen sollten immer <strong>in Transaktionen</strong> erfolgen, damit Konsistenz und Rollbacks bei Fehlern gewährleistet sind.</p>
+<h3 id="a-automatische-transaktionen-in-quarkus"><strong>A) Automatische Transaktionen in Quarkus</strong></h3>
+<p>In Quarkus werden Datenbankoperationen standardmäßig <strong>innerhalb von Transaktionen</strong> ausgeführt, wenn sie in Methoden stehen, die mit
+<code>@Transactional</code> annotiert sind.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> io.quarkus.hibernate.orm.panache.PanacheEntity;
+<span class="hljs-keyword">import</span> javax.transaction.Transactional;
+
+<span class="hljs-meta">@ApplicationScoped</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserService</span> {
+
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">createUserWithOrder</span><span class="hljs-params">()</span> {
+        <span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>();
+        user.name = <span class="hljs-string">&quot;Tom&quot;</span>;
+        user.persist();
+
+        <span class="hljs-type">Order</span> <span class="hljs-variable">order</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Order</span>();
+        order.product = <span class="hljs-string">&quot;PC&quot;</span>;
+        order.user = user;
+        order.persist();
+        <span class="hljs-comment">// Beide Persist-Vorgänge laufen in EINER Transaktion</span>
+    }
+}
+</code></pre>
+<h3 id="b-rollback-bei-fehlern"><strong>B) Rollback bei Fehlern</strong></h3>
+<p>Wenn innerhalb einer @Transactional-Methode eine Exception auftritt, werden alle bis dahin vorgenommenen Änderungen <strong>automatisch zurückgerollt</strong>.</p>
+<hr>
+<h3 id="c-tipp-explizite-transaktionen-vermeiden"><strong>C) Tipp: Explizite Transaktionen vermeiden</strong></h3>
+<p>Vertraue dem Transaktionsmanagement von Quarkus und Panache, schreibe nur dann eigene Logik, wenn du sehr spezielle Anforderungen hast.</p>
+<hr>
+<h2 id="zusammenfassung--erweiterte-features-von-panache"><strong>Zusammenfassung – Erweiterte Features von Panache</strong></h2>
+<ul>
+<li><strong>Sortierung &amp; Paging</strong> erleichtern die Arbeit mit großen Datenmengen und machen APIs nutzerfreundlicher.</li>
+<li><strong>Optionale Rückgabewerte</strong> verhindern Fehler und machen die Codebasis robuster.</li>
+<li><strong>Beziehungen</strong> sind wie bei JPA abbildbar und werden durch Panache nicht eingeschränkt.</li>
+<li><strong>Transaktionen</strong> sorgen für konsistente Daten und sicheres Arbeiten – meist „out of the box“ durch Quarkus.</li>
+</ul>
+<hr>
+<h3 id="praxis-checkliste"><strong>Praxis-Checkliste:</strong></h3>
+<ol>
+<li>Ergebnisse nach bestimmten Kriterien sortieren, filtern und paginieren.</li>
+<li>Optional<T> verwenden, um sicher auf Einzelergebnisse zuzugreifen.</li>
+<li>Beziehungen zwischen Entitäten abbilden und testen.</li>
+<li>Transaktionen mit @Transactional absichern – Fehler sicher abfangen.</li>
+</ol>
+
+            
+            
+        </body>
+        </html>

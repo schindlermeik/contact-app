@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Moderne Ans&auml;tze &ndash; Executor Framework und Thread Pools in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-moderne-ansätze--executor-framework-und-thread-pools-in-java">Handout: Moderne Ansätze – Executor Framework und Thread Pools in Java</h1>
+<hr>
+<h2 id="71-warum-nicht-mehr-direkt-threads-erzeugen-ressourcen-skalierbarkeit">7.1 Warum nicht mehr direkt Threads erzeugen? (Ressourcen, Skalierbarkeit)</h2>
+<p><strong>Problem der direkten Thread-Erzeugung:</strong></p>
+<ul>
+<li>Jeder neue Thread braucht Speicher und Betriebssystem-Ressourcen.</li>
+<li>Viele „lose“ Threads verursachen Overhead, können zum Ressourcen-Engpass oder gar Absturz führen.</li>
+<li>Direkte Thread-Erzeugung macht Verwaltung, Beendigung und Fehlerbehandlung unübersichtlich.</li>
+<li>Schwierig, Aufgaben effizient auf CPU-Kerne zu verteilen.</li>
+</ul>
+<p><strong>Thread Pools – die Lösung:</strong></p>
+<ul>
+<li>Ein Pool von Threads wird einmalig erstellt und wiederverwendet.</li>
+<li>Aufgaben (Runnables/Callables) werden in eine Warteschlange gestellt und von freien Threads übernommen.</li>
+<li>Threads werden automatisch verwaltet, wiederverwendet und korrekt beendet.</li>
+</ul>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li><strong>Skalierbarkeit:</strong> Anzahl der gleichzeitig laufenden Threads bleibt kontrolliert.</li>
+<li><strong>Performance:</strong> Weniger Overhead, bessere Nutzung der CPU-Kerne.</li>
+<li><strong>Robustheit:</strong> Kein Thread-Leak, zentrale Fehlerbehandlung.</li>
+</ul>
+<hr>
+<h2 id="72-verwendung-von-executorservice-executorsnewfixedthreadpool-usw">7.2 Verwendung von <code>ExecutorService</code>, <code>Executors.newFixedThreadPool()</code> usw.</h2>
+<p><strong>Das Executor-Framework (seit Java 5) vereinfacht Thread-Management erheblich.</strong></p>
+<h3 id="schritt-1-thread-pool-erzeugen">Schritt 1: Thread Pool erzeugen</h3>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.concurrent.ExecutorService;
+<span class="hljs-keyword">import</span> java.util.concurrent.Executors;
+
+<span class="hljs-type">ExecutorService</span> <span class="hljs-variable">pool</span> <span class="hljs-operator">=</span> Executors.newFixedThreadPool(<span class="hljs-number">4</span>); <span class="hljs-comment">// 4 Threads im Pool</span>
+</code></pre>
+<h3 id="schritt-2-aufgaben-einreichen">Schritt 2: Aufgaben einreichen</h3>
+<pre><code class="language-java">pool.execute(() -&gt; {
+    System.out.println(<span class="hljs-string">&quot;Task läuft im Thread-Pool!&quot;</span>);
+});
+</code></pre>
+<p>Oder mit einer klassischen Runnable-Instanz:</p>
+<pre><code class="language-java"><span class="hljs-type">Runnable</span> <span class="hljs-variable">task</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyTask</span>();
+pool.execute(task);
+</code></pre>
+<h3 id="schritt-3-pool-korrekt-beenden">Schritt 3: Pool korrekt beenden</h3>
+<pre><code class="language-java">pool.shutdown(); <span class="hljs-comment">// Wartet, bis alle Aufgaben abgearbeitet sind und beendet dann die Threads</span>
+<span class="hljs-comment">// Optional: pool.shutdownNow(); um laufende Tasks sofort zu beenden</span>
+</code></pre>
+<h3 id="verschiedene-executor-typen">Verschiedene Executor-Typen:</h3>
+<ul>
+<li><strong><code>newFixedThreadPool(int n)</code>:</strong> Feste Anzahl von Threads, gut für gleichmäßige, überschaubare Last.</li>
+<li><strong><code>newCachedThreadPool()</code>:</strong> Pool mit variabler Größe, für viele kurze Aufgaben (Achtung: Gefahr zu vieler Threads!).</li>
+<li><strong><code>newSingleThreadExecutor()</code>:</strong> Nur ein Thread, Aufgaben werden sequenziell abgearbeitet.</li>
+<li><strong><code>newScheduledThreadPool(int n)</code>:</strong> Für wiederkehrende oder verzögerte Aufgaben (ähnlich Timer).</li>
+</ul>
+<hr>
+<h2 id="73-aufgabenbasierte-nebenläufigkeit-mit-callable-future">7.3 Aufgabenbasierte Nebenläufigkeit mit <code>Callable</code>, <code>Future</code></h2>
+<p><strong>Warum nicht immer Runnable?</strong></p>
+<ul>
+<li><code>Runnable</code> kann keinen Rückgabewert liefern und keine Ausnahme werfen.</li>
+</ul>
+<p><strong><code>Callable&lt;V&gt;</code>:</strong></p>
+<ul>
+<li>Wie Runnable, aber gibt einen Wert zurück und kann Exceptions werfen.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.concurrent.Callable;
+<span class="hljs-keyword">import</span> java.util.concurrent.ExecutorService;
+<span class="hljs-keyword">import</span> java.util.concurrent.Executors;
+<span class="hljs-keyword">import</span> java.util.concurrent.Future;
+
+Callable&lt;Integer&gt; task = () -&gt; {
+    <span class="hljs-comment">// Aufwändige Berechnung</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">42</span>;
+};
+
+<span class="hljs-type">ExecutorService</span> <span class="hljs-variable">pool</span> <span class="hljs-operator">=</span> Executors.newSingleThreadExecutor();
+Future&lt;Integer&gt; result = pool.submit(task);
+
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-type">Integer</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> result.get(); <span class="hljs-comment">// Wartet ggf. auf das Ergebnis</span>
+    System.out.println(<span class="hljs-string">&quot;Ergebnis: &quot;</span> + value);
+} <span class="hljs-keyword">catch</span> (Exception e) {
+    e.printStackTrace();
+}
+pool.shutdown();
+</code></pre>
+<p><strong><code>Future&lt;V&gt;</code>:</strong></p>
+<ul>
+<li>Repräsentiert ein zukünftiges Ergebnis einer asynchronen Berechnung.</li>
+<li>Mit <code>get()</code> wird auf das Ergebnis gewartet (blockierend).</li>
+</ul>
+<hr>
+<h2 id="74-übersicht-forkjoin-framework-ab-java-7-und-parallel-streams-ab-java-8">7.4 Übersicht: Fork/Join Framework (ab Java 7) und parallel Streams (ab Java 8)</h2>
+<h3 id="forkjoin-framework-ab-java-7">Fork/Join Framework (ab Java 7)</h3>
+<ul>
+<li>Für die effiziente Parallelisierung von rechenintensiven Aufgaben (Divide-and-Conquer-Prinzip).</li>
+<li>Nutzt sogenannte „Work Stealing“-Pools für maximale Ausnutzung aller Kerne.</li>
+</ul>
+<p><strong>Beispiel (vereinfachte Nutzung):</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.concurrent.RecursiveTask;
+<span class="hljs-keyword">import</span> java.util.concurrent.ForkJoinPool;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">SumTask</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">RecursiveTask</span>&lt;Integer&gt; {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span>[] arr; <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> start, end;
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">SumTask</span><span class="hljs-params">(<span class="hljs-type">int</span>[] arr, <span class="hljs-type">int</span> start, <span class="hljs-type">int</span> end)</span> { ... }
+
+    <span class="hljs-keyword">protected</span> Integer <span class="hljs-title function_">compute</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">if</span> (end - start &lt;= <span class="hljs-number">10</span>) { <span class="hljs-comment">// Kleiner Bereich: direkt berechnen</span>
+            <span class="hljs-type">int</span> <span class="hljs-variable">sum</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> start; i &lt; end; i++) sum += arr[i];
+            <span class="hljs-keyword">return</span> sum;
+        } <span class="hljs-keyword">else</span> { <span class="hljs-comment">// Großer Bereich: aufteilen</span>
+            <span class="hljs-type">int</span> <span class="hljs-variable">mid</span> <span class="hljs-operator">=</span> (start + end) / <span class="hljs-number">2</span>;
+            <span class="hljs-type">SumTask</span> <span class="hljs-variable">left</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SumTask</span>(arr, start, mid);
+            <span class="hljs-type">SumTask</span> <span class="hljs-variable">right</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SumTask</span>(arr, mid, end);
+            left.fork(); <span class="hljs-comment">// asynchron</span>
+            <span class="hljs-keyword">return</span> right.compute() + left.join();
+        }
+    }
+}
+
+<span class="hljs-type">ForkJoinPool</span> <span class="hljs-variable">pool</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ForkJoinPool</span>();
+<span class="hljs-type">int</span> <span class="hljs-variable">sum</span> <span class="hljs-operator">=</span> pool.invoke(<span class="hljs-keyword">new</span> <span class="hljs-title class_">SumTask</span>(arr, <span class="hljs-number">0</span>, arr.length));
+</code></pre>
+<h3 id="parallel-streams-ab-java-8">Parallel Streams (ab Java 8)</h3>
+<ul>
+<li>Einfache Parallelisierung von Operationen auf Collections.</li>
+<li>Intern wird ein ForkJoinPool verwendet.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.Arrays;
+
+<span class="hljs-type">int</span>[] numbers = {<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>,<span class="hljs-number">10</span>};
+<span class="hljs-type">int</span> <span class="hljs-variable">sum</span> <span class="hljs-operator">=</span> Arrays.stream(numbers)
+    .parallel()
+    .map(n -&gt; n * n)
+    .sum();
+System.out.println(<span class="hljs-string">&quot;Summe der Quadrate: &quot;</span> + sum);
+</code></pre>
+<p><strong>Hinweis:</strong></p>
+<ul>
+<li>Parallel Streams sind besonders für große Datenmengen oder rechenintensive Aufgaben sinnvoll.</li>
+<li>Achtung: Für IO-Operationen oder kleine Datenmengen können sie kontraproduktiv sein.</li>
+</ul>
+<hr>
+<h2 id="reflexionsfragen">Reflexionsfragen</h2>
+<ol>
+<li>Warum ist die direkte Erzeugung vieler Threads problematisch?</li>
+<li>Wie sorgt ein Thread Pool für bessere Ressourcenverwaltung?</li>
+<li>Was ist der Unterschied zwischen <code>Runnable</code> und <code>Callable</code>?</li>
+<li>In welchem Szenario ist das Fork/Join Framework besonders nützlich?</li>
+<li>Wann sind Parallel Streams sinnvoll – und wann nicht?</li>
+</ol>
+<hr>
+<h2 id="zusammenfassung">Zusammenfassung</h2>
+<ul>
+<li>Moderne Java-Programme sollten für Multithreading bevorzugt das Executor-Framework und Thread Pools einsetzen.</li>
+<li>Sie bieten bessere Skalierbarkeit, Performance und Fehlerbehandlung als „manuelle“ Thread-Verwaltung.</li>
+<li>Aufgaben können elegant mit <code>Callable</code> und <code>Future</code> asynchron berechnet und ausgewertet werden.</li>
+<li>Für aufwändige, aufteilbare Rechenaufgaben sind Fork/Join Framework und Parallel Streams nützliche Werkzeuge.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

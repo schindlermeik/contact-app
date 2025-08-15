@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Curriculum&colon; Grundlagen von Generics und typsichere Programmierung</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h2 id="curriculum-grundlagen-von-generics-und-typsichere-programmierung">Curriculum: Grundlagen von Generics und typsichere Programmierung</h2>
+<h3 id="1-einführung-in-generics">1. Einführung in Generics</h3>
+<ul>
+<li>
+<p>Was sind Generics?</p>
+<ul>
+<li>Motivation: Warum wurden Generics in Java eingeführt?</li>
+<li>Vorteile gegenüber der Verwendung von <code>Object</code></li>
+</ul>
+</li>
+<li>
+<p>Typische Problemstellungen vor Generics (z.B. Type Casting, Laufzeitfehler)</p>
+</li>
+</ul>
+<h3 id="2-verwendung-von-generics-in-eigenen-klassen-und-interfaces">2. Verwendung von Generics in eigenen Klassen und Interfaces</h3>
+<ul>
+<li>
+<p>Generische Klassen</p>
+<ul>
+<li>Syntax: <code>class Box&lt;T&gt; { ... }</code></li>
+<li>Beispiel: Eine generische Box für verschiedene Datentypen</li>
+</ul>
+</li>
+<li>
+<p>Generische Interfaces</p>
+<ul>
+<li>Beispiel: Das Interface <code>Comparable&lt;T&gt;</code></li>
+</ul>
+</li>
+<li>
+<p>Instanziierung generischer Klassen</p>
+</li>
+</ul>
+<h3 id="3-generics-in-der-java-standardbibliothek">3. Generics in der Java-Standardbibliothek</h3>
+<ul>
+<li>
+<p>Verwendung von Generics in Collections</p>
+<ul>
+<li>Listen, Sets, Maps: <code>List&lt;String&gt;</code>, <code>Map&lt;Integer, String&gt;</code>, etc.</li>
+</ul>
+</li>
+<li>
+<p>Vorteile der Typsicherheit am Beispiel von Collections</p>
+</li>
+</ul>
+<h3 id="4-typ-parameter-und-wildcards">4. Typ-Parameter und Wildcards</h3>
+<ul>
+<li>
+<p>Typ-Parameter</p>
+<ul>
+<li>Mehrere Typ-Parameter: <code>Map&lt;K, V&gt;</code></li>
+<li>Beschränkte Typ-Parameter (Bounds): <code>class Box&lt;T extends Number&gt;</code></li>
+</ul>
+</li>
+<li>
+<p>Wildcards</p>
+<ul>
+<li>Ungebundene Wildcard: <code>&lt;?&gt;</code></li>
+<li>Gebundene Wildcards: <code>&lt;? extends Number&gt;</code>, <code>&lt;? super Integer&gt;</code></li>
+<li>Typische Anwendungsfälle</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-typische-fallstricke-und-einschränkungen-bei-generics">5. Typische Fallstricke und Einschränkungen bei Generics</h3>
+<ul>
+<li>Typ-Löschung (Type Erasure): Was bedeutet das?</li>
+<li>Keine Generics für primitive Datentypen</li>
+<li>Keine Instanziierung mit Typ-Parameter: <code>new T()</code> nicht erlaubt</li>
+<li>Keine statischen Variablen von Typ-Parametern</li>
+</ul>
+<h3 id="6-typsichere-programmierung">6. Typsichere Programmierung</h3>
+<ul>
+<li>Definition und Bedeutung der Typsicherheit</li>
+<li>Wie Generics Typsicherheit fördern</li>
+<li>Vergleich: Generics vs. „raw types“</li>
+<li>Kompilierzeit-Prüfung statt Laufzeit-Fehler</li>
+</ul>
+<h3 id="7-praktische-übungen-und-beispiele">7. Praktische Übungen und Beispiele</h3>
+<ul>
+<li>Schreiben einer eigenen generischen Klasse</li>
+<li>Verwendung von Generics in Methoden</li>
+<li>Implementierung und Einsatz von Wildcards</li>
+<li>Refactoring: Von „raw types“ zu Generics</li>
+</ul>
+<h3 id="8-best-practices-beim-einsatz-von-generics">8. Best Practices beim Einsatz von Generics</h3>
+<ul>
+<li>Lesbarkeit und Verständlichkeit verbessern</li>
+<li>Sinnvolle Namensgebung für Typ-Parameter (<code>T</code>, <code>E</code>, <code>K</code>, <code>V</code> etc.)</li>
+<li>Wann Wildcards verwenden – und wann nicht?</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

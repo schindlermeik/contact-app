@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Typische Fallstricke und Einschr&auml;nkungen bei Generics</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-typische-fallstricke-und-einschränkungen-bei-generics">Handout: Typische Fallstricke und Einschränkungen bei Generics</h1>
+<hr>
+<p>Generics machen Java deutlich typsicherer und flexibler, doch sie haben auch ihre Besonderheiten und Grenzen. In diesem Handout lernst du die wichtigsten Einschränkungen und typische Stolperfallen im Umgang mit Generics kennen.</p>
+<hr>
+<h2 id="1-typ-löschung-type-erasure-was-bedeutet-das">1. Typ-Löschung (Type Erasure): Was bedeutet das?</h2>
+<h3 id="was-ist-typ-löschung">Was ist Typ-Löschung?</h3>
+<p>Java-Generics sind eine <strong>Compile-Time-Funktion</strong>. Das heißt: Die Typinformationen der Generics existieren <strong>nur zur Übersetzungszeit</strong>.
+Nach dem Kompilieren („zur Laufzeit“) <strong>gibt es keine Informationen mehr über die konkreten Typen</strong> – sie werden gelöscht.</p>
+<p>Das nennt man <strong>Type Erasure</strong>.</p>
+<h3 id="was-bedeutet-das-konkret">Was bedeutet das konkret?</h3>
+<ul>
+<li>Der Compiler ersetzt die Typ-Parameter durch ihre Schranke (meist <code>Object</code> oder die angegebene <code>extends</code>-Klasse).</li>
+<li>Casts werden automatisch vom Compiler eingefügt.</li>
+<li><strong>Keine Typinformationen zur Laufzeit</strong>: Du kannst also zur Laufzeit z. B. nicht abfragen, ob ein <code>List&lt;String&gt;</code> oder ein <code>List&lt;Integer&gt;</code> vorliegt.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; stringList = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+List&lt;Integer&gt; intList = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+
+System.out.println(stringList.getClass() == intList.getClass()); <span class="hljs-comment">// true!</span>
+</code></pre>
+<p>Beide Listen haben zur Laufzeit exakt den gleichen Typ (<code>ArrayList</code>). Nur zur Compilezeit werden die Typschranken geprüft!</p>
+<h3 id="folge">Folge:</h3>
+<ul>
+<li>
+<p><strong>Kein instanceof mit generischem Typ möglich:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// if (list instanceof List&lt;String&gt;) { ... } // Compilerfehler!</span>
+<span class="hljs-keyword">if</span> (list <span class="hljs-keyword">instanceof</span> List) { ... } <span class="hljs-comment">// Erlaubt</span>
+</code></pre>
+</li>
+<li>
+<p><strong>Kein Zugriff auf den konkreten Typ-Parameter zur Laufzeit:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">void</span> <span class="hljs-title function_">foo</span><span class="hljs-params">(List&lt;T&gt; list)</span> {
+    <span class="hljs-comment">// if (list instanceof List&lt;String&gt;) ... // Geht nicht!</span>
+}
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="2-keine-generics-für-primitive-datentypen">2. Keine Generics für primitive Datentypen</h2>
+<p>Generics funktionieren <strong>nur mit Referenztypen</strong>, nicht mit primitiven Datentypen (<code>int</code>, <code>double</code>, <code>char</code> etc.).</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// List&lt;int&gt; list = new ArrayList&lt;&gt;(); // Compilerfehler!</span>
+List&lt;Integer&gt; list = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+list.add(<span class="hljs-number">5</span>);
+</code></pre>
+<p>Stattdessen verwendest du die <strong>Wrapper-Klassen</strong> (<code>Integer</code>, <code>Double</code>, <code>Character</code> etc.).</p>
+<p><strong>Warum?</strong>
+Weil Generics auf Objekten beruhen und Java-Collections keine primitiven Typen speichern können.</p>
+<hr>
+<h2 id="3-keine-instanziierung-mit-typ-parameter-new-t-nicht-erlaubt">3. Keine Instanziierung mit Typ-Parameter: <code>new T()</code> nicht erlaubt</h2>
+<p>Du kannst <strong>keine neuen Objekte</strong> mit einem Typparameter direkt erstellen, weil zur Laufzeit keine Typinformation mehr vorhanden ist (Type Erasure).</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span>&lt;T&gt; {
+    <span class="hljs-comment">// T obj = new T(); // Compilerfehler!</span>
+}
+</code></pre>
+<p><strong>Warum?</strong>
+Weil der Typ <code>T</code> zur Laufzeit nicht bekannt ist – der Compiler kann kein <code>new T()</code> erzeugen.</p>
+<p><strong>Workarounds:</strong></p>
+<ul>
+<li>
+<p>Übergib ein passendes Objekt oder einen Konstruktor als Argument:</p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span>&lt;T&gt; {
+    <span class="hljs-keyword">private</span> T value;
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Box</span><span class="hljs-params">(T value)</span> {
+        <span class="hljs-built_in">this</span>.value = value;
+    }
+}
+</code></pre>
+</li>
+<li>
+<p>Alternativ kann manchmal ein sogenannter <strong>Type-Token</strong> (z. B. <code>Class&lt;T&gt;</code>) genutzt werden:</p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span>&lt;T&gt; {
+    T <span class="hljs-title function_">createInstance</span><span class="hljs-params">(Class&lt;T&gt; clazz)</span> <span class="hljs-keyword">throws</span> Exception {
+        <span class="hljs-keyword">return</span> clazz.getDeclaredConstructor().newInstance();
+    }
+}
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="4-keine-statischen-variablen-von-typ-parametern">4. Keine statischen Variablen von Typ-Parametern</h2>
+<p><strong>Statische Variablen und Methoden</strong> sind <strong>klassenweit</strong> und nicht objektgebunden – Generics hingegen sind typgebunden ans Objekt. Daher kannst du keine statischen Felder oder Methoden mit Typ-Parametern direkt verwenden.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span>&lt;T&gt; {
+    <span class="hljs-comment">// private static T value; // Compilerfehler!</span>
+}
+</code></pre>
+<p><strong>Warum?</strong>
+Der Typ-Parameter <code>T</code> ist nur in Bezug auf ein bestimmtes Objekt bekannt – eine statische Variable müsste aber für alle Typen von <code>Box&lt;T&gt;</code> existieren.</p>
+<p><strong>Lösung:</strong></p>
+<ul>
+<li>
+<p>Nutze statische Variablen nur mit konkreten (nicht-generischen) Typen.</p>
+</li>
+<li>
+<p>Statische Methoden können selbst eigene Typ-Parameter haben (als Methodengenerics):</p>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Util</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;T&gt; <span class="hljs-keyword">void</span> <span class="hljs-title function_">print</span><span class="hljs-params">(T value)</span> {
+        System.out.println(value);
+    }
+}
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="5-zusammenfassung-die-wichtigsten-einschränkungen">5. Zusammenfassung: Die wichtigsten Einschränkungen</h2>
+<table>
+<thead>
+<tr>
+<th>Einschränkung</th>
+<th>Beispiel</th>
+<th>Warum?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type Erasure (Typ-Löschung)</td>
+<td>Kein <code>instanceof List&lt;String&gt;</code></td>
+<td>Typ-Info nur bei Compilezeit</td>
+</tr>
+<tr>
+<td>Keine primitiven Typen für Generics</td>
+<td>Kein <code>List&lt;int&gt;</code></td>
+<td>Collections speichern Objekte</td>
+</tr>
+<tr>
+<td>Kein <code>new T()</code></td>
+<td>Kein <code>T obj = new T();</code></td>
+<td>Kein Typ-Info zur Laufzeit</td>
+</tr>
+<tr>
+<td>Keine statischen Felder vom Typ <code>T</code></td>
+<td>Kein <code>static T field;</code></td>
+<td>Typ-Parameter ist objektgebunden</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="6-übungen-zum-selbststudium">6. Übungen zum Selbststudium</h2>
+<ol>
+<li>Probiere aus, zwei Listen mit unterschiedlichen Typ-Parametern zu vergleichen (<code>getClass()</code>). Was fällt dir auf?</li>
+<li>Schreibe eine generische Methode, die eine Liste beliebigen Typs ausgibt – aber keine primitiven Typen annimmt. Was passiert, wenn du es versuchst?</li>
+<li>Überlege, wie du ein Objekt vom generischen Typ erzeugen kannst, obwohl <code>new T()</code> nicht erlaubt ist.</li>
+<li>Was passiert, wenn du versuchst, eine statische Variable vom Typ-Parameter zu deklarieren?</li>
+</ol>
+<hr>
+<h2 id="7-merksätze">7. Merksätze</h2>
+<ul>
+<li><strong>Generics sind eine Compile-Time-Funktion:</strong> Nach dem Kompilieren ist der Typ weg.</li>
+<li><strong>Nur Referenztypen:</strong> Für primitive Typen nutze Wrapper-Klassen.</li>
+<li><strong>Kein <code>new T()</code> und keine statischen Variablen von Typ-Parametern:</strong> Der Typ-Parameter ist an das Objekt gebunden, nicht an die Klasse.</li>
+<li><strong>Type Erasure bedeutet:</strong> Alle generischen Typen sehen zur Laufzeit gleich aus.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

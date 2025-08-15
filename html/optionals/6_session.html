@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Optional in der Praxis</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-optional-in-der-praxis">Handout: Optional in der Praxis</h1>
+<hr>
+<h2 id="1-optionals-als-rückgabewert-von-methoden">1. Optionals als Rückgabewert von Methoden</h2>
+<p>Der <strong>wichtigste und sinnvollste Einsatz</strong> von Optional ist als Rückgabewert von Methoden, die <em>möglicherweise keinen Wert liefern</em> können.</p>
+<h3 id="vorteile">Vorteile:</h3>
+<ul>
+<li>Macht für Aufrufer <strong>sofort klar</strong>, dass der Wert fehlen kann – explizit im Methodenkopf sichtbar.</li>
+<li>Der Umgang mit dem Fehlen eines Wertes wird <strong>erzwingbar</strong> und ist keine „böse Überraschung“ mehr.</li>
+</ul>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> Optional&lt;String&gt; <span class="hljs-title function_">findeBenutzernameById</span><span class="hljs-params">(String id)</span> {
+    <span class="hljs-keyword">if</span> (datenbank.containsKey(id)) {
+        <span class="hljs-keyword">return</span> Optional.of(datenbank.get(id));
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> Optional.empty();
+    }
+}
+
+<span class="hljs-comment">// Aufrufer:</span>
+Optional&lt;String&gt; benutzername = findeBenutzernameById(<span class="hljs-string">&quot;4711&quot;</span>);
+benutzername.ifPresent(System.out::println);
+</code></pre>
+<p>Oder mit Defaultwert:</p>
+<pre><code class="language-java"><span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> findeBenutzernameById(<span class="hljs-string">&quot;4711&quot;</span>).orElse(<span class="hljs-string">&quot;unbekannt&quot;</span>);
+</code></pre>
+<hr>
+<h2 id="2-optional-als-alternative-zu-rückgabe-von-null">2. Optional als Alternative zu Rückgabe von <code>null</code></h2>
+<p><strong>Warum nicht einfach <code>null</code> zurückgeben?</strong></p>
+<ul>
+<li><code>null</code> ist <strong>unsichtbar</strong> und wird leicht vergessen → führt zu NullPointerException.</li>
+<li>Mit Optional wird das Fehlen eines Werts <strong>typisiert und dokumentiert</strong>.</li>
+<li>Der Code wird <strong>wartbarer und sicherer</strong> – zwingt zum bewussten Umgang.</li>
+</ul>
+<p><strong>Refactoring-Beispiel:</strong></p>
+<p>Vorher (unsicher):</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> String <span class="hljs-title function_">findeEmail</span><span class="hljs-params">(String name)</span> {
+    <span class="hljs-keyword">if</span> (db.contains(name)) {
+        <span class="hljs-keyword">return</span> db.getEmail(name);
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; <span class="hljs-comment">// Risiko!</span>
+    }
+}
+</code></pre>
+<p>Nachher (sicher):</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> Optional&lt;String&gt; <span class="hljs-title function_">findeEmail</span><span class="hljs-params">(String name)</span> {
+    <span class="hljs-keyword">if</span> (db.contains(name)) {
+        <span class="hljs-keyword">return</span> Optional.of(db.getEmail(name));
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> Optional.empty();
+    }
+}
+</code></pre>
+<p><strong>Jetzt ist klar:</strong>
+Der Aufrufer <em>muss</em> mit beiden Fällen rechnen und kann nicht versehentlich eine NPE auslösen.</p>
+<hr>
+<h2 id="3-optionals-als-methode-parameter-best-practice">3. Optionals als Methode-Parameter? (Best Practice!)</h2>
+<h3 id="sollte-man-optional-als-parameter-typ-in-methoden-verwenden"><strong>Sollte man Optional als Parameter-Typ in Methoden verwenden?</strong></h3>
+<p><strong>Klare Empfehlung:</strong></p>
+<blockquote>
+<p><strong>Optionals sind für Rückgabewerte gedacht, NICHT als Parameter für Methoden!</strong></p>
+</blockquote>
+<p><strong>Warum?</strong></p>
+<ul>
+<li>Es gibt keinen echten Vorteil, einen Optional als Parameter zu nutzen.</li>
+<li>Für optionale Parameter (die fehlen können), ist es besser, <em>überladene Methoden</em> oder Standardwerte zu verwenden.</li>
+<li>Die Methode selbst sollte entscheiden, wie sie mit null/fehlenden Werten umgeht und ggf. Optional zurückgeben – <strong>aber nicht erwarten</strong>.</li>
+</ul>
+<p><strong>Schlecht:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">bearbeiteBenutzer</span><span class="hljs-params">(Optional&lt;String&gt; name)</span> { ... }
+</code></pre>
+<p><strong>Besser:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">bearbeiteBenutzer</span><span class="hljs-params">(String name)</span> { ... }
+<span class="hljs-comment">// und dokumentieren, wie mit null umzugehen ist, falls möglich.</span>
+</code></pre>
+<p>Oder:</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> Optional&lt;String&gt; <span class="hljs-title function_">findeBenutzer</span><span class="hljs-params">(String id)</span> { ... }
+</code></pre>
+<hr>
+<h2 id="4-praxis-tipps">4. Praxis-Tipps</h2>
+<ul>
+<li>
+<p>Verwende Optional <strong>immer</strong> für Rückgabewerte, wenn das Ergebnis fehlen kann.</p>
+</li>
+<li>
+<p>Nutze für Parameter lieber klassische Ansätze:</p>
+<ul>
+<li>Überladene Methoden</li>
+<li>Standardparameter</li>
+<li>Eindeutige Dokumentation und ggf. NotNull-Annotationen</li>
+</ul>
+</li>
+<li>
+<p>Vermeide Optional in DTOs, Entities und bei Serialisierung – das kann zu Problemen führen.</p>
+</li>
+</ul>
+<hr>
+<h2 id="5-übungen-zum-selbststudium">5. Übungen zum Selbststudium</h2>
+<ol>
+<li>Schreibe eine Methode, die einen optionalen Wert als Rückgabewert verwendet. Teste alle Varianten des Auslesens (z. B. mit <code>ifPresent</code>, <code>orElse</code>, etc.).</li>
+<li>Refactore eine Methode, die bisher <code>null</code> zurückgibt, auf Optional.</li>
+<li>Überlege für Methoden, die mehrere optionale Eingaben bekommen könnten, wie man diese eleganter gestaltet (z. B. durch Builder-Pattern oder Überladen).</li>
+</ol>
+<hr>
+<h2 id="6-merksätze">6. Merksätze</h2>
+<ul>
+<li><strong>Optional ist für Rückgabewerte, NICHT für Parameter gedacht!</strong></li>
+<li><strong>Optional ersetzt unsichtbare null-Werte durch explizite, sichere API.</strong></li>
+<li><strong>Optional erzwingt einen bewussten Umgang mit leeren Rückgabewerten.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

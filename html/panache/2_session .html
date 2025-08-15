@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Voraussetzungen &amp; Projekt-Setup &ndash; Panache mit Quarkus und PostgreSQL</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-voraussetzungen--projekt-setup--panache-mit-quarkus-und-postgresql">Handout: Voraussetzungen &amp; Projekt-Setup – Panache mit Quarkus und PostgreSQL</h1>
+<hr>
+<h2 id="21-integration-von-panache-in-ein-maven-projekt">2.1 Integration von Panache in ein Maven-Projekt</h2>
+<p><strong>Panache</strong> ist eine Erweiterung von <strong>Quarkus</strong> und setzt auf Hibernate ORM auf. Die Einbindung erfolgt komfortabel über Maven – das verbreitetste Build- und Dependency-Management-System für Java.</p>
+<h3 id="vorgehensweise">Vorgehensweise</h3>
+<ol>
+<li>
+<p><strong>Quarkus-Projekt erstellen:</strong>
+Entweder manuell oder mit dem <a href="https://code.quarkus.io/">Quarkus Initializer</a>.</p>
+</li>
+<li>
+<p><strong>Benötigte Extensions im Maven-Projekt eintragen:</strong>
+Abhängigkeiten werden im Abschnitt <code>&lt;dependencies&gt;</code> in der <code>pom.xml</code> gepflegt.</p>
+</li>
+</ol>
+<h3 id="projektstruktur-auszug">Projektstruktur (Auszug)</h3>
+<pre><code>mein-panache-projekt/
+├── src/
+│   ├── main/
+│   │   ├── java/           // Quellcode
+│   │   └── resources/
+│   │        └── application.properties
+└── pom.xml                 // Maven-Konfigurationsdatei
+</code></pre>
+<hr>
+<h2 id="22-notwendige-abhängigkeiten-für-panache">2.2 Notwendige Abhängigkeiten für Panache</h2>
+<p>Um mit Panache, Hibernate ORM und PostgreSQL arbeiten zu können, werden folgende Maven-Dependencies benötigt:</p>
+<h3 id="beispiel-abschnitt-für-die-pomxml">Beispiel-Abschnitt für die <code>pom.xml</code>:</h3>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- Quarkus BOM für die Versionsverwaltung --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependencyManagement</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.quarkus<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>quarkus-bom<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.8.3<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span> <span class="hljs-comment">&lt;!-- Aktuelle Version prüfen! --&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">type</span>&gt;</span>pom<span class="hljs-tag">&lt;/<span class="hljs-name">type</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>import<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependencyManagement</span>&gt;</span>
+    
+    <span class="hljs-comment">&lt;!-- Quarkus Hibernate ORM mit Panache --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.quarkus<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>quarkus-hibernate-orm-panache<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+    
+    <span class="hljs-comment">&lt;!-- Quarkus JDBC-Treiber für PostgreSQL --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.quarkus<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>quarkus-jdbc-postgresql<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+    
+    <span class="hljs-comment">&lt;!-- Quarkus RESTEasy für REST-APIs (optional, aber meist gewünscht) --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.quarkus<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>quarkus-resteasy<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
+</code></pre>
+<p><strong>Hinweise:</strong></p>
+<ul>
+<li><strong>Versionsnummer:</strong> Am besten nutzt du das Quarkus-BOM (<code>quarkus-bom</code>) im <code>&lt;dependencyManagement&gt;</code>, dann entfallen explizite Versionsangaben bei den einzelnen Quarkus-Abhängigkeiten.</li>
+<li><strong>Weitere Extensions:</strong> Je nach Projekt können weitere Extensions hinzugefügt werden (z. B. <code>quarkus-resteasy-jackson</code> für JSON-Support).</li>
+<li><strong>Dependency-Updates:</strong> Prüfe aktuelle Versionen und kompatible Erweiterungen im <a href="https://code.quarkus.io/?extension-search=panache">Quarkus Extension Catalog</a>.</li>
+</ul>
+<hr>
+<h2 id="23-datenbankanbindung-und-konfiguration-beispiel-postgresql">2.3 Datenbankanbindung und Konfiguration (Beispiel: PostgreSQL)</h2>
+<h3 id="datenbank-vorbereiten">Datenbank vorbereiten</h3>
+<ul>
+<li>
+<p>Installiere PostgreSQL lokal (z. B. per <a href="https://www.postgresql.org/download/">offizieller Downloadseite</a>) oder nutze einen bestehenden Server.</p>
+</li>
+<li>
+<p>Lege eine Datenbank und einen Benutzer mit Passwort an:</p>
+<pre><code class="language-sql"><span class="hljs-keyword">CREATE</span> DATABASE panache_demo;
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">USER</span> panache_user <span class="hljs-keyword">WITH</span> ENCRYPTED PASSWORD <span class="hljs-string">&#x27;geheimespasswort&#x27;</span>;
+<span class="hljs-keyword">GRANT</span> <span class="hljs-keyword">ALL</span> PRIVILEGES <span class="hljs-keyword">ON</span> DATABASE panache_demo <span class="hljs-keyword">TO</span> panache_user;
+</code></pre>
+</li>
+</ul>
+<h3 id="konfiguration-in-quarkus">Konfiguration in Quarkus</h3>
+<p>Die zentrale Konfigurationsdatei bei Quarkus ist die
+<code>src/main/resources/application.properties</code>.</p>
+<p><strong>Beispielkonfiguration für PostgreSQL mit Panache:</strong></p>
+<pre><code class="language-properties"><span class="hljs-comment"># JDBC-URL zur Datenbank (Host, Port, DB-Name)</span>
+<span class="hljs-attr">quarkus.datasource.db-kind</span>=<span class="hljs-string">postgresql</span>
+<span class="hljs-attr">quarkus.datasource.username</span>=<span class="hljs-string">panache_user</span>
+<span class="hljs-attr">quarkus.datasource.password</span>=<span class="hljs-string">geheimespasswort</span>
+<span class="hljs-attr">quarkus.datasource.jdbc.url</span>=<span class="hljs-string">jdbc:postgresql://localhost:5432/panache_demo</span>
+<span class="hljs-comment">
+# Hibernate DDL-Strategie (z. B. drop-and-create, update, validate)</span>
+<span class="hljs-attr">quarkus.hibernate-orm.database.generation</span>=<span class="hljs-string">drop-and-create</span>
+<span class="hljs-comment">
+# Panache-Spezifisch: Optional Logging für SQL-Befehle</span>
+<span class="hljs-attr">quarkus.hibernate-orm.log.sql</span>=<span class="hljs-string">true</span>
+</code></pre>
+<p><strong>Hinweise:</strong></p>
+<ul>
+<li>Die Einstellungen sollten <em>nicht</em> für Produktionsdatenbanken verwendet werden (<code>drop-and-create</code> löscht die Tabellen bei jedem Start!).</li>
+<li>Für die Entwicklung ist das automatische Schema-Management praktisch, kann aber zu Datenverlust führen, wenn nicht vorsichtig eingesetzt.</li>
+<li>Die Zugangsdaten können auch über Umgebungsvariablen oder externe Konfigurationsmechanismen gesetzt werden (siehe <a href="https://quarkus.io/guides/config-reference">Quarkus Configuration Reference</a>).</li>
+</ul>
+<h3 id="optional-docker-setup-für-postgresql">(Optional) Docker-Setup für PostgreSQL</h3>
+<p>Du kannst eine lokale PostgreSQL-Datenbank auch schnell mit Docker starten:</p>
+<pre><code class="language-bash">docker run --name postgres-panache -e POSTGRES_DB=panache_demo \
+    -e POSTGRES_USER=panache_user -e POSTGRES_PASSWORD=geheimespasswort \
+    -p 5432:5432 -d postgres:16
+</code></pre>
+<p>Damit hast du sofort eine lauffähige Datenbank für Quarkus &amp; Panache zur Verfügung.</p>
+<hr>
+<h2 id="kurze-schritt-für-schritt-checkliste">Kurze Schritt-für-Schritt-Checkliste</h2>
+<ol>
+<li><strong>Neues Maven-Projekt anlegen (z. B. per Quarkus Initializer).</strong></li>
+<li><strong>Notwendige Dependencies (<code>quarkus-hibernate-orm-panache</code>, <code>quarkus-jdbc-postgresql</code>) ergänzen.</strong></li>
+<li><strong>PostgreSQL-Datenbank &amp; Benutzer vorbereiten (lokal oder Docker).</strong></li>
+<li><strong><code>application.properties</code> passend konfigurieren.</strong></li>
+<li><strong>Projekt bauen und ersten Test starten (<code>./mvnw quarkus:dev</code>).</strong></li>
+</ol>
+<hr>
+<h2 id="weiterführende-links">Weiterführende Links</h2>
+<ul>
+<li>
+<p><a href="https://quarkus.io/guides/hibernate-orm-panache">Quarkus Panache Guide (offiziell)</a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/getting-started">Quarkus: Getting Started</a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/config-reference">Quarkus Configuration Reference</a></p>
+</li>
+<li>
+<p><a href="https://hub.docker.com/_/postgres">PostgreSQL Docker Hub</a></p>
+</li>
+<li></li>
+</ul>
+
+            
+            
+        </body>
+        </html>

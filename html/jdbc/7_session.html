@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praktische &Uuml;bung&lpar;en&rpar;&colon; Erstellung einer CRUD-Anwendung</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praktische-übungen-erstellung-einer-crud-anwendung">Handout: Praktische Übung(en): Erstellung einer CRUD-Anwendung</h1>
+<p>In dieser Übung wirst du ein kleines Java-Konsolenprogramm entwickeln, das die <strong>vollständigen CRUD-Operationen</strong> (Create, Read, Update, Delete) für eine Datenbanktabelle implementiert. Wir werden die zuvor besprochenen Best Practices wie <code>PreparedStatement</code>, das <strong>DAO-Pattern</strong> und Fehlerbehandlung anwenden.</p>
+<h2 id="71-aufbau-eines-kleinen-java-programms-für-vollständige-crud-operationen">7.1 Aufbau eines kleinen Java-Programms für vollständige CRUD-Operationen</h2>
+<p>Unser Ziel ist es, eine einfache Anwendung zu schreiben, die Benutzer in einer Datenbank verwalten kann.</p>
+<h3 id="schritt-1-datenbank-und-tabelle-vorbereiten">Schritt 1: Datenbank und Tabelle vorbereiten</h3>
+<p>Bevor du mit dem Java-Code startest, musst du eine Datenbank und eine Tabelle erstellen. Du kannst die folgenden SQL-Befehle in deinem Datenbank-Client (z.B. DBeaver, MySQL Workbench) ausführen.</p>
+<pre><code class="language-sql"><span class="hljs-comment">-- Datenbank erstellen</span>
+<span class="hljs-keyword">CREATE</span> DATABASE IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> crud_db;
+
+<span class="hljs-comment">-- Datenbank auswählen</span>
+USE crud_db;
+
+<span class="hljs-comment">-- Tabelle erstellen</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> <span class="hljs-keyword">user</span> (
+    id <span class="hljs-type">INT</span> AUTO_INCREMENT <span class="hljs-keyword">PRIMARY</span> KEY,
+    name <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+    email <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>
+);
+</code></pre>
+<h3 id="schritt-2-projektstruktur-und-abhängigkeiten-einrichten">Schritt 2: Projektstruktur und Abhängigkeiten einrichten</h3>
+<p>Erstelle ein neues Java-Projekt in deiner IDE (z.B. IntelliJ IDEA oder Eclipse). Du benötigst einen JDBC-Treiber für deine Datenbank. Wenn du Maven verwendest, füge die entsprechende Abhängigkeit in deine <code>pom.xml</code> ein:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>mysql<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mysql-connector-java<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>8.0.28<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
+</code></pre>
+<p>Wenn du Maven nicht verwendest, lade die JAR-Datei des Treibers herunter und füge sie deinem Projekt-Build-Pfad manuell hinzu.</p>
+<h3 id="schritt-3-das-dao-pattern-implementieren">Schritt 3: Das DAO-Pattern implementieren</h3>
+<p>Wir werden das DAO-Pattern anwenden, um die Datenbanklogik zu kapseln. Erstelle drei neue Java-Klassen: <code>User</code>, <code>UserDao</code> und <code>UserDaoImpl</code>.</p>
+<h4 id="die-entity-klasse-userjava">Die Entity-Klasse <code>User.java</code></h4>
+<p>Diese Klasse repräsentiert einen Datensatz aus unserer <code>user</code>-Tabelle.</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> id;
+    <span class="hljs-keyword">private</span> String name;
+    <span class="hljs-keyword">private</span> String email;
+
+    <span class="hljs-comment">// Konstruktor zum Erstellen eines neuen Users</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">User</span><span class="hljs-params">(String name, String email)</span> {
+        <span class="hljs-built_in">this</span>.name = name;
+        <span class="hljs-built_in">this</span>.email = email;
+    }
+    
+    <span class="hljs-comment">// Konstruktor zum Laden eines Users aus der Datenbank</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">User</span><span class="hljs-params">(<span class="hljs-type">int</span> id, String name, String email)</span> {
+        <span class="hljs-built_in">this</span>.id = id;
+        <span class="hljs-built_in">this</span>.name = name;
+        <span class="hljs-built_in">this</span>.email = email;
+    }
+
+    <span class="hljs-comment">// Getter und Setter</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getId</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> id; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setId</span><span class="hljs-params">(<span class="hljs-type">int</span> id)</span> { <span class="hljs-built_in">this</span>.id = id; }
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getName</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> name; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setName</span><span class="hljs-params">(String name)</span> { <span class="hljs-built_in">this</span>.name = name; }
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getEmail</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> email; }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setEmail</span><span class="hljs-params">(String email)</span> { <span class="hljs-built_in">this</span>.email = email; }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;User{&quot;</span> + <span class="hljs-string">&quot;id=&quot;</span> + id + <span class="hljs-string">&quot;, name=&#x27;&quot;</span> + name + <span class="hljs-string">&quot;&#x27;, email=&#x27;&quot;</span> + email + <span class="hljs-string">&quot;&#x27;}&quot;</span>;
+    }
+}
+</code></pre>
+<h4 id="das-dao-interface-userdaojava">Das DAO-Interface <code>UserDao.java</code></h4>
+<p>Dieses Interface definiert die CRUD-Methoden.</p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.List;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">UserDao</span> {
+    User <span class="hljs-title function_">findById</span><span class="hljs-params">(<span class="hljs-type">int</span> id)</span>;
+    List&lt;User&gt; <span class="hljs-title function_">findAll</span><span class="hljs-params">()</span>;
+    <span class="hljs-type">boolean</span> <span class="hljs-title function_">save</span><span class="hljs-params">(User user)</span>;
+    <span class="hljs-type">boolean</span> <span class="hljs-title function_">update</span><span class="hljs-params">(User user)</span>;
+    <span class="hljs-type">boolean</span> <span class="hljs-title function_">delete</span><span class="hljs-params">(<span class="hljs-type">int</span> id)</span>;
+}
+</code></pre>
+<h4 id="die-dao-implementierung-userdaoimpljava">Die DAO-Implementierung <code>UserDaoImpl.java</code></h4>
+<p>Hier schreibst du die eigentliche JDBC-Logik. Achte auf die korrekte Verwendung von <code>PreparedStatement</code> und <code>try-with-resources</code>.</p>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.sql.*;
+<span class="hljs-keyword">import</span> java.util.ArrayList;
+<span class="hljs-keyword">import</span> java.util.List;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserDaoImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">UserDao</span> {
+
+    <span class="hljs-keyword">private</span> Connection <span class="hljs-title function_">getConnection</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> SQLException {
+        <span class="hljs-keyword">return</span> DriverManager.getConnection(<span class="hljs-string">&quot;jdbc:mysql://localhost:3306/crud_db&quot;</span>, <span class="hljs-string">&quot;benutzer&quot;</span>, <span class="hljs-string">&quot;passwort&quot;</span>);
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> User <span class="hljs-title function_">findById</span><span class="hljs-params">(<span class="hljs-type">int</span> id)</span> {
+        <span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;SELECT id, name, email FROM user WHERE id = ?&quot;</span>;
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> getConnection();
+             <span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">ps</span> <span class="hljs-operator">=</span> conn.prepareStatement(sql)) {
+            
+            ps.setInt(<span class="hljs-number">1</span>, id);
+            <span class="hljs-keyword">try</span> (<span class="hljs-type">ResultSet</span> <span class="hljs-variable">rs</span> <span class="hljs-operator">=</span> ps.executeQuery()) {
+                <span class="hljs-keyword">if</span> (rs.next()) {
+                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(rs.getInt(<span class="hljs-string">&quot;id&quot;</span>), rs.getString(<span class="hljs-string">&quot;name&quot;</span>), rs.getString(<span class="hljs-string">&quot;email&quot;</span>));
+                }
+            }
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> List&lt;User&gt; <span class="hljs-title function_">findAll</span><span class="hljs-params">()</span> {
+        List&lt;User&gt; users = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+        <span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;SELECT id, name, email FROM user&quot;</span>;
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> getConnection();
+             <span class="hljs-type">Statement</span> <span class="hljs-variable">stmt</span> <span class="hljs-operator">=</span> conn.createStatement();
+             <span class="hljs-type">ResultSet</span> <span class="hljs-variable">rs</span> <span class="hljs-operator">=</span> stmt.executeQuery(sql)) {
+            
+            <span class="hljs-keyword">while</span> (rs.next()) {
+                users.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(rs.getInt(<span class="hljs-string">&quot;id&quot;</span>), rs.getString(<span class="hljs-string">&quot;name&quot;</span>), rs.getString(<span class="hljs-string">&quot;email&quot;</span>)));
+            }
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+        <span class="hljs-keyword">return</span> users;
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">save</span><span class="hljs-params">(User user)</span> {
+        <span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;INSERT INTO user (name, email) VALUES (?, ?)&quot;</span>;
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> getConnection();
+             <span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">ps</span> <span class="hljs-operator">=</span> conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            ps.setString(<span class="hljs-number">1</span>, user.getName());
+            ps.setString(<span class="hljs-number">2</span>, user.getEmail());
+            <span class="hljs-type">int</span> <span class="hljs-variable">affectedRows</span> <span class="hljs-operator">=</span> ps.executeUpdate();
+            
+            <span class="hljs-keyword">if</span> (affectedRows &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">try</span> (<span class="hljs-type">ResultSet</span> <span class="hljs-variable">generatedKeys</span> <span class="hljs-operator">=</span> ps.getGeneratedKeys()) {
+                    <span class="hljs-keyword">if</span> (generatedKeys.next()) {
+                        user.setId(generatedKeys.getInt(<span class="hljs-number">1</span>)); <span class="hljs-comment">// Setze die generierte ID im Objekt</span>
+                    }
+                }
+                <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+            }
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">update</span><span class="hljs-params">(User user)</span> {
+        <span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;UPDATE user SET name = ?, email = ? WHERE id = ?&quot;</span>;
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> getConnection();
+             <span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">ps</span> <span class="hljs-operator">=</span> conn.prepareStatement(sql)) {
+            
+            ps.setString(<span class="hljs-number">1</span>, user.getName());
+            ps.setString(<span class="hljs-number">2</span>, user.getEmail());
+            ps.setInt(<span class="hljs-number">3</span>, user.getId());
+            <span class="hljs-type">int</span> <span class="hljs-variable">affectedRows</span> <span class="hljs-operator">=</span> ps.executeUpdate();
+            
+            <span class="hljs-keyword">return</span> affectedRows &gt; <span class="hljs-number">0</span>;
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">delete</span><span class="hljs-params">(<span class="hljs-type">int</span> id)</span> {
+        <span class="hljs-type">String</span> <span class="hljs-variable">sql</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;DELETE FROM user WHERE id = ?&quot;</span>;
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Connection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> getConnection();
+             <span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">ps</span> <span class="hljs-operator">=</span> conn.prepareStatement(sql)) {
+            
+            ps.setInt(<span class="hljs-number">1</span>, id);
+            <span class="hljs-type">int</span> <span class="hljs-variable">affectedRows</span> <span class="hljs-operator">=</span> ps.executeUpdate();
+            
+            <span class="hljs-keyword">return</span> affectedRows &gt; <span class="hljs-number">0</span>;
+        } <span class="hljs-keyword">catch</span> (SQLException e) {
+            e.printStackTrace();
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+}
+</code></pre>
+<h2 id="72-testen-der-crud-methoden-mit-beispieltabellen-zb-user-oder-produkte">7.2 Testen der CRUD-Methoden mit Beispieltabellen (z.B. User oder Produkte)</h2>
+<p>Jetzt kannst du die implementierten Methoden testen, indem du sie in einer Hauptklasse aufrufst.</p>
+<h4 id="die-hauptklasse-mainjava">Die Hauptklasse <code>Main.java</code></h4>
+<pre><code class="language-java"><span class="hljs-keyword">import</span> java.util.List;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> {
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-type">UserDao</span> <span class="hljs-variable">userDao</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UserDaoImpl</span>();
+
+        <span class="hljs-comment">// C - CREATE</span>
+        System.out.println(<span class="hljs-string">&quot;--- 1. Erstelle neue Benutzer ---&quot;</span>);
+        <span class="hljs-type">User</span> <span class="hljs-variable">user1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(<span class="hljs-string">&quot;Max Mustermann&quot;</span>, <span class="hljs-string">&quot;max@example.com&quot;</span>);
+        <span class="hljs-type">User</span> <span class="hljs-variable">user2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(<span class="hljs-string">&quot;Erika Musterfrau&quot;</span>, <span class="hljs-string">&quot;erika@example.com&quot;</span>);
+
+        userDao.save(user1);
+        userDao.save(user2);
+        System.out.println(<span class="hljs-string">&quot;Benutzer erfolgreich erstellt: &quot;</span> + user1);
+        System.out.println(<span class="hljs-string">&quot;Benutzer erfolgreich erstellt: &quot;</span> + user2);
+        
+        <span class="hljs-comment">// R - READ (Alle Benutzer auslesen)</span>
+        System.out.println(<span class="hljs-string">&quot;\n--- 2. Lese alle Benutzer ---&quot;</span>);
+        List&lt;User&gt; users = userDao.findAll();
+        users.forEach(System.out::println);
+
+        <span class="hljs-comment">// U - UPDATE</span>
+        System.out.println(<span class="hljs-string">&quot;\n--- 3. Aktualisiere einen Benutzer ---&quot;</span>);
+        <span class="hljs-keyword">if</span> (user1.getId() &gt; <span class="hljs-number">0</span>) {
+            user1.setName(<span class="hljs-string">&quot;Maximilian Mustermann&quot;</span>);
+            user1.setEmail(<span class="hljs-string">&quot;maximilian@example.com&quot;</span>);
+            <span class="hljs-type">boolean</span> <span class="hljs-variable">success</span> <span class="hljs-operator">=</span> userDao.update(user1);
+            <span class="hljs-keyword">if</span> (success) {
+                System.out.println(<span class="hljs-string">&quot;Benutzer erfolgreich aktualisiert: &quot;</span> + userDao.findById(user1.getId()));
+            }
+        }
+        
+        <span class="hljs-comment">// R - READ (Ein einzelner Benutzer auslesen)</span>
+        System.out.println(<span class="hljs-string">&quot;\n--- 4. Lese einen Benutzer per ID ---&quot;</span>);
+        <span class="hljs-type">User</span> <span class="hljs-variable">foundUser</span> <span class="hljs-operator">=</span> userDao.findById(user2.getId());
+        <span class="hljs-keyword">if</span> (foundUser != <span class="hljs-literal">null</span>) {
+            System.out.println(<span class="hljs-string">&quot;Gefundener Benutzer: &quot;</span> + foundUser);
+        }
+
+        <span class="hljs-comment">// D - DELETE</span>
+        System.out.println(<span class="hljs-string">&quot;\n--- 5. Lösche einen Benutzer ---&quot;</span>);
+        <span class="hljs-type">boolean</span> <span class="hljs-variable">success</span> <span class="hljs-operator">=</span> userDao.delete(user1.getId());
+        <span class="hljs-keyword">if</span> (success) {
+            System.out.println(<span class="hljs-string">&quot;Benutzer mit ID &quot;</span> + user1.getId() + <span class="hljs-string">&quot; erfolgreich gelöscht.&quot;</span>);
+        }
+        
+        <span class="hljs-comment">// R - READ (Überprüfung nach dem Löschen)</span>
+        System.out.println(<span class="hljs-string">&quot;\n--- 6. Überprüfe, ob Benutzer gelöscht wurde ---&quot;</span>);
+        users = userDao.findAll();
+        users.forEach(System.out::println);
+    }
+}
+</code></pre>
+<h2 id="73-erweiterung-fehlerfälle-und-transaktionen-einbauen">7.3 Erweiterung: Fehlerfälle und Transaktionen einbauen</h2>
+<p>Das bisherige Programm ist schon gut, aber es ignoriert einige Best Practices, die wir im letzten Handout besprochen haben. Erweitere das Programm, um es robuster zu machen.</p>
+<h3 id="aufgabe-1-fehlerbehandlung-verbessern">Aufgabe 1: Fehlerbehandlung verbessern</h3>
+<p>Die aktuellen Methoden geben einfach <code>e.printStackTrace()</code> aus. Eine bessere Vorgehensweise wäre, eine benutzerdefinierte Ausnahme (z.B. <code>DaoException</code>) zu definieren und diese im DAO zu werfen. Der Aufrufer (die <code>Main</code>-Klasse) könnte diese dann abfangen und angemessen darauf reagieren.</p>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// In UserDaoImpl:</span>
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-comment">// ... JDBC-Code ...</span>
+} <span class="hljs-keyword">catch</span> (SQLException e) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DaoException</span>(<span class="hljs-string">&quot;Fehler beim Einfügen des Benutzers&quot;</span>, e);
+}
+</code></pre>
+<h3 id="aufgabe-2-transaktionen-hinzufügen">Aufgabe 2: Transaktionen hinzufügen</h3>
+<p>Stell dir vor, du hast zwei DAOs, <code>UserDao</code> und <code>AddressDao</code>, und eine Methode, die beide aufruft, um einen Benutzer mit seiner Adresse zu speichern. Wenn das Speichern der Adresse fehlschlägt, darf der Benutzer nicht in der Datenbank verbleiben.</p>
+<ul>
+<li><strong>Schritt 1:</strong> Schreibe eine neue Methode in deiner <code>Main</code>-Klasse, die eine Transaktion steuert.</li>
+<li><strong>Schritt 2:</strong> Hole die <code>Connection</code> nicht direkt im DAO, sondern übergib sie als Parameter an die DAO-Methoden. Dadurch kannst du die Transaktion in der <code>Main</code>-Klasse zentral steuern.</li>
+<li><strong>Schritt 3:</strong> Deaktiviere <code>autoCommit</code>, führe die DAO-Methoden aus und rufe <code>commit()</code> oder <code>rollback()</code> in einem <code>try-catch</code>-Block auf.</li>
+</ul>
+<p><strong>Beispielhafter Code für eine Transaktionsmethode:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">saveUserWithAddress</span><span class="hljs-params">(User user, Address address)</span> {
+    <span class="hljs-type">Connection</span> <span class="hljs-variable">connection</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;
+    <span class="hljs-keyword">try</span> {
+        connection = DriverManager.getConnection(<span class="hljs-string">&quot;...&quot;</span>, <span class="hljs-string">&quot;...&quot;</span>, <span class="hljs-string">&quot;...&quot;</span>);
+        connection.setAutoCommit(<span class="hljs-literal">false</span>); <span class="hljs-comment">// Transaktion starten</span>
+        
+        <span class="hljs-comment">// ... DAO-Methoden aufrufen (die die Connection erhalten) ...</span>
+        <span class="hljs-comment">// userDao.save(connection, user);</span>
+        <span class="hljs-comment">// addressDao.save(connection, address);</span>
+        
+        connection.commit(); <span class="hljs-comment">// Bei Erfolg</span>
+    } <span class="hljs-keyword">catch</span> (SQLException e) {
+        <span class="hljs-keyword">if</span> (connection != <span class="hljs-literal">null</span>) {
+            <span class="hljs-keyword">try</span> {
+                connection.rollback(); <span class="hljs-comment">// Bei Fehler</span>
+            } <span class="hljs-keyword">catch</span> (SQLException ex) {
+                <span class="hljs-comment">// ...</span>
+            }
+        }
+    } <span class="hljs-keyword">finally</span> {
+        <span class="hljs-comment">// Verbindung schließen und AutoCommit zurücksetzen</span>
+    }
+}
+</code></pre>
+
+            
+            
+        </body>
+        </html>

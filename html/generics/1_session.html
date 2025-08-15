@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Was sind Generics&quest;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-was-sind-generics">Handout: Was sind Generics?</h1>
+<hr>
+<h2 id="1-was-sind-generics">1. Was sind Generics?</h2>
+<p><strong>Generics</strong> sind eine Sprachfunktion in Java, mit der du Klassen, Interfaces und Methoden so schreiben kannst, dass sie mit unterschiedlichen Datentypen arbeiten können – und zwar <strong>typsicher</strong>, d. h. mit Überprüfung schon zur Compile-Zeit.</p>
+<p><strong>Beispiel (ohne Generics):</strong></p>
+<pre><code class="language-java"><span class="hljs-comment">// Eine einfache Box für beliebige Objekte</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span> {
+    <span class="hljs-keyword">private</span> Object content;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setContent</span><span class="hljs-params">(Object content)</span> {
+        <span class="hljs-built_in">this</span>.content = content;
+    }
+
+    <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">getContent</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> content;
+    }
+}
+</code></pre>
+<p><strong>Nachteile:</strong></p>
+<ul>
+<li>
+<p>Beim Herausholen des Inhalts muss man casten:</p>
+<pre><code class="language-java"><span class="hljs-type">Box</span> <span class="hljs-variable">box</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>();
+box.setContent(<span class="hljs-string">&quot;Hallo Welt&quot;</span>);
+
+<span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> (String) box.getContent(); <span class="hljs-comment">// Cast notwendig!</span>
+</code></pre>
+</li>
+<li>
+<p>Fehler (z. B. ein Integer statt String) werden erst zur Laufzeit erkannt.</p>
+</li>
+</ul>
+<p><strong>Mit Generics:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Box</span>&lt;T&gt; {
+    <span class="hljs-keyword">private</span> T content;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setContent</span><span class="hljs-params">(T content)</span> {
+        <span class="hljs-built_in">this</span>.content = content;
+    }
+
+    <span class="hljs-keyword">public</span> T <span class="hljs-title function_">getContent</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> content;
+    }
+}
+</code></pre>
+<ul>
+<li>
+<p>Die Klasse ist <strong>typsicher</strong>: Du bestimmst beim Erstellen, welchen Typ die Box enthalten soll.</p>
+<pre><code class="language-java">Box&lt;String&gt; box = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Box</span>&lt;&gt;();
+box.setContent(<span class="hljs-string">&quot;Hallo Welt&quot;</span>);
+
+<span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> box.getContent(); <span class="hljs-comment">// Kein Cast nötig!</span>
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="2-motivation-warum-wurden-generics-in-java-eingeführt">2. Motivation: Warum wurden Generics in Java eingeführt?</h2>
+<p><strong>Vor Java 5</strong> gab es keine Generics. Alle „verallgemeinerten“ Klassen, wie zum Beispiel die Collections-API (<code>List</code>, <code>Map</code>, <code>Set</code>), arbeiteten mit dem Typ <code>Object</code>. Das führte zu folgenden Problemen:</p>
+<h3 id="typische-probleme">Typische Probleme:</h3>
+<ul>
+<li><strong>Fehlende Typsicherheit:</strong>
+Du konntest jeder Collection beliebige Objekte hinzufügen, aber nicht garantieren, dass alle Elemente denselben Typ haben.</li>
+<li><strong>Zwang zum Casten:</strong>
+Jedes Element musste beim Herausnehmen aus einer Collection gecastet werden.</li>
+<li><strong>Laufzeitfehler:</strong>
+Casts konnten fehlschlagen und verursachten dann zur Laufzeit einen <code>ClassCastException</code>.</li>
+<li><strong>Unübersichtlicher Code:</strong>
+Viele Casts machen Code schwer lesbar und fehleranfällig.</li>
+</ul>
+<p><strong>Motivation für Generics:</strong></p>
+<ul>
+<li><strong>Typsicherheit:</strong> Fehler werden bereits beim Kompilieren erkannt.</li>
+<li><strong>Besser lesbarer und wartbarer Code:</strong> Klarheit über verwendete Typen.</li>
+<li><strong>Vermeidung von Laufzeitfehlern:</strong> Potenziell gefährliche Casts entfallen.</li>
+</ul>
+<hr>
+<h2 id="3-vorteile-gegenüber-der-verwendung-von-object">3. Vorteile gegenüber der Verwendung von <code>Object</code></h2>
+<p><strong>Mit Generics:</strong></p>
+<ul>
+<li>Du kannst Collections und andere generische Klassen auf einen bestimmten Typ einschränken, z. B. <code>List&lt;String&gt;</code>.</li>
+<li>Der Compiler prüft, ob nur passende Typen eingefügt werden.</li>
+<li>Beim Zugriff auf Elemente ist kein Cast mehr nötig.</li>
+</ul>
+<p><strong>Beispiel – ohne Generics:</strong></p>
+<pre><code class="language-java"><span class="hljs-type">List</span> <span class="hljs-variable">names</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>();
+names.add(<span class="hljs-string">&quot;Anna&quot;</span>);
+names.add(<span class="hljs-number">123</span>); <span class="hljs-comment">// Funktioniert! Aber ist das sinnvoll?</span>
+
+<span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> (String) names.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// OK</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">another</span> <span class="hljs-operator">=</span> (String) names.get(<span class="hljs-number">1</span>); <span class="hljs-comment">// Fehler erst zur Laufzeit!</span>
+</code></pre>
+<p><strong>Beispiel – mit Generics:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; names = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+names.add(<span class="hljs-string">&quot;Anna&quot;</span>);
+names.add(<span class="hljs-number">123</span>); <span class="hljs-comment">// Fehler: Compiler meldet den Fehler sofort!</span>
+
+<span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> names.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// Kein Cast nötig</span>
+</code></pre>
+<hr>
+<h2 id="4-typische-problemstellungen-vor-generics-type-casting-laufzeitfehler">4. Typische Problemstellungen vor Generics (Type Casting, Laufzeitfehler)</h2>
+<h3 id="a-type-casting">a) <strong>Type Casting</strong></h3>
+<ul>
+<li>
+<p>Ohne Generics gibt Java nur ein <code>Object</code> zurück, du musst also casten:</p>
+<pre><code class="language-java"><span class="hljs-type">List</span> <span class="hljs-variable">list</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>();
+list.add(<span class="hljs-string">&quot;Hallo&quot;</span>);
+<span class="hljs-type">String</span> <span class="hljs-variable">s</span> <span class="hljs-operator">=</span> (String) list.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// Cast nötig</span>
+</code></pre>
+</li>
+<li>
+<p>Fügst du versehentlich einen anderen Typ ein, passiert der Fehler erst beim Cast:</p>
+<pre><code class="language-java">list.add(<span class="hljs-number">123</span>); <span class="hljs-comment">// Wird akzeptiert</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">t</span> <span class="hljs-operator">=</span> (String) list.get(<span class="hljs-number">1</span>); <span class="hljs-comment">// ClassCastException!</span>
+</code></pre>
+</li>
+</ul>
+<h3 id="b-laufzeitfehler">b) <strong>Laufzeitfehler</strong></h3>
+<ul>
+<li>Fehler werden <strong>erst zur Laufzeit</strong> entdeckt, nicht beim Kompilieren.</li>
+<li>Ein Programm, das sich kompilieren lässt, kann trotzdem abstürzen, weil der Typ nicht passt.</li>
+</ul>
+<p><strong>Konkretes Beispiel:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+    <span class="hljs-type">List</span> <span class="hljs-variable">words</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>();
+    words.add(<span class="hljs-string">&quot;Hund&quot;</span>);
+    words.add(<span class="hljs-string">&quot;Katze&quot;</span>);
+    words.add(<span class="hljs-number">42</span>); <span class="hljs-comment">// Logisch falsch, aber erlaubt!</span>
+
+    <span class="hljs-keyword">for</span> (Object obj : words) {
+        <span class="hljs-type">String</span> <span class="hljs-variable">word</span> <span class="hljs-operator">=</span> (String) obj; <span class="hljs-comment">// Beim ersten Mal OK, beim dritten Mal ClassCastException!</span>
+        System.out.println(word);
+    }
+}
+</code></pre>
+<p><strong>Ausgabe:</strong></p>
+<pre><code>Hund
+Katze
+Exception in thread &quot;main&quot; java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.String
+</code></pre>
+<h3 id="c-unübersichtlicher-und-fehleranfälliger-code">c) <strong>Unübersichtlicher und fehleranfälliger Code</strong></h3>
+<ul>
+<li>Viele Casts führen zu weniger verständlichem Code.</li>
+<li>Fehler sind schwieriger zu finden.</li>
+</ul>
+<hr>
+<h2 id="5-zusammenfassung-was-bringen-generics">5. Zusammenfassung: Was bringen Generics?</h2>
+<ul>
+<li><strong>Typsicherheit:</strong> Fehler werden früh erkannt (bei der Kompilierung).</li>
+<li><strong>Weniger Casts:</strong> Weniger Fehlerquellen und mehr Lesbarkeit.</li>
+<li><strong>Besser wartbarer Code:</strong> Klar definierte Typen.</li>
+<li><strong>Einheitliche Klassen für verschiedene Typen:</strong> Einmal geschrieben, mehrfach verwendbar.</li>
+</ul>
+<hr>
+<h2 id="6-zum-weiterarbeiten">6. Zum Weiterarbeiten</h2>
+<h3 id="aufgaben">Aufgaben:</h3>
+<ol>
+<li>Erstelle eine generische Klasse <code>Pair&lt;T, U&gt;</code>, die zwei beliebige Werte speichert.</li>
+<li>Schreibe eine Methode, die eine <code>List&lt;Integer&gt;</code> entgegennimmt und die Summe berechnet.</li>
+<li>Überlege: Welche Fehler könnten auftreten, wenn du diese Aufgabe <em>ohne</em> Generics löst?</li>
+</ol>
+<hr>
+<p><strong>Merke:</strong>
+Generics sind ein Werkzeug, das deinen Code sicherer und klarer macht. Sie helfen dir, Fehler früh zu finden und einmal geschriebenen Code für verschiedene Typen wiederzuverwenden.</p>
+
+            
+            
+        </body>
+        </html>

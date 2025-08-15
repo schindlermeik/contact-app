@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Praktische Anwendungsf&auml;lle von Lambdas</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-praktische-anwendungsfälle-von-lambdas">Handout: Praktische Anwendungsfälle von Lambdas</h1>
+<hr>
+<h2 id="1-lambdas-im-zusammenspiel-mit-collections">1. Lambdas im Zusammenspiel mit Collections</h2>
+<p>Mit Lambda-Ausdrücken lassen sich Operationen auf Collections wie Sortieren, Filtern oder Mapping besonders kompakt und ausdrucksstark schreiben.</p>
+<h3 id="a-sortieren">a) Sortieren</h3>
+<p><strong>Beispiel:</strong> Sortiere eine Liste von Strings nach Länge.</p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Christoph&quot;</span>);
+
+<span class="hljs-comment">// Mit Lambda-Ausdruck:</span>
+namen.sort((a, b) -&gt; a.length() - b.length());
+System.out.println(namen); <span class="hljs-comment">// [Anna, Bernd, Christoph]</span>
+
+<span class="hljs-comment">// Mit Methodenreferenz (Vergleich ignoriert Groß-/Kleinschreibung):</span>
+namen.sort(String::compareToIgnoreCase);
+System.out.println(namen); <span class="hljs-comment">// [Anna, Bernd, Christoph]</span>
+</code></pre>
+<hr>
+<h3 id="b-filtern">b) Filtern</h3>
+<p><strong>Beispiel:</strong> Finde alle Namen, die mit „A“ beginnen.</p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Anja&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+
+<span class="hljs-comment">// Mit Streams und Lambda:</span>
+List&lt;String&gt; gefiltert = namen.stream()
+    .filter(n -&gt; n.startsWith(<span class="hljs-string">&quot;A&quot;</span>))
+    .collect(Collectors.toList());
+
+System.out.println(gefiltert); <span class="hljs-comment">// [Anna, Anja]</span>
+</code></pre>
+<hr>
+<h3 id="c-mapping">c) Mapping</h3>
+<p><strong>Beispiel:</strong> Wandle alle Namen in Großbuchstaben um.</p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+
+List&lt;String&gt; upper = namen.stream()
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+
+System.out.println(upper); <span class="hljs-comment">// [ANNA, BERND, CLARA]</span>
+</code></pre>
+<hr>
+<h2 id="2-lambdas-und-streams-api-zb-map-filter-reduce">2. Lambdas und Streams-API (z. B. <code>map</code>, <code>filter</code>, <code>reduce</code>)</h2>
+<p>Die <strong>Streams-API</strong> (seit Java 8) kombiniert die funktionale Arbeitsweise mit leistungsfähigen Datenoperationen.</p>
+<h3 id="a-map--transformation-jedes-elements">a) <code>map</code> – Transformation jedes Elements</h3>
+<pre><code class="language-java">List&lt;Integer&gt; zahlen = Arrays.asList(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>);
+
+List&lt;Integer&gt; quadriert = zahlen.stream()
+    .map(x -&gt; x * x)
+    .collect(Collectors.toList());
+
+System.out.println(quadriert); <span class="hljs-comment">// [1, 4, 9]</span>
+</code></pre>
+<hr>
+<h3 id="b-filter--auswahl-bestimmter-elemente">b) <code>filter</code> – Auswahl bestimmter Elemente</h3>
+<pre><code class="language-java">List&lt;Integer&gt; zahlen = Arrays.asList(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>);
+
+List&lt;Integer&gt; gerade = zahlen.stream()
+    .filter(x -&gt; x % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>)
+    .collect(Collectors.toList());
+
+System.out.println(gerade); <span class="hljs-comment">// [2, 4]</span>
+</code></pre>
+<hr>
+<h3 id="c-reduce--aggregationreduktion-der-elemente">c) <code>reduce</code> – Aggregation/Reduktion der Elemente</h3>
+<p><strong>Beispiel:</strong> Summiere alle Zahlen in einer Liste.</p>
+<pre><code class="language-java">List&lt;Integer&gt; zahlen = Arrays.asList(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>);
+
+<span class="hljs-type">int</span> <span class="hljs-variable">summe</span> <span class="hljs-operator">=</span> zahlen.stream()
+    .reduce(<span class="hljs-number">0</span>, (a, b) -&gt; a + b); <span class="hljs-comment">// Startwert: 0</span>
+
+System.out.println(summe); <span class="hljs-comment">// 10</span>
+</code></pre>
+<hr>
+<h2 id="3-eigene-methoden-die-functional-interfaces-als-parameter-nutzen">3. Eigene Methoden, die Functional Interfaces als Parameter nutzen</h2>
+<p>Du kannst Methoden schreiben, die ein Functional Interface als Argument akzeptieren – zum Beispiel, um flexibles Verhalten zu ermöglichen.</p>
+<p><strong>Beispiel:</strong>
+Schreibe eine Methode, die eine Liste von Strings und ein <code>Predicate&lt;String&gt;</code> erhält und alle passenden Strings ausgibt.</p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">filterUndAusgeben</span><span class="hljs-params">(List&lt;String&gt; daten, Predicate&lt;String&gt; kriterium)</span> {
+    <span class="hljs-keyword">for</span> (String s : daten) {
+        <span class="hljs-keyword">if</span> (kriterium.test(s)) {
+            System.out.println(s);
+        }
+    }
+}
+
+<span class="hljs-comment">// Verwendung:</span>
+List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Anja&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+filterUndAusgeben(namen, s -&gt; s.length() &gt; <span class="hljs-number">4</span>); <span class="hljs-comment">// Gibt nur &quot;Bernd&quot; und &quot;Clara&quot; aus</span>
+</code></pre>
+<p><strong>Noch kompakter mit Streams:</strong></p>
+<pre><code class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">filterUndAusgeben</span><span class="hljs-params">(List&lt;String&gt; daten, Predicate&lt;String&gt; kriterium)</span> {
+    daten.stream().filter(kriterium).forEach(System.out::println);
+}
+</code></pre>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>Sortiere eine Liste von Zahlen absteigend mit einem Lambda-Ausdruck.</li>
+<li>Filtere aus einer Liste von Strings alle, die länger als fünf Zeichen sind.</li>
+<li>Verwende <code>map</code>, um die Längen aller Wörter in einer Liste als neue Liste zu erzeugen.</li>
+<li>Schreibe eine eigene Methode, die als Parameter ein <code>Function&lt;Integer, Integer&gt;</code>-Interface bekommt und eine Liste von Zahlen damit transformiert.</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li>Lambdas machen typische Operationen auf Collections und Streams <strong>kurz und lesbar</strong>.</li>
+<li>Streams ermöglichen das <strong>Verketteln</strong> von Operationen wie <code>filter</code>, <code>map</code>, <code>reduce</code>.</li>
+<li>Mit eigenen Methoden, die Functional Interfaces akzeptieren, wird dein Code <strong>modular und flexibel</strong>.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

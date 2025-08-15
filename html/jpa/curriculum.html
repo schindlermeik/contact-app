@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Einf&uuml;hrung in JPA &lpar;Java Persistence API&rpar; &ndash; Curriculum</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h2 id="einführung-in-jpa-java-persistence-api--curriculum">Einführung in JPA (Java Persistence API) – Curriculum</h2>
+<h3 id="1-grundverständnis-jpa">1. Grundverständnis JPA</h3>
+<ul>
+<li>1.1 Was ist JPA? – Ziel und Motivation</li>
+<li>1.2 Abgrenzung: JPA vs. JDBC vs. Hibernate</li>
+<li>1.3 Typische Anwendungsfälle von JPA</li>
+</ul>
+<h3 id="2-architektur-und-kernkonzepte-von-jpa">2. Architektur und Kernkonzepte von JPA</h3>
+<ul>
+<li>2.1 Entity, EntityManager, Persistence Context</li>
+<li>2.2 Die Rolle der Persistence Unit (<code>persistence.xml</code>)</li>
+<li>2.3 Lebenszyklus von Entities</li>
+</ul>
+<h3 id="3-konfiguration-von-jpa">3. Konfiguration von JPA</h3>
+<ul>
+<li>3.1 Integration von JPA in ein Maven-Projekt (inkl. Abhängigkeiten)</li>
+<li>3.2 Konfiguration der Datenquelle (Postgres als Beispiel)</li>
+<li>3.3 Aufbau und Inhalt der <code>persistence.xml</code></li>
+</ul>
+<h3 id="4-mapping-von-java-klassen-auf-datenbanktabellen-orm-grundlagen">4. Mapping von Java-Klassen auf Datenbanktabellen (ORM-Grundlagen)</h3>
+<ul>
+<li>
+<p>4.1 Entities und Annotationen (<code>@Entity</code>, <code>@Id</code>, etc.)</p>
+</li>
+<li>
+<p>4.2 Attribut-Mapping (<code>@Column</code>, Datentypen, Constraints)</p>
+</li>
+<li>
+<p>4.3 Beziehungen zwischen Entitäten</p>
+<ul>
+<li>4.3.1 One-to-One</li>
+<li>4.3.2 One-to-Many</li>
+<li>4.3.3 Many-to-One</li>
+<li>4.3.4 Many-to-Many</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-crud-operationen-mit-jpa">5. CRUD-Operationen mit JPA</h3>
+<ul>
+<li>5.1 Erstellen (Persistieren) von Entities</li>
+<li>5.2 Lesen (Abfragen) von Entities (JPQL, Criteria API)</li>
+<li>5.3 Aktualisieren von Entities</li>
+<li>5.4 Löschen von Entities</li>
+</ul>
+<h3 id="6-abfragen-und-filtermöglichkeiten">6. Abfragen und Filtermöglichkeiten</h3>
+<ul>
+<li>6.1 Verwendung von JPQL (Java Persistence Query Language)</li>
+<li>6.2 Named Queries</li>
+<li>6.3 Criteria API (typen­sichere Abfragen)</li>
+<li>6.4 Native Queries (SQL)</li>
+</ul>
+<h3 id="7-umgang-mit-transaktionen">7. Umgang mit Transaktionen</h3>
+<ul>
+<li>7.1 Was sind Transaktionen im JPA-Kontext?</li>
+<li>7.2 Manuelles vs. automatisches Transaktionsmanagement</li>
+<li>7.3 Fehler- und Rollback-Strategien</li>
+</ul>
+<h3 id="8-erweiterte-jpa-features-überblick">8. Erweiterte JPA-Features (Überblick)</h3>
+<ul>
+<li>8.1 Caching (First-Level/Second-Level)</li>
+<li>8.2 Lazy/Eager Loading</li>
+<li>8.3 Lebenszyklus-Callbacks (z. B. <code>@PrePersist</code>, <code>@PostLoad</code>)</li>
+<li>8.4 Validierung mit Bean Validation (z. B. <code>@NotNull</code>)</li>
+</ul>
+<h3 id="9-best-practices--fallstricke">9. Best Practices &amp; Fallstricke</h3>
+<ul>
+<li>9.1 Umgang mit der Entity-Lebensdauer</li>
+<li>9.2 Performance-Tipps (Batching, Fetch-Typen)</li>
+<li>9.3 Migration von Legacy-Code zu JPA</li>
+</ul>
+<h3 id="10-praktische-übungen">10. Praktische Übung(en)</h3>
+<ul>
+<li>10.1 Schrittweiser Aufbau eines kleinen JPA-Projekts (z. B. „Userverwaltung“)</li>
+<li>10.2 Umsetzung von Beziehungen und Queries</li>
+<li>10.3 Testen von JPA-Operationen mit einer PostgreSQL-Datenbank</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

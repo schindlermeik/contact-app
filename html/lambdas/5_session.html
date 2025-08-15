@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Handout&colon; Methodenreferenzen &lpar;Method References&rpar; in Java</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="handout-methodenreferenzen-method-references-in-java">Handout: Methodenreferenzen (Method References) in Java</h1>
+<hr>
+<h2 id="1-was-sind-methodenreferenzen">1. Was sind Methodenreferenzen?</h2>
+<p><strong>Methodenreferenzen</strong> sind eine besonders kompakte und lesbare Kurzschreibweise für Lambda-Ausdrücke, die einfach eine bestehende Methode aufrufen.</p>
+<p>Statt</p>
+<pre><code class="language-java">x -&gt; Methode(x)
+</code></pre>
+<p>kannst du schreiben:</p>
+<pre><code class="language-java">Klasse::Methode
+</code></pre>
+<p>Sie können überall dort verwendet werden, wo ein Lambda-Ausdruck eine bereits existierende Methode ohne zusätzliche Logik ausführt.</p>
+<hr>
+<h2 id="2-unterschiedliche-formen-von-methodenreferenzen">2. Unterschiedliche Formen von Methodenreferenzen</h2>
+<p>Es gibt <strong>vier Formen</strong> von Methodenreferenzen in Java:</p>
+<h3 id="a-statische-methodenreferenz">a) Statische Methodenreferenz</h3>
+<p>Verweis auf eine <strong>statische</strong> Methode einer Klasse.</p>
+<p><strong>Syntax:</strong></p>
+<pre><code class="language-java">Klasse::statischeMethode
+</code></pre>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Function&lt;String, Integer&gt; parser = Integer::parseInt;
+System.out.println(parser.apply(<span class="hljs-string">&quot;123&quot;</span>)); <span class="hljs-comment">// 123</span>
+</code></pre>
+<p>Entspricht dem Lambda:</p>
+<pre><code class="language-java">s -&gt; Integer.parseInt(s)
+</code></pre>
+<hr>
+<h3 id="b-instanzmethodenreferenz-eines-beliebigen-objekts">b) Instanzmethodenreferenz eines beliebigen Objekts</h3>
+<p>Verweis auf eine <strong>Instanzmethode</strong> einer Klasse – das Objekt wird als Argument übergeben.</p>
+<p><strong>Syntax:</strong></p>
+<pre><code class="language-java">Klasse::instanzMethode
+</code></pre>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;anna&quot;</span>, <span class="hljs-string">&quot;bob&quot;</span>, <span class="hljs-string">&quot;clara&quot;</span>);
+namen.forEach(String::toUpperCase); <span class="hljs-comment">// Funktioniert so nicht direkt, aber:</span>
+namen.forEach(s -&gt; System.out.println(s.toUpperCase()));
+namen.forEach(System.out::println); <span class="hljs-comment">// Gültige Methodenreferenz</span>
+</code></pre>
+<p>Ein weiteres Beispiel für Vergleich:</p>
+<pre><code class="language-java">Comparator&lt;String&gt; cmp = String::compareToIgnoreCase;
+<span class="hljs-type">int</span> <span class="hljs-variable">ergebnis</span> <span class="hljs-operator">=</span> cmp.compare(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;anna&quot;</span>); <span class="hljs-comment">// 0</span>
+</code></pre>
+<p>Entspricht dem Lambda:</p>
+<pre><code class="language-java">(a, b) -&gt; a.compareToIgnoreCase(b)
+</code></pre>
+<hr>
+<h3 id="c-instanzmethodenreferenz-eines-bestimmten-objekts">c) Instanzmethodenreferenz eines bestimmten Objekts</h3>
+<p>Verweis auf eine Methode eines <strong>bestimmten Objekts</strong>.</p>
+<p><strong>Syntax:</strong></p>
+<pre><code class="language-java">objekt::instanzMethode
+</code></pre>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Consumer&lt;String&gt; drucker = System.out::println;
+drucker.accept(<span class="hljs-string">&quot;Hallo Welt!&quot;</span>); <span class="hljs-comment">// Gibt &quot;Hallo Welt!&quot; aus</span>
+</code></pre>
+<p>Entspricht dem Lambda:</p>
+<pre><code class="language-java">s -&gt; System.out.println(s)
+</code></pre>
+<hr>
+<h3 id="d-konstruktorreferenz">d) Konstruktorreferenz</h3>
+<p>Verweis auf einen <strong>Konstruktor</strong> – besonders praktisch bei Streams und Factory-Methoden.</p>
+<p><strong>Syntax:</strong></p>
+<pre><code class="language-java">Klasse::<span class="hljs-keyword">new</span>
+</code></pre>
+<p><strong>Beispiel:</strong></p>
+<pre><code class="language-java">Supplier&lt;List&lt;String&gt;&gt; listSupplier = ArrayList::<span class="hljs-keyword">new</span>;
+List&lt;String&gt; meineListe = listSupplier.get();
+</code></pre>
+<p>Entspricht dem Lambda:</p>
+<pre><code class="language-java">() -&gt; <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;()
+</code></pre>
+<hr>
+<h2 id="3-beispiele-und-einsatzmöglichkeiten">3. Beispiele und Einsatzmöglichkeiten</h2>
+<h3 id="a-mit-collections-und-streams">a) Mit Collections und Streams</h3>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+
+<span class="hljs-comment">// Statt:</span>
+namen.forEach(s -&gt; System.out.println(s));
+<span class="hljs-comment">// Besser:</span>
+namen.forEach(System.out::println);
+
+<span class="hljs-comment">// Umwandlung in Großbuchstaben:</span>
+List&lt;String&gt; upper = namen.stream()
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+</code></pre>
+<h3 id="b-mit-comparator">b) Mit Comparator</h3>
+<pre><code class="language-java">List&lt;String&gt; namen = Arrays.asList(<span class="hljs-string">&quot;Anna&quot;</span>, <span class="hljs-string">&quot;Bernd&quot;</span>, <span class="hljs-string">&quot;Clara&quot;</span>);
+
+<span class="hljs-comment">// Statt:</span>
+namen.sort((a, b) -&gt; a.compareToIgnoreCase(b));
+<span class="hljs-comment">// Besser:</span>
+namen.sort(String::compareToIgnoreCase);
+</code></pre>
+<h3 id="c-mit-eigenen-klassen">c) Mit eigenen Klassen</h3>
+<pre><code class="language-java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Mathe</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">verdoppeln</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> { <span class="hljs-keyword">return</span> x * <span class="hljs-number">2</span>; }
+}
+
+Function&lt;Integer, Integer&gt; func = Mathe::verdoppeln;
+System.out.println(func.apply(<span class="hljs-number">5</span>)); <span class="hljs-comment">// 10</span>
+</code></pre>
+<h3 id="d-konstruktorreferenz-in-streams">d) Konstruktorreferenz in Streams</h3>
+<pre><code class="language-java">Stream&lt;String&gt; stream = Stream.of(<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;C&quot;</span>);
+List&lt;String&gt; liste = stream.collect(Collectors.toCollection(ArrayList::<span class="hljs-keyword">new</span>));
+</code></pre>
+<hr>
+<h2 id="4-übungen-zum-selbststudium">4. Übungen zum Selbststudium</h2>
+<ol>
+<li>
+<p>Schreibe einen Lambda-Ausdruck, dann wandle ihn in eine Methodenreferenz um:</p>
+<ul>
+<li>Beispiel: <code>s -&gt; System.out.println(s)</code> ⇒ <code>System.out::println</code></li>
+</ul>
+</li>
+<li>
+<p>Sortiere eine Liste von Strings nach natürlicher Reihenfolge mit Methodenreferenz.</p>
+</li>
+<li>
+<p>Erzeuge eine neue Liste mit der Konstruktorreferenz <code>ArrayList::new</code>.</p>
+</li>
+<li>
+<p>Schreibe eine eigene statische Hilfsmethode und verwende sie als Methodenreferenz in einer Stream-Operation.</p>
+</li>
+</ol>
+<hr>
+<h2 id="5-merksätze">5. Merksätze</h2>
+<ul>
+<li>Methodenreferenzen sind <strong>noch kompakter als Lambda-Ausdrücke</strong> und erhöhen die Lesbarkeit.</li>
+<li>Es gibt vier Formen: <strong>statisch</strong>, <strong>Instanz beliebigen Objekts</strong>, <strong>Instanz eines bestimmten Objekts</strong>, <strong>Konstruktor</strong>.</li>
+<li><strong>Immer dann verwenden, wenn der Lambda-Ausdruck nur eine bestehende Methode aufruft.</strong></li>
+</ul>
+
+            
+            
+        </body>
+        </html>
