@@ -14,10 +14,18 @@ public class JPAUtil {
     public static void close() { EMF.close(); }
 
     public static void main(String[] args) {
-        EntityManager entityManager = em();
-        entityManager.close();
+        UserRepository repo = new UserRepository();
+        UserEntity user = new UserEntity("Susi Sorglos", "susi@sorglos.com");
+        UserEntity user1 = new UserEntity("Hans Sorglos", "hans@sorglos.com");
+        user = repo.save(user);
+        user1 = repo.save(user1);
+        System.out.println(repo.findByName("Susi Sorglos"));
+        System.out.println(repo.findAll());
+
         close();
     }
+
+
 }
 
 

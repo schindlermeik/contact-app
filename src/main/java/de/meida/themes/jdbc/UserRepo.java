@@ -7,13 +7,7 @@ import java.util.List;
 
 public class UserRepo {
 
-    private static Users process(ResultSet rs) throws SQLException {
-        Users user = new Users();
-        user.setId(rs.getLong("id"));
-        user.setName(rs.getString("name"));
-        user.setEmail(rs.getString("email"));
-        return user;
-    }
+
 
     public int insertUsers(List<Users> users) {
 
@@ -104,6 +98,14 @@ public class UserRepo {
         } catch (IOException e) {
             throw new RuntimeException("Fehler beim Herstellen der Datenbankverbindung.", e);
         }
+    }
+
+    private static Users process(ResultSet rs) throws SQLException {
+        Users user = new Users();
+        user.setId(rs.getLong("id"));
+        user.setName(rs.getString("name"));
+        user.setEmail(rs.getString("email"));
+        return user;
     }
 
 
