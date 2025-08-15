@@ -3,6 +3,8 @@ package de.meida.app;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 public class ContactClient {
 
     private static final Logger logger = LoggerFactory.getLogger(ContactClient.class);
@@ -32,6 +34,9 @@ public class ContactClient {
             logger.error(" irgendwas ist aufgetreten", e);
         }
         logger.info(" --- Anwendung beendet ---");
+
+        Optional<Contact> op = contactService.getById(3L);
+
 
     }
 }

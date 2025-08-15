@@ -3,6 +3,8 @@ package de.meida.app;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 
 public class ContactService {
 
@@ -30,16 +32,25 @@ public class ContactService {
     }
 
 
-    public Contact getById(Long id) {
+    public Optional<Contact> getById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("Id darf nicht null sein");
         }
         logger.info(" Suche nach kontakt mit ID: {}", id);
-        if (repository.findById(id) != null) {
-            return repository.findById(id);
-        }
+
+        Optional<Contact> optional = repository.findById(id);
+        //Contact contact = optional.get();
+
         logger.warn("Contact mit Id: {} wurde nicht gefunden", id);
-        throw new ContactNotFoundException(String.format("Contact mit Id: %s wurde nicht gefunden", id)); //ContactNotFound
+
+        return optional;
+        //return optional.orElseThrow(() -> new ContactNotFoundException("Contact mit Id nicht gefunden"))
+    }
+
+    void method(Contact opt ){
+        System.out.println("test");
     }
 
 }
+
+

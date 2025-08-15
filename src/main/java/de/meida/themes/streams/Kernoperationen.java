@@ -1,6 +1,11 @@
 package de.meida.themes.streams;
 
+import de.meida.app.Contact;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Kernoperationen {
@@ -36,6 +41,22 @@ public class Kernoperationen {
          allMatch  //bool
          neneMatch  // bool
          */
+        example();
+
+    }
+
+    public static void example() {
+
+        List<Contact> contacts = new ArrayList<>(List.of(
+                new Contact(1L, "Ada", null, null),
+                new Contact(2L, "Linus", null, null),
+                new Contact(3L, "Brendan", null, null),
+                new Contact(4L, "Ada", null, null)
+        ));
+        Map <Boolean,List<Contact>> filtered = contacts.stream()
+                //.filter(x -> x.getName().startsWith("A"))
+                .collect(Collectors.partitioningBy(x -> x.getId() <= 2) );
+        System.out.println(filtered);
 
     }
 }

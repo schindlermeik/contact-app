@@ -4,14 +4,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RepositoryImpl<T extends Base<ID>, ID> implements Repository<T, ID> {
 
-    private final List<T> entities;
+    private  List<T> entities;
     public  ID nextId ;
 
     public RepositoryImpl() {
-        entities = new ArrayList<>();
+        //entities = new ArrayList<>();
     }
 
     @Override
@@ -24,13 +25,13 @@ public class RepositoryImpl<T extends Base<ID>, ID> implements Repository<T, ID>
     }
 
     @Override
-    public T findById(ID id) {
+    public Optional<T> findById(ID id) {
         for (T entity : entities) {
             if (entity.getId().equals(id)) {
-                return entity;
+                return Optional.of(entity);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
