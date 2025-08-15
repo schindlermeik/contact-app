@@ -25,6 +25,14 @@ public class UserEntity {
     @Column(nullable=false, updatable=false)
     private Instant createdAt;
 
+    public UserEntity() {
+    }
+
+    public UserEntity(String email, String name) {
+        this.email = email;
+        this.name = name;
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();
